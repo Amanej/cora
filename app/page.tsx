@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { PhoneCall, MessageSquare, Calendar, Clock, CheckCircle, Phone } from "lucide-react"
+import { PhoneCall, MessageSquare, Calendar, Clock, CheckCircle } from "lucide-react"
 import Link from 'next/link'
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGroup, SelectLabel } from '@/components/ui/select'
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
 
 const Header = () => {
   return (
@@ -22,8 +22,8 @@ const Header = () => {
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
           Use Cases
         </Link>
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
-          Pricing
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://tally.so/r/mY4vVz">
+          Request service
         </Link>
       </nav>
     </header>
@@ -46,8 +46,10 @@ export default function LandingPage() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [useCase, setUseCase] = useState<USE_CASES>(USE_CASES.CUSTOMER_SURVEY)
   const [lang, setLang] = useState(LANG.NO)
+  const [isLoading, setIsLoading] = useState(false);
 
   const callApi = async (callNumber: string) => {
+    setIsLoading(true);
     const response = await fetch('/api/call', {
       method: 'POST',
       headers: {
@@ -56,13 +58,12 @@ export default function LandingPage() {
       body: JSON.stringify({ phoneNumber: callNumber, useCase, lang })
     })
     const data = await response.json()
-    console.log(data)
+    // console.log(data)
+    setIsLoading(false);
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // This is where you'd typically make an API call to get the AI number
-    // setAiNumber('(555) 123-4567') // Placeholder AI number
     callApi(phoneNumber)
   }
 
@@ -78,7 +79,7 @@ export default function LandingPage() {
                   AI-Powered Calling for Everyone
                 </h1>
                 <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl dark:text-gray-400">
-                  Transform your communication with our AI caller service. Personalized, efficient, and available 24/7.
+                  Transform your communication with our AI caller service. <br/> Personalized, efficient, and available 24/7. <br/> Outbound and Inbound.
                 </p>
               </div>
               <div className="flex flex-col space-y-4">
@@ -92,7 +93,7 @@ export default function LandingPage() {
                       setLang(LANG.NO)
                   }} className={useCase === USE_CASES.CUSTOMER_SERIVCE ? "bg-slate-300 text-gray-900" : ""}>📞 Customer Service</Button>
                 </div>
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 mx-auto my-6">
                   <Button onClick={() => setLang(LANG.NO)} className={lang === LANG.NO ? "bg-slate-300 text-gray-900" : ""}>🇳🇴 Norwegian</Button>
                   {useCase === USE_CASES.CUSTOMER_SURVEY &&                  
                     <Button onClick={() => {
@@ -125,12 +126,12 @@ export default function LandingPage() {
                 <form onSubmit={handleSubmit} className="flex space-x-2">
                   <Input
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder="Enter your phone number with country code"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="flex-1"
                   />
-                  <Button type="submit" variant={"secondary"}>Receive call</Button>
+                  <Button type="submit" variant={"secondary"} disabled={isLoading}>{isLoading ? "In progress..." : "Receive call"}</Button>
                 </form>
               </div>
             </div>
@@ -211,14 +212,16 @@ export default function LandingPage() {
         <p className="text-xs text-gray-500 dark:text-gray-400">
           © 2023 Cora Inc. All rights reserved.
         </p>
-        <nav className="sm:ml-auto flex gap-4 sm:gap-6">
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Terms of Service
-          </Link>
-          <Link className="text-xs hover:underline underline-offset-4" href="#">
-            Privacy
-          </Link>
-        </nav>
+        {/*         
+          <nav className="sm:ml-auto flex gap-4 sm:gap-6">
+            <Link className="text-xs hover:underline underline-offset-4" href="#">
+              Terms of Service
+            </Link>
+            <Link className="text-xs hover:underline underline-offset-4" href="#">
+              Privacy
+            </Link>
+          </nav>
+        */}
       </footer>
     </div>
   )
