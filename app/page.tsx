@@ -58,7 +58,7 @@ export default function LandingPage() {
       body: JSON.stringify({ phoneNumber: callNumber, useCase, lang })
     })
     const data = await response.json()
-    // console.log(data)
+    console.log(data)
     setIsLoading(false);
   }
 
