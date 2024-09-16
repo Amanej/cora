@@ -1,11 +1,56 @@
-const ASSISTANTS = {
-    customerSurvey: "54279e03-34ee-4269-9bb1-08262b7937b0",
-    debtCollection: "b232ce78-b5c6-4481-8f1a-06b01456918c"
+export enum useCase {
+    "CUSTOMER_SURVEY" = "CUSTOMER_SURVEY",
+    "DEBT_COLLECTION" = "DEBT_COLLECTION"
 }
-export const triggerCustomerSurveyCall = async (phoneNumberToCall: string) => {
-    const body = { 
-        assistantId: ASSISTANTS.customerSurvey, 
-        phoneNumberId: "c895bb88-d52d-40da-83e7-002883450d5e", 
+
+export enum LANG {
+    NO = "NORWEGIAN",
+    SWE = "SWEDISH",
+    ENG = "ENGLISH"
+}
+
+const NORWEGIAN_ASSISTANTS = {
+    [useCase.CUSTOMER_SURVEY]: "54279e03-34ee-4269-9bb1-08262b7937b0",
+    [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c"
+}
+
+const SWEDISH_ASSISTANTS = {
+    [useCase.CUSTOMER_SURVEY]: "7f0f9571-33ee-4bb0-bb28-c40264bfa034",
+    [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c" // Missing
+}
+
+const ENGLISH_ASSISTANTS = {
+    [useCase.CUSTOMER_SURVEY]: "30af1aba-1da6-4c58-955a-dd77a8045490",
+    [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c" // Missing
+}
+
+
+const getAssistantId = (useCase: useCase, lang: LANG) => {
+    switch (lang) {
+        case LANG.NO:
+            console.log("isNorwegian")
+            return NORWEGIAN_ASSISTANTS[useCase]
+            break;
+        case LANG.ENG:
+            console.log("isEnglish")
+            return ENGLISH_ASSISTANTS[useCase]
+            break;
+        case LANG.SWE:
+            console.log("isSwedish")
+            return SWEDISH_ASSISTANTS[useCase]
+            break;
+    }
+};
+
+export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCase: useCase, lang: LANG) => {
+    console.log("useCase, lang",useCase, lang);
+    const assistantId = getAssistantId(useCase, lang);
+    console.log("assistantId ",assistantId);
+
+    const body = {
+        assistantId: assistantId,
+
+        phoneNumberId: "c895bb88-d52d-40da-83e7-002883450d5e",
         customer: {
             numberE164CheckEnabled: true,
             number: phoneNumberToCall || "+4740568399"

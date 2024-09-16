@@ -36,10 +36,16 @@ enum USE_CASES {
  CUSTOMER_SERIVCE="CUSTOMER_SERIVCE"
 }
 
+enum LANG {
+  NO = "NORWEGIAN",
+  SWE = "SWEDISH",
+  ENG = "ENGLISH"
+}
+
 export default function LandingPage() {
   const [phoneNumber, setPhoneNumber] = useState('')
-  // const [aiNumber, setAiNumber] = useState('')
   const [useCase, setUseCase] = useState<USE_CASES>(USE_CASES.CUSTOMER_SURVEY)
+  const [lang, setLang] = useState(LANG.NO)
 
   const callApi = async (callNumber: string) => {
     const response = await fetch('/api/call', {
@@ -47,7 +53,7 @@ export default function LandingPage() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ phoneNumber: callNumber })
+      body: JSON.stringify({ phoneNumber: callNumber, useCase, lang })
     })
     const data = await response.json()
     console.log(data)
@@ -75,7 +81,19 @@ export default function LandingPage() {
                   Transform your communication with our AI caller service. Personalized, efficient, and available 24/7.
                 </p>
               </div>
-              <div className="w-full max-w-sm space-y-2 flex justify-center align-middle">
+              <div className="flex flex-col space-y-4">
+                <div className="flex space-x-4">
+                  <Button onClick={() => setUseCase(USE_CASES.CUSTOMER_SURVEY)} className={useCase === USE_CASES.CUSTOMER_SURVEY ? "bg-slate-300 text-gray-900" : ""}>❔ Customer Survey</Button>
+                  <Button onClick={() => setUseCase(USE_CASES.DEBT_COLLECTION)} className={useCase === USE_CASES.DEBT_COLLECTION ? "bg-slate-300 text-gray-900" : ""}>💰 Debt Collection</Button>
+                  <Button onClick={() => setUseCase(USE_CASES.CUSTOMER_SERIVCE)}  className={useCase === USE_CASES.CUSTOMER_SERIVCE ? "bg-slate-300 text-gray-900" : ""}>📞 Customer Service</Button>
+                </div>
+                <div className="flex space-x-4">
+                  <Button onClick={() => setLang(LANG.NO)} className={lang === LANG.NO ? "bg-slate-300 text-gray-900" : ""}>🇳🇴 Norwegian</Button>
+                  <Button onClick={() => setLang(LANG.ENG)} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}>🇺🇸 English</Button>
+                  <Button onClick={() => setLang(LANG.SWE)} className={lang === LANG.SWE ? "bg-slate-300 text-gray-900" : ""}>🇸🇪 Swedish</Button>
+                </div>
+              </div>
+              <div className="w-full max-w-sm space-y-2 justify-center align-middle hidden">
                 <p className="flex items-center pr-2">Use case </p>
                 <Select defaultValue={USE_CASES.CUSTOMER_SURVEY}>
                   <SelectTrigger className="w-[180px]">
