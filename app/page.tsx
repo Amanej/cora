@@ -11,29 +11,29 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem, SelectGr
 const Header = () => {
   return (
     <header className="px-4 lg:px-6 h-14 flex items-center">
-    <Link className="flex items-center justify-center" href="#">
-      <PhoneCall className="h-6 w-6 mr-2" />
-      <span className="font-bold">Cora</span>
-    </Link>
-    <nav className="ml-auto flex gap-4 sm:gap-6">
-      <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
-        Features
+      <Link className="flex items-center justify-center" href="#">
+        <PhoneCall className="h-6 w-6 mr-2" />
+        <span className="font-bold">Cora</span>
       </Link>
-      <Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
-        Use Cases
-      </Link>
-      <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
-        Pricing
-      </Link>
-    </nav>
-  </header>
+      <nav className="ml-auto flex gap-4 sm:gap-6">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
+          Features
+        </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
+          Use Cases
+        </Link>
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="#pricing">
+          Pricing
+        </Link>
+      </nav>
+    </header>
   )
 }
 
 enum USE_CASES {
- CUSTOMER_SURVEY="CUSTOMER_SURVEY",
- DEBT_COLLECTION="DEBT_COLLECTION",
- CUSTOMER_SERIVCE="CUSTOMER_SERIVCE"
+  CUSTOMER_SURVEY = "CUSTOMER_SURVEY",
+  DEBT_COLLECTION = "DEBT_COLLECTION",
+  CUSTOMER_SERIVCE = "CUSTOMER_SERVICE"
 }
 
 enum LANG {
@@ -84,13 +84,28 @@ export default function LandingPage() {
               <div className="flex flex-col space-y-4">
                 <div className="flex space-x-4">
                   <Button onClick={() => setUseCase(USE_CASES.CUSTOMER_SURVEY)} className={useCase === USE_CASES.CUSTOMER_SURVEY ? "bg-slate-300 text-gray-900" : ""}>❔ Customer Survey</Button>
-                  <Button onClick={() => setUseCase(USE_CASES.DEBT_COLLECTION)} className={useCase === USE_CASES.DEBT_COLLECTION ? "bg-slate-300 text-gray-900" : ""}>💰 Debt Collection</Button>
-                  <Button onClick={() => setUseCase(USE_CASES.CUSTOMER_SERIVCE)}  className={useCase === USE_CASES.CUSTOMER_SERIVCE ? "bg-slate-300 text-gray-900" : ""}>📞 Customer Service</Button>
+                  <Button onClick={() => {setUseCase(USE_CASES.DEBT_COLLECTION)
+                    setLang(LANG.NO)
+                  }} className={useCase === USE_CASES.DEBT_COLLECTION ? "bg-slate-300 text-gray-900" : ""}>💰 Debt Collection</Button>
+                  <Button onClick={() => {
+                      setUseCase(USE_CASES.CUSTOMER_SERIVCE)
+                      setLang(LANG.NO)
+                  }} className={useCase === USE_CASES.CUSTOMER_SERIVCE ? "bg-slate-300 text-gray-900" : ""}>📞 Customer Service</Button>
                 </div>
                 <div className="flex space-x-4">
                   <Button onClick={() => setLang(LANG.NO)} className={lang === LANG.NO ? "bg-slate-300 text-gray-900" : ""}>🇳🇴 Norwegian</Button>
-                  <Button onClick={() => setLang(LANG.ENG)} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}>🇺🇸 English</Button>
-                  <Button onClick={() => setLang(LANG.SWE)} className={lang === LANG.SWE ? "bg-slate-300 text-gray-900" : ""}>🇸🇪 Swedish</Button>
+                  {useCase === USE_CASES.CUSTOMER_SURVEY &&                  
+                    <Button onClick={() => {
+                        setLang(LANG.ENG);
+                        setUseCase(USE_CASES.CUSTOMER_SURVEY);
+                    }} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}>🇺🇸 English</Button>
+                  }
+                  {useCase === USE_CASES.CUSTOMER_SURVEY &&                  
+                    <Button onClick={() => {
+                      setLang(LANG.SWE)
+                      setUseCase(USE_CASES.CUSTOMER_SURVEY);
+                    }} className={lang === LANG.SWE ? "bg-slate-300 text-gray-900" : ""}>🇸🇪 Swedish</Button>
+                  }
                 </div>
               </div>
               <div className="w-full max-w-sm space-y-2 justify-center align-middle hidden">
@@ -100,9 +115,9 @@ export default function LandingPage() {
                     <SelectValue placeholder="Select a use case" />
                   </SelectTrigger>
                   <SelectContent>
-                      <SelectItem value={USE_CASES.CUSTOMER_SURVEY}>Customer Survey</SelectItem>
-                      <SelectItem value={USE_CASES.DEBT_COLLECTION}>Debt Collection</SelectItem>
-                      <SelectItem value={USE_CASES.CUSTOMER_SERIVCE}>Customer Service</SelectItem>
+                    <SelectItem value={USE_CASES.CUSTOMER_SURVEY}>Customer Survey</SelectItem>
+                    <SelectItem value={USE_CASES.DEBT_COLLECTION}>Debt Collection</SelectItem>
+                    <SelectItem value={USE_CASES.CUSTOMER_SERIVCE}>Customer Service</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
