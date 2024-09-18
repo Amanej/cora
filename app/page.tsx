@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PhoneCall, MessageSquare, Calendar, Clock, CheckCircle } from "lucide-react"
 import Link from 'next/link'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select'
+import clsx from 'clsx'
 
 const Header = () => {
   return (
@@ -22,8 +23,8 @@ const Header = () => {
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
           Use Cases
         </Link>
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
-          Request service
+        <Link className="text-sm font-medium underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
+          Request access
         </Link>
       </nav>
     </header>
@@ -67,6 +68,9 @@ export default function LandingPage() {
     callApi(phoneNumber)
   }
 
+  const isCustomerSurvey = useCase === USE_CASES.CUSTOMER_SURVEY;
+  const isDebtCollection = useCase === USE_CASES.DEBT_COLLECTION;
+  const isCustomerService = useCase === USE_CASES.CUSTOMER_SERIVCE;
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -83,30 +87,35 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-col space-y-4">
-                <div className="flex space-x-4">
-                  <Button onClick={() => setUseCase(USE_CASES.CUSTOMER_SURVEY)} className={useCase === USE_CASES.CUSTOMER_SURVEY ? "bg-slate-300 text-gray-900" : ""}>❔ Customer Survey</Button>
-                  <Button onClick={() => {setUseCase(USE_CASES.DEBT_COLLECTION)
-                    setLang(LANG.NO)
-                  }} className={useCase === USE_CASES.DEBT_COLLECTION ? "bg-slate-300 text-gray-900" : ""}>💰 Debt Collection</Button>
-                  <Button onClick={() => {
+                <div className="flex flex-col md:flex-row md:space-x-4">
+                  <button className={clsx("border border-white rounded-md p-2 mb-4", isCustomerSurvey ? "bg-gray-200 text-black" : "")} onClick={() => setUseCase(USE_CASES.CUSTOMER_SURVEY)}>❔ Customer Survey</button>
+                  <button className={clsx("border border-white rounded-md p-2 mb-4", isDebtCollection ? "bg-gray-200 text-black" : "")}
+                    onClick={() => {setUseCase(USE_CASES.DEBT_COLLECTION)
+                      setLang(LANG.NO)
+                    }}
+                  >💰 Debt Collection</button>
+                  <button className={clsx("border border-white rounded-md p-2 mb-4", isCustomerService ? "bg-gray-200 text-black" : "")}
+                    onClick={() => {
                       setUseCase(USE_CASES.CUSTOMER_SERIVCE)
                       setLang(LANG.NO)
-                  }} className={useCase === USE_CASES.CUSTOMER_SERIVCE ? "bg-slate-300 text-gray-900" : ""}>📞 Customer Service</Button>
+                  }}
+                  >📞 Customer Service</button>
                 </div>
                 <div className="flex space-x-4 mx-auto my-6">
                   <Button onClick={() => setLang(LANG.NO)} className={lang === LANG.NO ? "bg-slate-300 text-gray-900" : ""}>🇳🇴 Norwegian</Button>
-                  {useCase === USE_CASES.CUSTOMER_SURVEY &&                  
+                  
                     <Button onClick={() => {
                         setLang(LANG.ENG);
                         setUseCase(USE_CASES.CUSTOMER_SURVEY);
-                    }} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}>🇺🇸 English</Button>
-                  }
-                  {useCase === USE_CASES.CUSTOMER_SURVEY &&                  
+                    }} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}
+                      disabled={!(useCase === USE_CASES.CUSTOMER_SURVEY)}
+                    >🇺🇸 English</Button>      
                     <Button onClick={() => {
                       setLang(LANG.SWE)
                       setUseCase(USE_CASES.CUSTOMER_SURVEY);
-                    }} className={lang === LANG.SWE ? "bg-slate-300 text-gray-900" : ""}>🇸🇪 Swedish</Button>
-                  }
+                    }} 
+                    disabled={!(useCase === USE_CASES.CUSTOMER_SURVEY)}
+                    className={lang === LANG.SWE ? "bg-slate-300 text-gray-900" : ""}>🇸🇪 Swedish</Button>
                 </div>
               </div>
               <div className="w-full max-w-sm space-y-2 justify-center align-middle hidden">
