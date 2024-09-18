@@ -22,7 +22,7 @@ const Header = () => {
         <Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
           Use Cases
         </Link>
-        <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://tally.so/r/mY4vVz">
+        <Link className="text-sm font-medium hover:underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
           Request service
         </Link>
       </nav>
