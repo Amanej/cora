@@ -10,9 +10,6 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-export const description =
-  "A simple login form with email and password. The submit button says 'Sign in'."
-
 export default function LoginForm() {
   return (
     <div className="m-auto">
