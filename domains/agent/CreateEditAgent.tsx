@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { ArrowLeft, FileText, LogOut, PenSquare } from "lucide-react"
-import SideBar from '@/components/global/Sidebar'
+import SideBar, { SidebarPage } from '@/components/global/Sidebar'
 import Link from 'next/link'
 
 export default function CreateEditAgent() {
@@ -17,7 +17,7 @@ export default function CreateEditAgent() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <SideBar />
+      <SideBar  currentPage={SidebarPage.Manage} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">

@@ -1,4 +1,4 @@
-import SideBar from "@/components/global/Sidebar"
+import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -25,19 +25,19 @@ export default function CallLogs() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <SideBar />
+      <SideBar currentPage={SidebarPage.Logg} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">Logger &gt; Espen</h2>
+          <p className="text-sm font-light text-black">Logger &gt; <span className="font-bold">Espen</span></p>
           <Button variant="ghost">
             <LogOut className="mr-2 h-4 w-4" />
             Logg ut
           </Button>
         </div>
 
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
+        <div className="bg-white text-gray-900 shadow-md rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
               <TableRow>

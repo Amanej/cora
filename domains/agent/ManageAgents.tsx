@@ -3,14 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
 import { CircleIcon, LogOutIcon, PlusIcon } from "lucide-react"
-import SideBar from "@/components/global/Sidebar"
+import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 
 
 const Management = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-    <SideBar />
+    <SideBar  currentPage={SidebarPage.Manage} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
