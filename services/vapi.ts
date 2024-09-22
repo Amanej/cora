@@ -2,7 +2,8 @@ export enum useCase {
     "CUSTOMER_SURVEY" = "CUSTOMER_SURVEY",
     "DEBT_COLLECTION" = "DEBT_COLLECTION",
     "FAIR_COLLECTION" = "FAIR_COLLECTION",
-    "SVEA_FINANS" = "SVEA_FINANS"
+    "SVEA_FINANS" = "SVEA_FINANS",
+    "SELGER" = "SELGER"
 }
 
 export enum LANG {
@@ -16,21 +17,24 @@ const NORWEGIAN_ASSISTANTS = {
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c",
     [useCase.FAIR_COLLECTION]: "c9c749e0-9325-4d28-841a-0232f6d8c1db",
     CUSTOMER_SERVICE: "01624712-cdf8-4586-a9a4-f236754808f9",
-    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61"
+    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61",
+    [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d"
 }
 
 const SWEDISH_ASSISTANTS = {
     [useCase.CUSTOMER_SURVEY]: "7f0f9571-33ee-4bb0-bb28-c40264bfa034",
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.FAIR_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
-    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61" // Missing
+    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
+    [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d"
 }
 
 const ENGLISH_ASSISTANTS = {
     [useCase.CUSTOMER_SURVEY]: "30af1aba-1da6-4c58-955a-dd77a8045490",
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.FAIR_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c",
-    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61" // Missing
+    [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
+[useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d"
 }
 
 
