@@ -43,5 +43,45 @@ export const fetchAgents = async () => {
     }
 };
 
+export const deleteAgent = async (agentId: string) => {
+    try {
+        const response = await fetch(APP_CONFIG.apiUrl+'/agents/'+agentId, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete agent');
+        }
+
+        console.log('Agent deleted successfully:', agentId);
+        return true;
+    } catch (error) {
+        console.error('Error deleting agent:', error);
+    }
+};
+
+export const updateAgent = async (agentData: Partial<AgentData>) => {
+    try {
+        const response = await fetch(APP_CONFIG.apiUrl+'/agents/'+agentData._id, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({...agentData}),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update agent');
+        }
+
+        const updatedAgent = await response.json();
+        console.log('Agent updated successfully:', updatedAgent);
+    } catch (error) {
+        console.error('Error updating agent:', error);
+    }
+};
 
 

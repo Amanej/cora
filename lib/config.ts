@@ -1,5 +1,5 @@
 const APP_CONFIG = {
-    apiUrl: 'http://localhost:4000',
+    apiUrl: process.env.API_URL,
 }
 
 export default APP_CONFIG;

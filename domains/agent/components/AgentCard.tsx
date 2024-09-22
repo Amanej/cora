@@ -1,26 +1,57 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@radix-ui/react-select";
-import { CircleIcon } from "lucide-react";
-import { AgentData, AgentStatus, AgentType } from "../types";
+'use client'
+
+import { useState } from "react";
 import Link from "next/link";
 import { ROUTES } from "@/lib/routing";
+import { CircleIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@radix-ui/react-select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AgentData, AgentStatus, AgentType } from "../types";
+import { deleteAgent, updateAgent } from "../api";
+import clsx from "clsx";
 
-const AgentCard = ({ agent }: { agent: AgentData }) => {
+type AgentCardProps = {
+    agent: AgentData;
+    refreshAgents: () => void;
+}
+
+const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [isUpdating, setIsUpdating] = useState(false);
 
     const toggleAgentStatus = async (agentId: string | undefined) => {
         console.log("toggleAgentStatus", agentId);
-        /*
-                    if (isActive) {
-                        deactivateAgent(agent._id);
-                    } else {
-                        activateAgent(agent._id);
-                    }
-        */
+        setIsUpdating(true);
+        if(isUpdating) {
+            return;
+        }
+        try {
+            await updateAgent({
+                _id: agent._id,
+                status: agent.status === AgentStatus.Active ? AgentStatus.Inactive : AgentStatus.Active
+            });
+            setIsUpdating(false);
+        } catch (error) {
+            console.error("Error updating agent:", error);
+            setIsUpdating(false);
+        }
     }
 
-    const deleteAgent = async (agentId: string | undefined) => {
-        console.log("deleteAgent", agentId);
+    const callDeleteAgent = async (agentId: string) => {
+        console.log("deleteAgent called", agentId);
+        setIsDeleting(true);
+        if(isDeleting) {
+            return;
+        }
+        try {
+            await deleteAgent(agentId);
+            setIsDeleting(false);
+            refreshAgents();
+        } catch (error) {
+            console.error("Error deleting agent:", error);
+            setIsDeleting(false);
+        }
     }
 
     const showCallList = agent.type === AgentType.Outgoing;
@@ -31,14 +62,14 @@ const AgentCard = ({ agent }: { agent: AgentData }) => {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">
             <div className="flex items-center space-x-3">
-              <CircleIcon className="h-3 w-3 fill-green-500 text-green-500" />
+              <CircleIcon className={clsx("h-3 w-3", isActive ? "fill-green-500 text-green-500" : "fill-red-500 text-red-500")} />
               <span>{agent.title}</span>
             </div>
           </CardTitle>
           <p className="text-sm text-link">{agent.type}</p>
         </CardHeader>
         <CardContent>
-          <p className="text-xs text-muted-foreground">124 samtaler håndtert idag</p>
+          {/*<p className="text-xs text-muted-foreground">124 samtaler håndtert idag</p>*/}
           <Separator className="my-2" />
           <div className="flex space-x-2">
             {showCallList &&
@@ -56,10 +87,13 @@ const AgentCard = ({ agent }: { agent: AgentData }) => {
                 <Link href={ROUTES.CREATE_AGENT+"?id="+agent._id}>Rediger</Link>
             </Button>
             <Button variant="outline" size="sm"
+                disabled={isDeleting}
                 onClick={() => {
-                    deleteAgent(agent._id);
+                    if(agent._id) {
+                        callDeleteAgent(agent._id);
+                    }
                 }}
-            >Slett</Button>
+            >{isDeleting ? "Sletter..." : "Slett"}</Button>
           </div>
         </CardContent>
       </Card>
