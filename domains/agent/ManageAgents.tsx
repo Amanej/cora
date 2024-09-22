@@ -1,12 +1,33 @@
+'use client'
+
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import Link from "next/link"
 import { CircleIcon, LogOutIcon, PlusIcon } from "lucide-react"
 import SideBar, { SidebarPage } from "@/components/global/Sidebar"
+import { ROUTES } from "@/lib/routing"
+import { AgentData } from "./types"
+import { fetchAgents } from "./api"
+import AgentCard from "./components/AgentCard"
 
 
 const Management = () => {
+
+  const [agents, setAgents] = useState<AgentData[]>([]);
+
+  useEffect(() => {
+    callFetchAgents();
+  }, []);
+
+  const callFetchAgents = async () => {
+    const agents = await fetchAgents();
+    if (agents) {
+      setAgents(agents);
+    }
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -24,6 +45,9 @@ const Management = () => {
 
         {/* Agent list */}
         <div className="space-y-4">
+          {agents.map((agent) => (
+            <AgentCard key={agent._id} agent={agent} />
+          ))}
           {/* Espen */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -75,7 +99,7 @@ const Management = () => {
 
         {/* Add agent button */}
         <div className="mt-8">
-          <Link href="/create-agent" className="inline-flex items-center py-2 px-4 text-white bg-blue-500 rounded-xl font-bold">
+          <Link href={ROUTES.CREATE_AGENT} className="inline-flex items-center py-2 px-4 text-white bg-blue-500 rounded-xl font-bold">
             <PlusIcon className="mr-2 h-4 w-4" />
             Opprett agent
           </Link>

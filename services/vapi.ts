@@ -34,7 +34,7 @@ const ENGLISH_ASSISTANTS = {
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.FAIR_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c",
     [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
-[useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d"
+    [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d"
 }
 
 

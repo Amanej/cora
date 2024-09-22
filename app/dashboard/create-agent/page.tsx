@@ -1,4 +1,4 @@
-import CreateEditAgent from "@/domains/agent/CreateEditAgent";
+import CreateEditAgent from "@/domains/agent/CreateAgent/CreateEditAgent";
 
 const CreateEditAgentPage = () => {
   return (
