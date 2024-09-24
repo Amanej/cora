@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {
     try {
-        console.log("req ", req);
+        // console.log("req ", req.headers.keys());
         console.log("req ", req.url);
         const getRandomName = () => {
             const names = ['John', 'Jane', 'Doe', 'Smith'];
