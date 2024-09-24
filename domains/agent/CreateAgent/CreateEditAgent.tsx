@@ -1,9 +1,9 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, FileText, PenSquare, Trash } from "lucide-react"
-import { createAgent } from '../api'
+import { createAgent, fetchAgentById } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -16,21 +16,44 @@ import SideBar, { SidebarPage } from '@/components/global/Sidebar'
 import { ROUTES } from '@/lib/routing'
 import { DEFAULT_INSTRUCTIONS } from './constants'
 
+const defaultAgentData: AgentData = {
+  title: '',
+  phoneNumberId: '',
+  subTitle: '',
+  type: AgentType.Incoming,
+  instructions: DEFAULT_INSTRUCTIONS,
+  knowledgebase: [],
+  createdAt: new Date(),
+  status: AgentStatus.Active,
+  templateId: '',
+}
+
 export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(true) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
-  const [_agentData, setAgentData] = useState({
-    title: '',
-    phoneNumberId: '',
-    subTitle: '',
-    type: AgentType.Incoming,
-    instructions: DEFAULT_INSTRUCTIONS,
-    knowledgebase: [],
-    createdAt: new Date(),
-    status: AgentStatus.Active,
-    templateId: '',
-  });
+  const [_agentData, setAgentData] = useState(defaultAgentData);
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const fetchAgent = async (id: string) => {
+    console.log('Fetching agent with ID:', id);
+    setIsEditing(true);
+    setIsLoading(true);
+    const agent = await fetchAgentById(id as string);
+    console.log('Agent fetched:', agent);
+    if (agent) {
+      setAgentData(agent);
+    }
+    setIsLoading(false);
+  };
+  
+  useEffect(() => {
+    const searchId = searchParams.get('id')
+    if (searchId) {
+      fetchAgent(searchId);
+    }
+  }, []);
 
   const agentData: AgentData = {
     title: _agentData.title || 'Customer Service Agent',
@@ -38,7 +61,7 @@ export default function CreateEditAgent() {
     subTitle: _agentData.subTitle || 'Support Agent',
     type: _agentData.type || AgentType.Incoming,
     instructions: _agentData.instructions || 'Handle customer inquiries',
-    knowledgebase: _agentData.knowledgebase || ['FAQ', 'Troubleshooting'],
+    knowledgebase: _agentData.knowledgebase,
     createdAt: _agentData.createdAt || new Date(),
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',

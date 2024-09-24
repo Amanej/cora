@@ -1,4 +1,4 @@
-import { howMuchDoIOwe } from '@/domains/integrations/debtcollection';
+import { howMuchDoIOweInTotal } from '@/domains/integrations/debtcollection';
 import { VAPI_Payload } from '@/services/vapi/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
         console.log("info toolCalls ", info.message.toolCalls[0]);
         console.log("req ", req.url);
         const saksNr = typedInfo.message.toolCallList[0].function.arguments.caseNumber;
-        const owe = await howMuchDoIOwe(saksNr);
+        const owe = await howMuchDoIOweInTotal(saksNr);
         console.log("owe ", owe);
         const vapiResponse = {
             "results": [

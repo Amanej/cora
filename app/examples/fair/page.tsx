@@ -10,8 +10,8 @@ import clsx from 'clsx'
 
 enum USE_CASES {
   CUSTOMER_SURVEY = "CUSTOMER_SURVEY",
-  DEBT_COLLECTION = "FAIR_COLLECTION",
-  CUSTOMER_SERIVCE = "CUSTOMER_SERVICE"
+  DEBT_COLLECTION = "DEBT_COLLECTION",
+  CUSTOMER_SERIVCE = "FAIR_COLLECTION"
 }
 
 enum LANG {
@@ -81,9 +81,8 @@ export default function LandingPage() {
                   
                     <Button onClick={() => {
                         setLang(LANG.ENG);
-                        setUseCase(USE_CASES.CUSTOMER_SURVEY);
                     }} className={lang === LANG.ENG ? "bg-slate-300 text-gray-900" : ""}
-                      disabled={!(useCase === USE_CASES.CUSTOMER_SURVEY)}
+                      disabled={(useCase === USE_CASES.DEBT_COLLECTION)}
                     >🇺🇸 English</Button>      
                     <Button onClick={() => {
                       setLang(LANG.SWE)

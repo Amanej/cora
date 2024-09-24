@@ -3,7 +3,7 @@ import { AgentData } from "../types";
 
 export const createAgent = async (agentData: AgentData) => {
     try {
-        const response = await fetch(APP_CONFIG.apiUrl+'/agents', {
+        const response = await fetch(APP_CONFIG.backendUrl+'/agents', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,7 +24,9 @@ export const createAgent = async (agentData: AgentData) => {
 
 export const fetchAgents = async () => {
     try {
-        const response = await fetch(APP_CONFIG.apiUrl+'/agents', {
+        const url = APP_CONFIG.backendUrl+'/agents';
+        console.log("fetchAgents called ",url);
+        const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -43,9 +45,38 @@ export const fetchAgents = async () => {
     }
 };
 
+export const fetchAgentById = async (agentId: string): Promise<AgentData | null> => {
+    try {
+        const url = `${APP_CONFIG.backendUrl}/agents/${agentId}`;
+        console.log(`Fetching agent with ID: ${agentId}`);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.log(`Agent with ID ${agentId} not found`);
+                return null;
+            }
+            throw new Error('Failed to fetch agent');
+        }
+
+        const agent: AgentData = await response.json();
+        console.log('Agent fetched successfully:', agent);
+        return agent;
+    } catch (error) {
+        console.error('Error fetching agent:', error);
+        return null;
+    }
+};
+
+
 export const deleteAgent = async (agentId: string) => {
     try {
-        const response = await fetch(APP_CONFIG.apiUrl+'/agents/'+agentId, {
+        const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentId, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
@@ -65,7 +96,7 @@ export const deleteAgent = async (agentId: string) => {
 
 export const updateAgent = async (agentData: Partial<AgentData>) => {
     try {
-        const response = await fetch(APP_CONFIG.apiUrl+'/agents/'+agentData._id, {
+        const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentData._id, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
