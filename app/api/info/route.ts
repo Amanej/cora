@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
     try {
-        // console.log("req ", req.headers.keys());
+        console.log("req ", req.body);
         console.log("req ", req.url);
         const getRandomName = () => {
             const names = ['John', 'Jane', 'Doe', 'Smith'];
