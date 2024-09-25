@@ -1,6 +1,6 @@
 import { fetchAirtableData } from "@/services/airtable";
 
-type AvailabilityRecord = {
+export type AvailabilityRecord = {
     Date: string,
     Hour: number,
     SlotsAvailable: number,

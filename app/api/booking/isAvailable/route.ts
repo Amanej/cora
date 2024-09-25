@@ -1,4 +1,4 @@
-import { getAvailability } from '@/domains/integrations/booking';
+import { AvailabilityRecord, getAvailability } from '@/domains/integrations/booking';
 import { VAPI_Payload } from '@/services/vapi/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
         console.log("day ", day);
         const availability = await getAvailability();
         console.log("availability ", availability);
-        const wednesdayAvailability = availability.find((day: any) => day.Date === "2024-09-25");
+        const wednesdayAvailability = availability.find((day: AvailabilityRecord) => day.Date === "2024-09-25");
         console.log("wednesdayAvailability ", wednesdayAvailability);
         const formattedAvailability = availability.filter((d) => d.SlotsAvailable > 0).map((d) => d.Hour).toString();
         console.log("formattedAvailability ", formattedAvailability);
