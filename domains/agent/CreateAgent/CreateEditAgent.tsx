@@ -70,9 +70,7 @@ export default function CreateEditAgent() {
     persona: _agentData.persona || '', // Add this line
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('Submit')
+  const handleSave = async () => {
     setIsLoading(true)
     await createAgent({...agentData, knowledgebase: [{
       url: 'https://www.google.com',
@@ -83,8 +81,8 @@ export default function CreateEditAgent() {
     router.push(ROUTES.MANAGE_AGENTS);
   }
 
-  const handleTestAgent = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleTestAgent = async () => {
+    // e.preventDefault() 
     callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
   }
 
@@ -115,7 +113,7 @@ export default function CreateEditAgent() {
               className="text-3xl font-bold" />
           </CardHeader>
           <CardContent>
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
 
               <div className="space-y-2">
@@ -245,13 +243,13 @@ export default function CreateEditAgent() {
                 </div>
                 <Button variant="outline"
                   onClick={() => {
-                    callApi(testNumber, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
+                    handleTestAgent()
                   }}
                 >Test agent</Button>
-                <Button disabled={isLoading} type="submit">
+                <Button disabled={isLoading} onClick={handleSave}>
                 {isLoading ? 'Laster...' : (isEditing ? 'Lagre endringer' : 'Opprett agent')}</Button>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </main>
