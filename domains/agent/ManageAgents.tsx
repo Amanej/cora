@@ -13,6 +13,7 @@ const Management = () => {
   const [agents, setAgents] = useState<AgentData[]>([]);
 
   useEffect(() => {
+    console.log("About to fetch agents")
     callFetchAgents();
   }, []);
 

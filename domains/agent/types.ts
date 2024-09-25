@@ -17,8 +17,12 @@ export type AgentData = {
     subTitle: string,
     type: AgentType,
     instructions: string,
-    knowledgebase: string[],
+    knowledgebase: {
+        url: string,  
+        name: string
+      }[],
     createdAt: Date,
     status: AgentStatus,
     templateId: string,
+    persona: string,
   };

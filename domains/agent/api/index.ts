@@ -115,4 +115,14 @@ export const updateAgent = async (agentData: Partial<AgentData>) => {
     }
 };
 
-
+export const callApi = async (callNumber: string, useCase: string, lang: string) => {
+    const response = await fetch('/api/call', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ phoneNumber: callNumber, useCase, lang })
+    })
+    const data = await response.json()
+    return data
+}

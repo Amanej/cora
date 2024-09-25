@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, FileText, PenSquare, Trash } from "lucide-react"
-import { createAgent, fetchAgentById } from '../api'
+import { callApi, createAgent, fetchAgentById } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -18,7 +18,7 @@ import { DEFAULT_INSTRUCTIONS } from './constants'
 
 const defaultAgentData: AgentData = {
   title: '',
-  phoneNumberId: '',
+  phoneNumberId: '+4746164687',
   subTitle: '',
   type: AgentType.Incoming,
   instructions: DEFAULT_INSTRUCTIONS,
@@ -26,12 +26,14 @@ const defaultAgentData: AgentData = {
   createdAt: new Date(),
   status: AgentStatus.Active,
   templateId: '',
+  persona: '', // Add this line
 }
 
 export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(true) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
+  const [testNumber, setTestNumber] = useState(defaultAgentData.phoneNumberId)
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -65,16 +67,25 @@ export default function CreateEditAgent() {
     createdAt: _agentData.createdAt || new Date(),
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',
+    persona: _agentData.persona || '', // Add this line
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log('Submit')
     setIsLoading(true)
-    await createAgent(agentData);
+    await createAgent({...agentData, knowledgebase: [{
+      url: 'https://www.google.com',
+      name: 'Google'
+    }]});
     console.log('Agent created')
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);
+  }
+
+  const handleTestAgent = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
   }
 
   return (
@@ -93,11 +104,6 @@ export default function CreateEditAgent() {
             </Link>
             <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? "Kundeservice agenten min" : "Opprett kundeservice agent"}</p>
           </div>
-          {/*          
-            <Link href={ROUTES.MANAGE_AGENTS}>
-              <p className="text-blue-500 hover:text-blue-700">Se maler</p>
-            </Link>
-          */}
         </div>
 
         <Card>
@@ -111,6 +117,25 @@ export default function CreateEditAgent() {
           <CardContent>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
+
+              <div className="space-y-2">
+                  <Label htmlFor="persona">Persona</Label>
+                  <Select
+                    onValueChange={(value) => {
+                      setAgentData({ ..._agentData, persona: value })
+                    }}
+                    value={_agentData.persona}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Velg persona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mann-norsk">Mann - Norsk</SelectItem>
+                      <SelectItem value="mann-britisk">Mann - Britisk engelsk</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
                   <Input id="phone" placeholder="+47 00 00 00 00" value={_agentData.phoneNumberId}
@@ -135,6 +160,7 @@ export default function CreateEditAgent() {
                     </SelectContent>
                   </Select>
                 </div>
+                
               </div>
 
               <div className="space-y-2">
@@ -162,50 +188,64 @@ export default function CreateEditAgent() {
                 <Label>Kunnskapsbank</Label>
                 <div className="flex space-x-4">
                   {/* TODO: Add knowledgebase files */}
-                  {false &&
+                  {agentData.knowledgebase.length > 0 &&
                     <>
-                      <Button variant="outline" className="flex items-center">
-                        <FileText className="mr-2 h-4 w-4" />
-                        FAQ.pdf
+                    {agentData.knowledgebase.map((file) =>                    
+                      <Button key={file.url} variant="outline" className="flex items-center">
+                        <Link href={file.url} target='_blank' className="flex items-center">
+                          <FileText className="mr-2 h-4 w-4" />
+                            {file.name}
+                        </Link>
                         <Trash className="ml-2 h-4 w-4" />
                       </Button>
-                      <Button variant="outline" className="flex items-center">
-                        <FileText className="mr-2 h-4 w-4" />
-                        Retningslinjer.pdf
-                      </Button>
-                    </>
+                    )}
+                   </>
                   }
                   <Button variant="outline">Last opp</Button>
                 </div>
               </div>
 
-              <Separator className="hidden" />
+              <Separator />
 
-              <div className="space-y-2 hidden">
+              <div className="space-y-2">
                 <h3 className="text-lg font-semibold">Handlinger</h3>
                 {/* TODO: Add actions */}
-                {false &&
                   <div className="space-y-1">
                     <div className="flex items-center justify-between">
-                      <span>Endre booking</span>
+                      <div>
+                        <span>isMyCaseActive</span><span className="text-gray-400 ml-2">Henter om kunden har aktiv sak</span>
+                      </div>
                       <PenSquare className="h-4 w-4 text-gray-400" />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Slett booking</span>
+                      <div>
+                        <span>getTotalDebt</span><span className="text-gray-400 ml-2">Henter kundens totale gjeld på tvers av saker</span>
+                      </div>
                       <PenSquare className="h-4 w-4 text-gray-400" />
                     </div>
                     <div className="flex items-center justify-between">
-                      <span>Få pris forespørsel</span>
+                      <div>
+                        <span>howMuchDoIOwe</span><span className="text-gray-400 ml-2">Henter hvor mye kunden skylder til banken</span>
+                      </div>
                       <PenSquare className="h-4 w-4 text-gray-400" />
                     </div>
                   </div>
-                }
               </div>
 
-              <div className="flex justify-end space-x-4">
+              <div className="flex justify-end space-x-6">
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="phoneNumber">Test:</Label>
+                  <Input
+                    id="phoneNumber"
+                    type="tel"
+                    placeholder="Test nummber"
+                    value={testNumber}
+                    onChange={(e) => setTestNumber(e.target.value)}
+                  />
+                </div>
                 <Button variant="outline"
                   onClick={() => {
-                    console.log('Test agent')
+                    callApi(testNumber, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
                   }}
                 >Test agent</Button>
                 <Button disabled={isLoading} type="submit">
