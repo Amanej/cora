@@ -5,6 +5,7 @@ export enum SidebarPage {
     Manage = "manage",
     Logg = "logg",
     Innstillinger = "innstillinger",
+    PhoneNumbers = "phone-numbers",
 }
 
 interface SideBarProps {
@@ -21,6 +22,9 @@ const SideBar: React.FC<SideBarProps> = ({ currentPage }) => {
                 </Link>
                 <Link href={ROUTES.LOGG} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Logg ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
                     Logger
+                </Link>
+                <Link href={ROUTES.PHONE_NUMBERS} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.PhoneNumbers ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
+                    Telefonnumre
                 </Link>
                 <Link href="#" className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Innstillinger ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
                     Innstillinger
