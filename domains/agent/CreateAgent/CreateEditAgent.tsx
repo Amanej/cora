@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, FileText, PenSquare, Trash } from "lucide-react"
-import { callApi, createAgent, fetchAgentById } from '../api'
+import { callApi, createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -30,13 +30,14 @@ const defaultAgentData: AgentData = {
 }
 
 export default function CreateEditAgent() {
-  const [isEditing, setIsEditing] = useState(true) // Set to false for create mode
+  const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
   const [testNumber, setTestNumber] = useState(defaultAgentData.phoneNumberId)
   const router = useRouter();
 
   const searchParams = useSearchParams();
+  const searchId = searchParams.get('id');
 
   const fetchAgent = async (id: string) => {
     console.log('Fetching agent with ID:', id);
@@ -51,7 +52,6 @@ export default function CreateEditAgent() {
   };
   
   useEffect(() => {
-    const searchId = searchParams.get('id')
     if (searchId) {
       fetchAgent(searchId);
     }
@@ -72,18 +72,31 @@ export default function CreateEditAgent() {
 
   const handleSave = async () => {
     setIsLoading(true)
-    await createAgent({...agentData, knowledgebase: [{
-      url: 'https://www.google.com',
-      name: 'Google'
-    }]});
+    await createAgent({...agentData}); 
+    // @TODO - Support for uploading files and picking them from knowledgebase
     console.log('Agent created')
+    setIsLoading(false)
+    router.push(ROUTES.MANAGE_AGENTS);
+  }
+
+  const handleUpdate = async () => {
+    setIsLoading(true)
+    if (searchId) {
+      await updateAgent(searchId, {...agentData}); 
+      console.log('Agent updated')
+    }
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);
   }
 
   const handleTestAgent = async () => {
     // e.preventDefault() 
-    callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
+    // callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
+    if (searchId) {
+      setIsLoading(true)
+      await testCallAgent(searchId, testNumber)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -213,41 +226,55 @@ export default function CreateEditAgent() {
                       <div>
                         <span>isMyCaseActive</span><span className="text-gray-400 ml-2">Henter om kunden har aktiv sak</span>
                       </div>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
+                      <div className="flex">
+                        <Trash className="h-4 w-4 text-gray-400" />
+                        {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
+                      </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <span>getTotalDebt</span><span className="text-gray-400 ml-2">Henter kundens totale gjeld på tvers av saker</span>
                       </div>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
+                      <div className="flex">
+                        <Trash className="h-4 w-4 text-gray-400" />
+                        {/*<PenSquare className="h-4 w-4 text-gray-40 ml-2" />*/}
+                      </div>
                     </div>
                     <div className="flex items-center justify-between">
                       <div>
                         <span>howMuchDoIOwe</span><span className="text-gray-400 ml-2">Henter hvor mye kunden skylder til banken</span>
                       </div>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
+                      <div className="flex">
+                        <Trash className="h-4 w-4 text-gray-400" />
+                        {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
+                      </div>
                     </div>
                   </div>
               </div>
 
               <div className="flex justify-end space-x-6">
-                <div className="flex items-center space-x-2">
-                  <Label htmlFor="phoneNumber">Test:</Label>
-                  <Input
-                    id="phoneNumber"
-                    type="tel"
-                    placeholder="Test nummber"
-                    value={testNumber}
-                    onChange={(e) => setTestNumber(e.target.value)}
-                  />
-                </div>
+                {isEditing &&                
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="phoneNumber">Test:</Label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      placeholder="Test nummber"
+                      value={testNumber}
+                      onChange={(e) => setTestNumber(e.target.value)}
+                    />
+                  </div>
+                }
                 <Button variant="outline"
                   onClick={() => {
                     handleTestAgent()
                   }}
+                  disabled={isLoading || !isEditing}
                 >Test agent</Button>
-                <Button disabled={isLoading} onClick={handleSave}>
-                {isLoading ? 'Laster...' : (isEditing ? 'Lagre endringer' : 'Opprett agent')}</Button>
+                <Button disabled={isLoading} onClick={() => {
+                  isEditing ? handleUpdate() : handleSave()
+                }}>
+                {isLoading ? 'Laster...' : (isEditing ? 'Oppdatere agent' : 'Opprett agent')}</Button>
               </div>
             </div>
           </CardContent>

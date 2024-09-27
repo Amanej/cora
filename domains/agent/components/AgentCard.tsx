@@ -27,10 +27,11 @@ const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
             return;
         }
         try {
-            await updateAgent({
-                _id: agent._id,
+            if(agentId) {
+            await updateAgent(agentId, {
                 status: agent.status === AgentStatus.Active ? AgentStatus.Inactive : AgentStatus.Active
             });
+        }
             setIsUpdating(false);
         } catch (error) {
             console.error("Error updating agent:", error);
