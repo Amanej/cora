@@ -115,7 +115,7 @@ export default function CreateEditAgent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
-                  <Input id="phone" placeholder="+47 00 00 00 00" value={"+47 46 16 46 87" || _agentData.phoneNumberId}
+                  <Input id="phone" placeholder="+47 00 00 00 00" value={"+47 46164687"} /* _agentData.phoneNumberId */
                     onChange={(e) => {
                       setAgentData({ ..._agentData, phoneNumberId: e.target.value })
                     }}
