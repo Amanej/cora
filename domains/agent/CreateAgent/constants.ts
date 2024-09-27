@@ -20,6 +20,7 @@ export const defaultAgentData: AgentData = {
     type: AgentType.Incoming,
     instructions: DEFAULT_INSTRUCTIONS,
     knowledgebase: [],
+    integrationIds: [],
     createdAt: new Date(),
     status: AgentStatus.Active,
     templateId: '',

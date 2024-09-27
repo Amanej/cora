@@ -1,8 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft } from "lucide-react"
 import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
@@ -56,6 +54,7 @@ export default function CreateEditAgent() {
     type: _agentData.type || AgentType.Incoming,
     instructions: _agentData.instructions || 'Handle customer inquiries',
     knowledgebase: _agentData.knowledgebase,
+    integrationIds: _agentData.integrationIds || [],
     createdAt: _agentData.createdAt || new Date(),
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',
@@ -116,7 +115,7 @@ export default function CreateEditAgent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
-                  <Input id="phone" placeholder="+47 00 00 00 00" value={_agentData.phoneNumberId}
+                  <Input id="phone" placeholder="+47 00 00 00 00" value={"+47 46 16 46 87" || _agentData.phoneNumberId}
                     onChange={(e) => {
                       setAgentData({ ..._agentData, phoneNumberId: e.target.value })
                     }}
@@ -166,7 +165,7 @@ export default function CreateEditAgent() {
 
               <Separator />
 
-              <AgentActions />
+              <AgentActions integrationIds={agentData.integrationIds} />
 
               <Separator />
 

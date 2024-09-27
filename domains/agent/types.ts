@@ -21,6 +21,7 @@ export type AgentData = {
     url: string,
     name: string
   }[],
+  integrationIds: string[],
   createdAt: Date,
   status: AgentStatus,
   templateId: string,

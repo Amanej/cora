@@ -137,6 +137,18 @@ export const testCallAgent = async (agentId: string, phoneNumberToCall: string) 
     }
 };
 
+export const fetchIntegrations = async () => {
+    const response = await fetch(APP_CONFIG.backendUrl+'/integrations/all', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });     
+    const data = await response.json();
+    return data;
+}
+    
+
 
 export const callApi = async (callNumber: string, useCase: string, lang: string) => {
     const response = await fetch('/api/call', {
