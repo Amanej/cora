@@ -2,8 +2,8 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, FileText, PenSquare, Trash } from "lucide-react"
-import { callApi, createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
+import { ArrowLeft } from "lucide-react"
+import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -14,20 +14,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import SideBar, { SidebarPage } from '@/components/global/Sidebar'
 import { ROUTES } from '@/lib/routing'
-import { DEFAULT_INSTRUCTIONS } from './constants'
-
-const defaultAgentData: AgentData = {
-  title: '',
-  phoneNumberId: '+4746164687',
-  subTitle: '',
-  type: AgentType.Incoming,
-  instructions: DEFAULT_INSTRUCTIONS,
-  knowledgebase: [],
-  createdAt: new Date(),
-  status: AgentStatus.Active,
-  templateId: '',
-  persona: '', // Add this line
-}
+import { defaultAgentData } from './constants'
+import TestAgent from './components/TestAgent'
+import AgentActions from './components/AgentActions'
+import AgentKnowledgeBase from './components/AgentKnowledgeBase'
+import AgentPersona from './components/AgentPersona'
+import AgentHeader from './components/AgentHeader'
 
 export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
@@ -50,7 +42,7 @@ export default function CreateEditAgent() {
     }
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
     if (searchId) {
       fetchAgent(searchId);
@@ -72,7 +64,7 @@ export default function CreateEditAgent() {
 
   const handleSave = async () => {
     setIsLoading(true)
-    await createAgent({...agentData}); 
+    await createAgent({ ...agentData });
     // @TODO - Support for uploading files and picking them from knowledgebase
     console.log('Agent created')
     setIsLoading(false)
@@ -82,7 +74,7 @@ export default function CreateEditAgent() {
   const handleUpdate = async () => {
     setIsLoading(true)
     if (searchId) {
-      await updateAgent(searchId, {...agentData}); 
+      await updateAgent(searchId, { ...agentData });
       console.log('Agent updated')
     }
     setIsLoading(false)
@@ -106,16 +98,7 @@ export default function CreateEditAgent() {
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-4">
-            <Link href={ROUTES.MANAGE_AGENTS}>
-              <Button className="text-black" variant="ghost" size="icon">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? "Kundeservice agenten min" : "Opprett kundeservice agent"}</p>
-          </div>
-        </div>
+        <AgentHeader isEditing={isEditing} />
 
         <Card>
           <CardHeader>
@@ -129,24 +112,8 @@ export default function CreateEditAgent() {
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
 
-              <div className="space-y-2">
-                  <Label htmlFor="persona">Persona</Label>
-                  <Select
-                    onValueChange={(value) => {
-                      setAgentData({ ..._agentData, persona: value })
-                    }}
-                    value={_agentData.persona}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Velg persona" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="mann-norsk">Mann - Norsk</SelectItem>
-                      <SelectItem value="mann-britisk">Mann - Britisk engelsk</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
+                <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
+
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
                   <Input id="phone" placeholder="+47 00 00 00 00" value={_agentData.phoneNumberId}
@@ -171,7 +138,7 @@ export default function CreateEditAgent() {
                     </SelectContent>
                   </Select>
                 </div>
-                
+
               </div>
 
               <div className="space-y-2">
@@ -195,86 +162,21 @@ export default function CreateEditAgent() {
                 </Button>
               </div>*/}
 
-              <div className="space-y-2">
-                <Label>Kunnskapsbank</Label>
-                <div className="flex space-x-4">
-                  {/* TODO: Add knowledgebase files */}
-                  {agentData.knowledgebase.length > 0 &&
-                    <>
-                    {agentData.knowledgebase.map((file) =>                    
-                      <Button key={file.url} variant="outline" className="flex items-center">
-                        <Link href={file.url} target='_blank' className="flex items-center">
-                          <FileText className="mr-2 h-4 w-4" />
-                            {file.name}
-                        </Link>
-                        <Trash className="ml-2 h-4 w-4" />
-                      </Button>
-                    )}
-                   </>
-                  }
-                  <Button variant="outline">Last opp</Button>
-                </div>
-              </div>
+              <AgentKnowledgeBase agentData={agentData} />
 
               <Separator />
 
-              <div className="space-y-2">
-                <h3 className="text-lg font-semibold">Handlinger</h3>
-                {/* TODO: Add actions */}
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span>isMyCaseActive</span><span className="text-gray-400 ml-2">Henter om kunden har aktiv sak</span>
-                      </div>
-                      <div className="flex">
-                        <Trash className="h-4 w-4 text-gray-400" />
-                        {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span>getTotalDebt</span><span className="text-gray-400 ml-2">Henter kundens totale gjeld på tvers av saker</span>
-                      </div>
-                      <div className="flex">
-                        <Trash className="h-4 w-4 text-gray-400" />
-                        {/*<PenSquare className="h-4 w-4 text-gray-40 ml-2" />*/}
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span>howMuchDoIOwe</span><span className="text-gray-400 ml-2">Henter hvor mye kunden skylder til banken</span>
-                      </div>
-                      <div className="flex">
-                        <Trash className="h-4 w-4 text-gray-400" />
-                        {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
-                      </div>
-                    </div>
-                  </div>
-              </div>
+              <AgentActions />
+
+              <Separator />
+
+              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} />
 
               <div className="flex justify-end space-x-6">
-                {isEditing &&                
-                  <div className="flex items-center space-x-2">
-                    <Label htmlFor="phoneNumber">Test:</Label>
-                    <Input
-                      id="phoneNumber"
-                      type="tel"
-                      placeholder="Test nummber"
-                      value={testNumber}
-                      onChange={(e) => setTestNumber(e.target.value)}
-                    />
-                  </div>
-                }
-                <Button variant="outline"
-                  onClick={() => {
-                    handleTestAgent()
-                  }}
-                  disabled={isLoading || !isEditing}
-                >Test agent</Button>
                 <Button disabled={isLoading} onClick={() => {
                   isEditing ? handleUpdate() : handleSave()
                 }}>
-                {isLoading ? 'Laster...' : (isEditing ? 'Oppdatere agent' : 'Opprett agent')}</Button>
+                  {isLoading ? 'Laster...' : (isEditing ? 'Oppdatere agent' : 'Opprett agent')}</Button>
               </div>
             </div>
           </CardContent>
