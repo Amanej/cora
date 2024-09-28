@@ -5,6 +5,7 @@ import Header from "@/components/global/Header";
 import Footer from "@/components/global/Footer";
 import { FacebookPixel } from "@/lib/tracking/pixels/facebook";
 import { GoogleTagBody, GoogleTagHead } from "@/lib/tracking/pixels/google";
+import { LinkedInPixel } from "@/lib/tracking/pixels/linkedin";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -42,6 +43,7 @@ export default function RootLayout({
           {children}
           <Footer />
         </div>
+        <LinkedInPixel />
       </body>
     </html>
   );
