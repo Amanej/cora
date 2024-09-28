@@ -8,10 +8,11 @@ import { Integration } from "@/domains/integrations/types";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
 
 type AgentActionProps = {
-    integrationIds: string[];       
+    integrationIds: string[];
+    setIntegrationIds: (integrationIds: string[]) => void;
 }
 
-const AgentActions = ({ integrationIds }: AgentActionProps) => {
+const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) => {
     const [integrations, setIntegrations] = useState<Integration[]>([]);
     const [selectedIntegrationIds, setSelectedIntegrationIds] = useState<string[]>(integrationIds);
 
@@ -28,7 +29,9 @@ const AgentActions = ({ integrationIds }: AgentActionProps) => {
         setSelectedIntegrationIds(integrationIds);
     }, [integrationIds]);
 
-    // const combinedIntegrationIds = [...integrationIds, ...selectedIntegrationIds];
+    const updateAgent = () => {
+        setIntegrationIds(selectedIntegrationIds);
+    }
 
     return (
         <div className="space-y-2">
@@ -61,6 +64,7 @@ const AgentActions = ({ integrationIds }: AgentActionProps) => {
                         } else {
                             setSelectedIntegrationIds([...selectedIntegrationIds, value]);
                         }
+                        updateAgent();
                     }}
                   >
                     <SelectTrigger>

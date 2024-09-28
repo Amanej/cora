@@ -165,7 +165,9 @@ export default function CreateEditAgent() {
 
               <Separator />
 
-              <AgentActions integrationIds={agentData.integrationIds} />
+              <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
+                setAgentData({ ...agentData, integrationIds: ids })
+              }} />
 
               <Separator />
 
