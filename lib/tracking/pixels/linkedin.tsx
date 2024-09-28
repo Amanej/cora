@@ -5,9 +5,9 @@ import Script from 'next/script';
 export const LinkedInPixel = () => {
 
   return (
-    <Script id="linkedin-pixel" strategy="afterInteractive">
+    <>
+      <Script id="linkedin-pixel" strategy="afterInteractive">
         {`
-        <script type="text/javascript">
         _linkedin_partner_id = "7663001";
         window._linkedin_data_partner_ids = window._linkedin_data_partner_ids || [];
         window._linkedin_data_partner_ids.push(_linkedin_partner_id);
@@ -20,11 +20,11 @@ export const LinkedInPixel = () => {
         b.type = "text/javascript";b.async = true;
         b.src = "https://snap.licdn.com/li.lms-analytics/insight.min.js";
         s.parentNode.insertBefore(b, s);})(window.lintrk);
-        </script>
-        <noscript>
-        <img height="1" width="1" style="display:none;" alt="" src="https://px.ads.linkedin.com/collect/?pid=7663001&fmt=gif" />
-        </noscript>
         `}
-    </Script>
+      </Script>
+      <noscript>
+        <img height="1" width="1" style={{display:"none"}} alt="" src="https://px.ads.linkedin.com/collect/?pid=7663001&fmt=gif" />
+      </noscript>
+    </>
   );
 };

@@ -5,10 +5,9 @@ import Script from 'next/script';
 export const FacebookPixel = () => {
 
   return (
+    <>
     <Script id="meta-pixel" strategy="afterInteractive">
         {`
-        <!-- Meta Pixel Code -->
-        <script>
         !function(f,b,e,v,n,t,s)
         {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
         n.callMethod.apply(n,arguments):n.queue.push(arguments)};
@@ -19,12 +18,11 @@ export const FacebookPixel = () => {
         'https://connect.facebook.net/en_US/fbevents.js');
         fbq('init', '1577589083152621');
         fbq('track', 'PageView');
-        </script>
-        <noscript><img height="1" width="1" style="display:none"
-        src="https://www.facebook.com/tr?id=1577589083152621&ev=PageView&noscript=1"
-        /></noscript>
         <!-- End Meta Pixel Code -->
         `}
     </Script>
+    <noscript><img height="1" width="1" style={{display: "none"}} src="https://www.facebook.com/tr?id=1577589083152621&ev=PageView&noscript=1"
+    /></noscript>
+    </>
   );
 };
