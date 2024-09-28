@@ -1,21 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
 import Script from 'next/script';
 
 export const FacebookPixel = () => {
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-     // @ts-expect-error this will be added to the window object by the Facebook SDK
-      window.fbq = window.fbq || function() {
-        // @ts-expect-error this will be added to the window object by the Facebook SDK
-        (window.fbq.q = window.fbq.q || []).push(arguments);
-      };
-    }
-  }, []);
 
   return (
-    <>
     <Script id="meta-pixel" strategy="afterInteractive">
         {`
         <!-- Meta Pixel Code -->
@@ -37,15 +26,5 @@ export const FacebookPixel = () => {
         <!-- End Meta Pixel Code -->
         `}
     </Script>
-      <noscript>
-        <img
-          height="1"
-          width="1"
-          style={{ display: 'none' }}
-          src="https://www.facebook.com/tr?id=1577589083152621&ev=PageView&noscript=1"
-          alt=""
-        />
-      </noscript>
-    </>
   );
 };
