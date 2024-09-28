@@ -6,9 +6,9 @@ import Script from 'next/script';
 export const FacebookPixel = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-     // @ts-ignore
+     // @ts-expect-error
       window.fbq = window.fbq || function() {
-        // @ts-ignore
+        // @ts-expect-error
         (window.fbq.q = window.fbq.q || []).push(arguments);
       };
     }
