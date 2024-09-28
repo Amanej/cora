@@ -6,9 +6,9 @@ import Script from 'next/script';
 export const FacebookPixel = () => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
-     // @ts-expect-error
+     // @ts-expect-error this will be added to the window object by the Facebook SDK
       window.fbq = window.fbq || function() {
-        // @ts-expect-error
+        // @ts-expect-error this will be added to the window object by the Facebook SDK
         (window.fbq.q = window.fbq.q || []).push(arguments);
       };
     }
