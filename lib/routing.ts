@@ -7,4 +7,5 @@ export const ROUTES = {
     FAIR_COLLECTION: '/examples/fair-collection',
     SVEA_FINANS: '/examples/svea-finans',
     SELGER: '/examples/selger',
+    LOGIN: '/login',
 }
