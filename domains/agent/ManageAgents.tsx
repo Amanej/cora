@@ -8,8 +8,10 @@ import { ROUTES } from "@/lib/routing"
 import { AgentData, AgentStatus } from "./types"
 import { fetchAgents } from "./api"
 import AgentCard from "./components/AgentCard"
+import { useIsAuthenticated } from "@/domains/auth/hooks/isAuthenticated"
 
 const Management = () => {
+  const isAuthenticated = useIsAuthenticated();
   const [agents, setAgents] = useState<AgentData[]>([]);
 
   useEffect(() => {
