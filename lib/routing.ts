@@ -8,4 +8,7 @@ export const ROUTES = {
     SVEA_FINANS: '/examples/svea-finans',
     SELGER: '/examples/selger',
     LOGIN: '/login',
+    CALL_SHEETS_BY_AGENT: '/dashboard/call-sheets/', // :agentId
+    CALL_SHEET: '/dashboard/call-sheet/', //
+    CALL_LOGS_BY_AGENT: '/dashboard/call-logs/', // :agentId
 }
