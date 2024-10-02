@@ -19,6 +19,25 @@ import AgentKnowledgeBase from './components/AgentKnowledgeBase'
 import AgentPersona from './components/AgentPersona'
 import AgentHeader from './components/AgentHeader'
 
+type PhoneNumberOption = {
+  number: string;
+  externalId: string;
+  countryCode: string;
+}
+
+const PHONENUMBER_OPTIONS: PhoneNumberOption[] = [
+  {
+    number: "+12056971654",
+    externalId: "e354916c-659a-489e-b141-a1e0ddb13712",
+    countryCode: "US",
+  },
+  {
+    number: "+4746164687",
+    externalId: "c895bb88-d52d-40da-83e7-002883450d5e",
+    countryCode: "NO",
+  }
+]
+
 export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
@@ -115,11 +134,23 @@ export default function CreateEditAgent() {
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
-                  <Input id="phone" placeholder="+47 00 00 00 00" value={"+47 46164687"} /* _agentData.phoneNumberId */
-                    onChange={(e) => {
-                      setAgentData({ ..._agentData, phoneNumberId: e.target.value })
+                  <Select
+                    value={_agentData.phoneNumberId}
+                    onValueChange={(value) => {
+                      setAgentData({ ..._agentData, phoneNumberId: value })
                     }}
-                  />
+                  >
+                    <SelectTrigger id="phone">
+                      <SelectValue placeholder="Select a phone number" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PHONENUMBER_OPTIONS.map((option) => (
+                        <SelectItem key={option.externalId} value={option.externalId}>
+                          {option.number}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="type">Type</Label>
