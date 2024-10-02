@@ -94,9 +94,9 @@ export const deleteAgent = async (agentId: string) => {
     }
 };
 
-export const updateAgent = async (agentData: Partial<AgentData>) => {
+export const updateAgent = async (agentId: string, agentData: Partial<AgentData>) => {
     try {
-        const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentData._id, {
+        const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentId, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -116,3 +116,48 @@ export const updateAgent = async (agentData: Partial<AgentData>) => {
 };
 
 
+export const testCallAgent = async (agentId: string, phoneNumberToCall: string) => {
+    try {
+        const response = await fetch(APP_CONFIG.backendUrl+'/calls/test-call', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({agentId, phoneNumberToCall}),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to test call');
+        }
+
+        const updatedAgent = await response.json();
+        console.log('Call test successfully:', updatedAgent);
+    } catch (error) {
+        console.error('Error testing call:', error);
+    }
+};
+
+export const fetchIntegrations = async () => {
+    const response = await fetch(APP_CONFIG.backendUrl+'/integrations/all', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });     
+    const data = await response.json();
+    return data;
+}
+    
+
+
+export const callApi = async (callNumber: string, useCase: string, lang: string) => {
+    const response = await fetch('/api/call', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ phoneNumber: callNumber, useCase, lang })
+    })
+    const data = await response.json()
+    return data
+}

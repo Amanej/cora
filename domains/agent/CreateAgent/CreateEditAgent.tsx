@@ -1,9 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
-import { ArrowLeft, FileText, PenSquare, Trash } from "lucide-react"
-import { createAgent, fetchAgentById } from '../api'
+import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
 import { AgentData, AgentType, AgentStatus } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -14,27 +12,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator"
 import SideBar, { SidebarPage } from '@/components/global/Sidebar'
 import { ROUTES } from '@/lib/routing'
-import { DEFAULT_INSTRUCTIONS } from './constants'
-
-const defaultAgentData: AgentData = {
-  title: '',
-  phoneNumberId: '',
-  subTitle: '',
-  type: AgentType.Incoming,
-  instructions: DEFAULT_INSTRUCTIONS,
-  knowledgebase: [],
-  createdAt: new Date(),
-  status: AgentStatus.Active,
-  templateId: '',
-}
+import { defaultAgentData } from './constants'
+import TestAgent from './components/TestAgent'
+import AgentActions from './components/AgentActions'
+import AgentKnowledgeBase from './components/AgentKnowledgeBase'
+import AgentPersona from './components/AgentPersona'
+import AgentHeader from './components/AgentHeader'
 
 export default function CreateEditAgent() {
-  const [isEditing, setIsEditing] = useState(true) // Set to false for create mode
+  const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
+  const [testNumber, setTestNumber] = useState(defaultAgentData.phoneNumberId)
   const router = useRouter();
 
   const searchParams = useSearchParams();
+  const searchId = searchParams.get('id');
 
   const fetchAgent = async (id: string) => {
     console.log('Fetching agent with ID:', id);
@@ -47,9 +40,8 @@ export default function CreateEditAgent() {
     }
     setIsLoading(false);
   };
-  
+
   useEffect(() => {
-    const searchId = searchParams.get('id')
     if (searchId) {
       fetchAgent(searchId);
     }
@@ -62,19 +54,40 @@ export default function CreateEditAgent() {
     type: _agentData.type || AgentType.Incoming,
     instructions: _agentData.instructions || 'Handle customer inquiries',
     knowledgebase: _agentData.knowledgebase,
+    integrationIds: _agentData.integrationIds || [],
     createdAt: _agentData.createdAt || new Date(),
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',
+    persona: _agentData.persona || '', // Add this line
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    console.log('Submit')
+  const handleSave = async () => {
     setIsLoading(true)
-    await createAgent(agentData);
+    await createAgent({ ...agentData });
+    // @TODO - Support for uploading files and picking them from knowledgebase
     console.log('Agent created')
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);
+  }
+
+  const handleUpdate = async () => {
+    setIsLoading(true)
+    if (searchId) {
+      await updateAgent(searchId, { ...agentData });
+      console.log('Agent updated')
+    }
+    setIsLoading(false)
+    router.push(ROUTES.MANAGE_AGENTS);
+  }
+
+  const handleTestAgent = async () => {
+    // e.preventDefault() 
+    // callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
+    if (searchId) {
+      setIsLoading(true)
+      await testCallAgent(searchId, testNumber)
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -84,21 +97,7 @@ export default function CreateEditAgent() {
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center space-x-4">
-            <Link href={ROUTES.MANAGE_AGENTS}>
-              <Button className="text-black" variant="ghost" size="icon">
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-            </Link>
-            <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? "Kundeservice agenten min" : "Opprett kundeservice agent"}</p>
-          </div>
-          {/*          
-            <Link href={ROUTES.MANAGE_AGENTS}>
-              <p className="text-blue-500 hover:text-blue-700">Se maler</p>
-            </Link>
-          */}
-        </div>
+        <AgentHeader isEditing={isEditing} />
 
         <Card>
           <CardHeader>
@@ -109,11 +108,14 @@ export default function CreateEditAgent() {
               className="text-3xl font-bold" />
           </CardHeader>
           <CardContent>
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
+
+                <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
+
                 <div className="space-y-2">
                   <Label htmlFor="phone">Telefon nummer</Label>
-                  <Input id="phone" placeholder="+47 00 00 00 00" value={_agentData.phoneNumberId}
+                  <Input id="phone" placeholder="+47 00 00 00 00" value={"+47 46164687"} /* _agentData.phoneNumberId */
                     onChange={(e) => {
                       setAgentData({ ..._agentData, phoneNumberId: e.target.value })
                     }}
@@ -135,6 +137,7 @@ export default function CreateEditAgent() {
                     </SelectContent>
                   </Select>
                 </div>
+
               </div>
 
               <div className="space-y-2">
@@ -158,60 +161,25 @@ export default function CreateEditAgent() {
                 </Button>
               </div>*/}
 
-              <div className="space-y-2">
-                <Label>Kunnskapsbank</Label>
-                <div className="flex space-x-4">
-                  {/* TODO: Add knowledgebase files */}
-                  {false &&
-                    <>
-                      <Button variant="outline" className="flex items-center">
-                        <FileText className="mr-2 h-4 w-4" />
-                        FAQ.pdf
-                        <Trash className="ml-2 h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" className="flex items-center">
-                        <FileText className="mr-2 h-4 w-4" />
-                        Retningslinjer.pdf
-                      </Button>
-                    </>
-                  }
-                  <Button variant="outline">Last opp</Button>
-                </div>
-              </div>
+              <AgentKnowledgeBase agentData={agentData} />
 
-              <Separator className="hidden" />
+              <Separator />
 
-              <div className="space-y-2 hidden">
-                <h3 className="text-lg font-semibold">Handlinger</h3>
-                {/* TODO: Add actions */}
-                {false &&
-                  <div className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <span>Endre booking</span>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Slett booking</span>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Få pris forespørsel</span>
-                      <PenSquare className="h-4 w-4 text-gray-400" />
-                    </div>
-                  </div>
-                }
-              </div>
+              <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
+                setAgentData({ ...agentData, integrationIds: ids })
+              }} />
 
-              <div className="flex justify-end space-x-4">
-                <Button variant="outline"
-                  onClick={() => {
-                    console.log('Test agent')
-                  }}
-                >Test agent</Button>
-                <Button disabled={isLoading} type="submit">
-                {isLoading ? 'Laster...' : (isEditing ? 'Lagre endringer' : 'Opprett agent')}</Button>
+              <Separator />
+
+              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} />
+
+              <div className="flex justify-end space-x-6">
+                <Button disabled={isLoading} onClick={() => {
+                  isEditing ? handleUpdate() : handleSave()
+                }}>
+                  {isLoading ? 'Laster...' : (isEditing ? 'Oppdatere agent' : 'Opprett agent')}</Button>
               </div>
-            </form>
+            </div>
           </CardContent>
         </Card>
       </main>
