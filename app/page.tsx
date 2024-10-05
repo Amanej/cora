@@ -129,6 +129,22 @@ export default function LandingPage() {
             <div className="grid gap-6 lg:grid-cols-3">
               <Card>
                 <CardHeader>
+                  <CardTitle>Customer Service</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Provide 24/7 support, answer FAQs, and escalate complex issues to human agents.</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Healthcare Provider</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p>Automate appointment reminders and handle basic patient inquiries efficiently.</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
                   <CardTitle>Backend operations</CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -149,22 +165,6 @@ export default function LandingPage() {
                 </CardHeader>
                 <CardContent>
                   <p>Handle debt collection, follow ups and inquiries.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Healthcare Provider</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Automate appointment reminders and handle basic patient inquiries efficiently.</p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Customer Service</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>Provide 24/7 support, answer FAQs, and escalate complex issues to human agents.</p>
                 </CardContent>
               </Card>
             </div>
