@@ -12,3 +12,19 @@ export const fetchAirtableData = async (tableName: string) => {
         throw error;
     }
 };
+
+export const createAirtableRecord = async (tableName: string, data: {day: string, notes?: string}) => {
+    try {
+        const row = [{
+            "fields": {
+                "Date": data.day,
+                "Notes": data.notes
+              }
+        }];
+        const record = await base(tableName).create(row);
+        return record;
+    } catch (error) {
+        console.error('Error creating record in Airtable:', error);
+        throw error;
+    }
+};
