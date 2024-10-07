@@ -21,7 +21,11 @@ interface CallSheetRow {
     metadata: object;
 }
 
-const CallSheet: React.FC = () => {
+type Props = {
+    agentId?: string;
+}
+
+const CallSheet: React.FC<Props> = ({ agentId }) => {
     const [callSheet, setCallSheet] = useState<CallSheetRow[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -83,6 +87,7 @@ const CallSheet: React.FC = () => {
     };
 
     // console.log("parsedData ",callSheet);
+    console.log("agentId ", agentId);
 
     return (
         <div className="flex h-screen bg-gray-100">

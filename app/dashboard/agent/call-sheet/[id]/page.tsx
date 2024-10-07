@@ -9,7 +9,7 @@ const CallSheetPage: React.FC = () => {
 
   return (
     <div>
-      <CallSheet />
+      <CallSheet agentId={id.toString()} />
     </div>
   );
 };
