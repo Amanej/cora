@@ -1,3 +1,7 @@
+'use client'
+
+import { format } from 'date-fns';
+import { nb } from 'date-fns/locale';
 import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 import { Button } from "@/components/ui/button"
 import {
@@ -10,6 +14,11 @@ import {
 } from "@/components/ui/table"
 import { PlayCircle, FileText, Trash2, LogOut } from "lucide-react"
 import Link from "next/link"
+import { useEffect, useState } from "react"
+import { fetchAgentById } from "../agent/api"
+import { AgentData } from "../agent/types"
+import { fetchCallsByAgentId } from "./api"
+import { Call } from "./types"
 
 const callLogs = [
   { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Kari Jackson", duration: "2:30" },
@@ -21,7 +30,41 @@ const callLogs = [
   // Add more log entries as needed
 ]
 
-export default function CallLogs() {
+type Props = {
+  id: string
+}
+
+export default function CallLogs({ id }: Props) { // Set to false for create mode
+  const [isLoading, setIsLoading] = useState(false)
+  const [agentData, setAgentData] = useState<AgentData | null>(null);
+  const [calls, setCalls] = useState<Call[]>([]);
+
+  const fetchAgent = async (id: string) => {
+    console.log('Fetching agent with ID:', id);
+    setIsLoading(true);
+    const agent = await fetchAgentById(id as string);
+    console.log('Agent fetched:', agent);
+    if (agent) {
+      setAgentData(agent);
+    }
+    setIsLoading(false);
+  };
+
+  const fetchCalls = async (agentId: string) => {
+    const agentCalls = await fetchCallsByAgentId(agentId);
+    console.log('Calls fetched:', agentCalls);
+    setCalls(agentCalls);
+  }
+
+
+  useEffect(() => {
+    if (id) {
+      fetchAgent(id);
+      fetchCalls(id);
+    }
+  }, []);
+
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -30,7 +73,7 @@ export default function CallLogs() {
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="flex justify-between items-center mb-6">
-          <p className="text-sm font-light text-black">Logger &gt; <span className="font-bold">Espen</span></p>
+          <p className="text-sm font-light text-black">Logger &gt; <span className="font-bold">{agentData?.title || 'Unknown'}</span></p>
           <Button variant="ghost">
             <LogOut className="mr-2 h-4 w-4" />
             Logg ut
@@ -49,6 +92,14 @@ export default function CallLogs() {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {calls.map((call, index) => (
+                <TableRow key={index}>
+                  <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
+                  <TableCell>{call.phoneNumber}</TableCell>
+                  <TableCell>{call.agentId}</TableCell>
+                  <TableCell>{call.status}</TableCell>
+                </TableRow>
+              ))}
               {callLogs.map((log, index) => (
                 <TableRow key={index}>
                   <TableCell>{log.date}</TableCell>

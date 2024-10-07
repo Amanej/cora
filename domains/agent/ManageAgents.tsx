@@ -38,7 +38,7 @@ const Management = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-    <SideBar  currentPage={SidebarPage.Manage} />
+    <SideBar currentPage={SidebarPage.Manage} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">

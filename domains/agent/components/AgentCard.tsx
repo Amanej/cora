@@ -74,10 +74,14 @@ const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
           <Separator className="my-2" />
           <div className="flex space-x-2">
             {showCallList &&
-                <Button variant="outline" size="sm">Ringelister</Button>
+                <Button variant="outline" size="sm">
+                    <Link href={`${ROUTES.CALL_SHEETS_BY_AGENT}${agent._id}`}>Ringelister</Link>
+                </Button>
             }
             {hasCalls &&
-                <Button variant="outline" size="sm">Se samtale logger</Button>
+                <Button variant="outline" size="sm">
+                    <Link href={`${ROUTES.CALL_LOGS_BY_AGENT}${agent._id}`}>Se samtale logger</Link>
+                </Button>
             }
             <Button variant="outline" size="sm"
                 onClick={() => {
