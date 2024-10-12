@@ -4,7 +4,8 @@ export enum useCase {
     "FAIR_COLLECTION" = "FAIR_COLLECTION",
     "SVEA_FINANS" = "SVEA_FINANS",
     "SELGER" = "SELGER",
-    "LEAD_FOLLOW_UP_CORA" = "LEAD_FOLLOW_UP_CORA"
+    "LEAD_FOLLOW_UP_CORA" = "LEAD_FOLLOW_UP_CORA",
+    "BLID_CUSTOMER_SERVICE" = "BLID_CUSTOMER_SERVICE"
 }
 
 export enum LANG {
@@ -20,7 +21,8 @@ const NORWEGIAN_ASSISTANTS = {
     CUSTOMER_SERVICE: "01624712-cdf8-4586-a9a4-f236754808f9",
     [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61",
     [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d",
-    [useCase.LEAD_FOLLOW_UP_CORA]: "3c5217af-e915-4aed-977a-d612ce349a48" // Secret
+    [useCase.LEAD_FOLLOW_UP_CORA]: "3c5217af-e915-4aed-977a-d612ce349a48", // Secret
+    [useCase.BLID_CUSTOMER_SERVICE]: "fc0a4cb4-098c-4b22-9417-c6ba7b6bd255" // Secret
 }
 
 const SWEDISH_ASSISTANTS = {
@@ -29,7 +31,8 @@ const SWEDISH_ASSISTANTS = {
     [useCase.FAIR_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
     [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d",
-    [useCase.LEAD_FOLLOW_UP_CORA]: "b232ce78-b5c6-4481-8f1a-06b01456918c" // Missing
+    [useCase.LEAD_FOLLOW_UP_CORA]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
+    [useCase.BLID_CUSTOMER_SERVICE]: "fc0a4cb4-098c-4b22-9417-c6ba7b6bd255" // Missing
 }
 
 const ENGLISH_ASSISTANTS = {
@@ -38,7 +41,8 @@ const ENGLISH_ASSISTANTS = {
     [useCase.FAIR_COLLECTION]: "99cd9d0d-9777-46c7-b731-f3501a40d922", // "b232ce78-b5c6-4481-8f1a-06b01456918c",
     [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
     [useCase.SELGER]: "f15c2af8-5041-4f32-ab60-a9caf366590d",
-    [useCase.LEAD_FOLLOW_UP_CORA]: "b232ce78-b5c6-4481-8f1a-06b01456918c" // Missing
+    [useCase.LEAD_FOLLOW_UP_CORA]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
+    [useCase.BLID_CUSTOMER_SERVICE]: "fc0a4cb4-098c-4b22-9417-c6ba7b6bd255" // Missing
 }
 
 
