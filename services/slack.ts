@@ -3,9 +3,10 @@ import { WebClient } from '@slack/web-api';
 // Initialize the Slack WebClient with your bot token
 const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
 
-export const triggerSlackMessage = async (phoneNumber: string, useCase: string, lang: string) => {
+export const triggerSlackMessage = async ({name, email, phoneNumber, useCase, lang}:{name?: string, email?: string, phoneNumber: string, useCase: string, lang: string}) => {
     if(phoneNumber !== "+4746164687") {
-        await sendSlackMessage(`Someone just sent a call to ${phoneNumber} with useCase ${useCase} and lang ${lang}`);
+      const text = `*CoraFone Lead* \n Phone: ${phoneNumber} \n Use case: ${useCase} \n Lang: ${lang} \n Name: ${name} \n Email: ${email}.`;
+      await sendSlackMessage(text);
     }
 }
 
