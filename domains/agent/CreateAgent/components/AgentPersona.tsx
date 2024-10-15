@@ -7,6 +7,13 @@ type AgentPersonaProps = {
     setAgentData: (data: AgentData) => void
 }
 
+export enum PERSONAS {
+    BRITISH = "british",
+    NORWEGIAN = "norwegian",
+    AMERICAN_FEMALE = "americanFemale",
+    AMERICAN_MALE = "americanMale"
+}
+
 const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
     return (
         <div className="space-y-2">
@@ -21,8 +28,10 @@ const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
                     <SelectValue placeholder="Velg persona" />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="mann-norsk">Mann - Norsk</SelectItem>
-                    <SelectItem value="mann-britisk">Mann - Britisk engelsk</SelectItem>
+                    <SelectItem value={PERSONAS.NORWEGIAN}>Male - Norwegian</SelectItem>
+                    <SelectItem value={PERSONAS.BRITISH}>Male - British</SelectItem>
+                    <SelectItem value={PERSONAS.AMERICAN_FEMALE}>Female - American</SelectItem>
+                    <SelectItem value={PERSONAS.AMERICAN_MALE}>Male - American</SelectItem>
                 </SelectContent>
             </Select>
         </div>
