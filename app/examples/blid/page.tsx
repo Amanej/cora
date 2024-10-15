@@ -45,8 +45,6 @@ export default function LandingPage() {
     callApi(phoneNumber)
   }
 
-  const isCustomerSurvey = useCase === USE_CASES.CUSTOMER_SURVEY;
-  const isDebtCollection = useCase === USE_CASES.DEBT_COLLECTION;
   const isCustomerService = useCase === USE_CASES.CUSTOMER_SERIVCE;
   return (
       <main className="flex-1">
