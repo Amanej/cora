@@ -1,5 +1,3 @@
-export const GOOGLE_MAPS_API_KEY = 'AIzaSyBP5150R3ikvxg-lhrEQHaXzymDyr9TOc0';
-
 import { Client } from "@googlemaps/google-maps-services-js";
 
 const client = new Client({});
@@ -10,7 +8,7 @@ export const validateAddress = async (address: string): Promise<{isValid: boolea
     const response = await client.geocode({
       params: {
         address: address,
-        key: GOOGLE_MAPS_API_KEY,
+        key: process.env.GOOGLE_MAPS_API_KEY || "",
       },
     });
 
