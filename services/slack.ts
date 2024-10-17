@@ -10,6 +10,15 @@ export const triggerSlackMessage = async ({name, email, phoneNumber, useCase, la
     }
 }
 
+export const failedCallSlackMessage = async ({name, email, phoneNumber, useCase, lang}:{name?: string, email?: string, phoneNumber: string, useCase: string, lang: string}) => {
+  if(phoneNumber !== "+4746164687") {
+    const text = `*CoraFone Call Failed* \n Phone: ${phoneNumber} \n Use case: ${useCase} \n Lang: ${lang} \n Name: ${name} \n Email: ${email}.`;
+    await sendSlackMessage(text);
+  }
+}
+
+
+
 export async function sendSlackMessage(message: string): Promise<void> {
   try {
     await slackClient.chat.postMessage({
