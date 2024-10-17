@@ -88,6 +88,12 @@ export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCa
             console.log("response ", response);
             return response.json()
         })
-        .then(response => console.log(response))
-        .catch(err => console.error(err));
+        .then(response => {
+            console.log(response)
+            return true
+        })
+        .catch(err => {
+            console.error(err)
+            return null
+        });
 }
