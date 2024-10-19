@@ -7,12 +7,12 @@ export async function POST(request: NextRequest) {
   try {
     const response = await triggerCustomerSurveyCall(phoneNumber, useCase, lang);
     if(response) {
-      triggerSlackMessage({name, email, phoneNumber, useCase, lang});
+      await triggerSlackMessage({name, email, phoneNumber, useCase, lang});
     } else {
-      failedCallSlackMessage({name, email, phoneNumber, useCase, lang});
+      await failedCallSlackMessage({name, email, phoneNumber, useCase, lang});
     }
   } catch(err) {
-    failedCallSlackMessage({name, email, phoneNumber, useCase, lang});
+    await failedCallSlackMessage({name, email, phoneNumber, useCase, lang});
   }
   console.log("phoneNumber ",phoneNumber);
 
