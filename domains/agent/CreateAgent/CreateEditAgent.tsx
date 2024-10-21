@@ -49,11 +49,11 @@ export default function CreateEditAgent() {
   const searchId = searchParams.get('id');
 
   const fetchAgent = async (id: string) => {
-    console.log('Fetching agent with ID:', id);
+    // console.log('Fetching agent with ID:', id);
     setIsEditing(true);
     setIsLoading(true);
     const agent = await fetchAgentById(id as string);
-    console.log('Agent fetched:', agent);
+    // console.log('Agent fetched:', agent);
     if (agent) {
       setAgentData(agent);
     }
@@ -84,7 +84,7 @@ export default function CreateEditAgent() {
     setIsLoading(true)
     await createAgent({ ...agentData });
     // @TODO - Support for uploading files and picking them from knowledgebase
-    console.log('Agent created')
+    // console.log('Agent created')
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);
   }
@@ -93,7 +93,7 @@ export default function CreateEditAgent() {
     setIsLoading(true)
     if (searchId) {
       await updateAgent(searchId, { ...agentData });
-      console.log('Agent updated')
+      // console.log('Agent updated')
     }
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);

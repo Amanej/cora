@@ -48,7 +48,7 @@ export const fetchAgents = async () => {
 export const fetchAgentById = async (agentId: string): Promise<AgentData | null> => {
     try {
         const url = `${APP_CONFIG.backendUrl}/agents/${agentId}`;
-        console.log(`Fetching agent with ID: ${agentId}`);
+        //console.log(`Fetching agent with ID: ${agentId}`);
         const response = await fetch(url, {
             method: 'GET',
             headers: {
@@ -65,7 +65,7 @@ export const fetchAgentById = async (agentId: string): Promise<AgentData | null>
         }
 
         const agent: AgentData = await response.json();
-        console.log('Agent fetched successfully:', agent);
+        // console.log('Agent fetched successfully:', agent);
         return agent;
     } catch (error) {
         console.error('Error fetching agent:', error);

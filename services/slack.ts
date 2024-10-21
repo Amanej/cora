@@ -3,6 +3,12 @@ import { WebClient } from '@slack/web-api';
 // Initialize the Slack WebClient with your bot token
 const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
 
+export const triggerSlackIntegrationExample = async ({name, phoneNumber, note}:{name?: string, phoneNumber: string, note: string}) => {
+      const text = `*Kundehenvendelse* \n Name: ${name} \n Phone: ${phoneNumber} \n Note: ${note}.`;
+      await sendSlackMessage(text, "CMGFVL1EU"); // replace with your channel id
+}
+
+
 export const triggerSlackMessage = async ({name, email, phoneNumber, useCase, lang}:{name?: string, email?: string, phoneNumber: string, useCase: string, lang: string}) => {
     if(phoneNumber !== "+4746164687") {
       const text = `*CoraFone Lead* \n Phone: ${phoneNumber} \n Use case: ${useCase} \n Lang: ${lang} \n Name: ${name} \n Email: ${email}.`;
@@ -17,12 +23,10 @@ export const failedCallSlackMessage = async ({name, email, phoneNumber, useCase,
   }
 }
 
-
-
-export async function sendSlackMessage(message: string): Promise<void> {
+export async function sendSlackMessage(message: string, channel="CMGFVL1EU"): Promise<void> {
   try {
     await slackClient.chat.postMessage({
-      channel: "CMGFVL1EU",
+      channel: channel,
       text: message,
     });
     console.log('Message sent successfully to Slack');
