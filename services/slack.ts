@@ -5,7 +5,8 @@ const slackClient = new WebClient(process.env.SLACK_BOT_TOKEN);
 
 export const triggerSlackIntegrationExample = async ({name, phoneNumber, note}:{name?: string, phoneNumber: string, note: string}) => {
       const text = `*Kundehenvendelse* \n Name: ${name} \n Phone: ${phoneNumber} \n Note: ${note}.`;
-      await sendSlackMessage(text, "CMGFVL1EU"); // replace with your channel id
+      const exampleChannel = "C07TLFG4KPS";
+      await sendSlackMessage(text, exampleChannel);
 }
 
 
@@ -23,7 +24,8 @@ export const failedCallSlackMessage = async ({name, email, phoneNumber, useCase,
   }
 }
 
-export async function sendSlackMessage(message: string, channel="CMGFVL1EU"): Promise<void> {
+const internalChannel = "C07TLFG4KPS";
+export async function sendSlackMessage(message: string, channel=internalChannel): Promise<void> {
   try {
     await slackClient.chat.postMessage({
       channel: channel,
