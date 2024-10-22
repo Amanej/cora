@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
     Table,
@@ -12,30 +12,26 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { LogOut } from 'lucide-react';
 import SideBar, { SidebarPage } from '@/components/global/Sidebar';
-
-interface CallSheetRow {
-    id: string | null;
-    name: string;
-    phoneNumber: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed';
-    metadata: object;
-}
+import { createCallsheet, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
+import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 
 type Props = {
     agentId?: string;
 }
 
 const CallSheet: React.FC<Props> = ({ agentId }) => {
-    const [callSheet, setCallSheet] = useState<CallSheetRow[]>([]);
+    const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
+    const [callSheetId, setCallSheetId] = useState<string | null>(null);
+    const [hasFetchedCallsheet, setHasFetchedCallsheet] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
-    const [selectedRow, setSelectedRow] = useState<CallSheetRow | null>(null);
+    const [selectedRow, setSelectedRow] = useState<ICallSheetItem | null>(null);
 
     const parseData = (csvData: string) => {
         const rows = csvData.split('\n');
         const headers = rows[0].split(',').slice(2).map(header => header.trim()); // Get headers for metadata
-        const parsedData: CallSheetRow[] = rows.slice(1).map((row, index) => {
-            const [name, phoneNumber, ...otherFields] = row.split(',');
+        const parsedData: ICallSheetItem[] = rows.slice(1).map((row, index) => {
+            const [name, phoneNumber, callId, ...otherFields] = row.split(',');
             const metadata: Record<string, string> = {};
             otherFields.forEach((field, i) => {
                 if (headers[i]) {
@@ -46,7 +42,9 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 id: `${index}`,
                 name,
                 phoneNumber,
-                status: 'pending',
+                callId,
+                status: CallSheetStatus.Pending,
+                saved: false,
                 metadata
             };
         });
@@ -72,19 +70,58 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 
-    const processSheet = () => {
+    const saveNewItems = async () => {
+        const callSheetData: ICallSheet = {
+            id: null,
+            items: callSheet.filter(item => !item.saved),
+            agentId: agentId || '',
+            ownerId: '123'
+        }
+        if(callSheetData.items.length > 0) {
+            await createCallsheet(callSheetData);
+        } else {
+            console.log("No new items to save");
+        }
+    }
+
+    const processSheet = async () => {
         setIsProcessing(true);
-        // Save call sheet to database
-        // Then trigger processing
-         // Show the sheet as loading
-        // Return call sheet, with ids and update status
+        await saveNewItems();
+        // Trigger calls, and set items to being processed
+            // Asynchronously update status of each call item
 
         // Simulating processing, replace with actual API call
+        if(agentId && callSheetId) {
+            await triggerProcessCallsheetWithAgent(agentId, callSheetId);
+        }
+        /*
         setTimeout(() => {
-            setCallSheet(prev => prev.map(row => ({ ...row, status: 'completed' })));
+            setCallSheet(prev => prev.map(row => ({ ...row, status: CallSheetStatus.Completed })));
             setIsProcessing(false);
         }, 2000);
+        */
+       setIsProcessing(false);
     };
+
+
+    const fetchCallsheet = async () => {
+        if(agentId) {
+            const callsheets = await getCallsheetsByAgent(agentId || '');
+            console.log("callsheets ", callsheets);
+            const firstCallsheet = callsheets[0];
+            if(firstCallsheet) {
+                setCallSheet(firstCallsheet.items.map(item => ({...item, saved: true})));
+                setCallSheetId(firstCallsheet.id);
+            }
+            setHasFetchedCallsheet(true);
+        }
+    }
+
+    useEffect(() => {
+        if(!hasFetchedCallsheet) {
+            fetchCallsheet();
+        }
+    }, [agentId]);
 
     // console.log("parsedData ",callSheet);
     console.log("agentId ", agentId);
@@ -114,9 +151,9 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 </div>
 
                 <Button onClick={() => { }} className="mr-2" disabled={isUploading}>
-                    {isUploading ? 'Uploading...' : 'Upload Call Sheet'}
+                    {isUploading ? 'Uploading...' : 'Upload Callsheet'}
                 </Button>
-                <Button onClick={processSheet} disabled={callSheet.length === 0 || isProcessing}>
+                <Button onClick={() => processSheet()} disabled={callSheet.length === 0 || isProcessing}>
                     {isProcessing ? 'Processing...' : 'Process Sheet'}
                 </Button>
 
@@ -131,7 +168,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                         </TableHeader>
                         <TableBody>
                             {callSheet.map((log, index) => (
-                                <TableRow key={log.phoneNumber} onClick={() => setSelectedRow(log)} className="cursor-pointer">
+                                <TableRow key={log.id} onClick={() => setSelectedRow(log)} className="cursor-pointer">
                                     <TableCell>{log.name}</TableCell>
                                     <TableCell>{log.phoneNumber}</TableCell>
                                     <TableCell>{log.status}</TableCell>
@@ -160,7 +197,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                                 <p><strong>Phone Number:</strong> {selectedRow.phoneNumber}</p>
                                 <p><strong>Status:</strong> {selectedRow.status}</p>
                                 {/* Add more details as needed */}
-                                {Object.entries(selectedRow.metadata).map(([key, value]) => (
+                                {selectedRow.metadata && Object.entries(selectedRow.metadata).map(([key, value]) => (
                                     <p key={key}><strong>{key}:</strong> {value}</p>
                                 ))}
                             </div>
