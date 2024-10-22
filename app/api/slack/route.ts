@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
         console.log("typedInfo - toolCallList ", typedInfo.message.toolCallList[0]);
         console.log("typedInfo - toolCallLists ", typedInfo.message.toolCallList);
         console.log("typedInfo - call ", typedInfo.message.call);
-        // @ts-ignore
         console.log("typedInfo - call ", typedInfo.message.customer);
 
         const name = typedInfo.message.toolCallList[0].function.arguments.name;
