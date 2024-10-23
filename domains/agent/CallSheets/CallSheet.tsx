@@ -31,9 +31,13 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
         const rows = csvData.split('\n');
         const headers = rows[0].split(',').slice(2).map(header => header.trim()); // Get headers for metadata
         const parsedData: ICallSheetItem[] = rows.slice(1).map((row, index) => {
-            const [name, phoneNumber, callId, ...otherFields] = row.split(',');
+            const [name, phoneNumber, ...otherFields] = row.split(',');
             const metadata: Record<string, string> = {};
+            // console.log("otherFields ", otherFields);
+            // console.log("headers ", headers);
             otherFields.forEach((field, i) => {
+                console.log("field ", field, " i ", i);
+                console.log("headers[i] ", headers[i]);
                 if (headers[i]) {
                     metadata[headers[i]] = field.trim();
                 }
@@ -42,7 +46,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 id: `${index}`,
                 name,
                 phoneNumber,
-                callId,
+                callId: null,
                 status: CallSheetStatus.Pending,
                 saved: false,
                 metadata
@@ -126,6 +130,8 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
     // console.log("parsedData ",callSheet);
     console.log("agentId ", agentId);
 
+    console.log("selectedRow.metadata ", selectedRow?.metadata);
+
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
@@ -134,6 +140,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
             {/* Main content */}
             <main className="flex-1 p-8 overflow-auto">
                 <div className="flex justify-between items-center mb-6">
+                    {/* Fix agent name */}
                     <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">Real estate prospector</span></p>
                     <Button variant="ghost">
                         <LogOut className="mr-2 h-4 w-4" />
