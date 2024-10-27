@@ -116,7 +116,7 @@ export default function CreateEditAgent() {
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
-        <AgentHeader isEditing={isEditing} />
+        <AgentHeader isEditing={isEditing} title={_agentData.title} />
 
         <Card>
           <CardHeader>

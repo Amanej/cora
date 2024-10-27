@@ -178,7 +178,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                                 <TableRow key={log.id} onClick={() => setSelectedRow(log)} className="cursor-pointer">
                                     <TableCell>{log.name}</TableCell>
                                     <TableCell>{log.phoneNumber}</TableCell>
-                                    <TableCell>{log.status}</TableCell>
+                                    <TableCell>{log.saved ? log.status : 'New'}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -188,8 +188,6 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 <div className="flex justify-center mt-4">
                     <nav className="inline-flex">
                         <Button className="mr-2" size="sm">1</Button>
-                        <Button className="mr-2" size="sm">2</Button>
-                        <Button className="mr-2" size="sm">3</Button>
                     </nav>
                 </div>
 

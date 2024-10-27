@@ -5,9 +5,10 @@ import { ROUTES } from '@/lib/routing'
 
 type AgentHeaderProps = {
     isEditing: boolean
+    title: string
 }
 
-const AgentHeader = ({ isEditing }: AgentHeaderProps) => {
+const AgentHeader = ({ isEditing, title }: AgentHeaderProps) => {
     return (
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-4">
@@ -16,7 +17,7 @@ const AgentHeader = ({ isEditing }: AgentHeaderProps) => {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? "Kundeservice agenten min" : "Opprett kundeservice agent"}</p>
+            <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? title : "Create agent"}</p>
           </div>
         </div>
     )
