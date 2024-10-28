@@ -1,13 +1,12 @@
 import APP_CONFIG from '@/lib/config';
 import { ICallSheet } from '../types';
+import { getLoggedInHeaders } from '@/domains/auth/utils';
 
-export const createCallsheet = async (callsheet: ICallSheet): Promise<ICallSheet> => {
+export const createCallsheet = async (callsheet: ICallSheet, token: string): Promise<ICallSheet> => {
   console.log("Create createCallsheet called");
   const response = await fetch(APP_CONFIG.backendUrl+'/callsheets', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getLoggedInHeaders(token),
     body: JSON.stringify(callsheet),
   });
 
@@ -18,12 +17,10 @@ export const createCallsheet = async (callsheet: ICallSheet): Promise<ICallSheet
   return response.json();
 };
 
-export const getCallsheetsByAgent = async (agentId: string): Promise<ICallSheet[]> => {
+export const getCallsheetsByAgent = async (agentId: string, token: string): Promise<ICallSheet[]> => {
   const response = await fetch(`${APP_CONFIG.backendUrl}/callsheets/agent/${agentId}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getLoggedInHeaders(token),
   });
 
   if (!response.ok) {
@@ -37,12 +34,10 @@ export const getCallsheetsByAgent = async (agentId: string): Promise<ICallSheet[
   }));
 };
 
-export const triggerProcessCallsheetWithAgent = async (agentId: string, callSheetId: string): Promise<void> => {
+export const triggerProcessCallsheetWithAgent = async (agentId: string, callSheetId: string, token: string): Promise<void> => {
   const response = await fetch(`${APP_CONFIG.backendUrl}/agents/${agentId}/process-callsheet/${callSheetId}`, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+    headers: getLoggedInHeaders(token),
   });
 
   if (!response.ok) {

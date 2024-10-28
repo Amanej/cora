@@ -6,6 +6,7 @@ import { Trash } from "lucide-react"
 import { fetchIntegrations } from "../../api";
 import { Integration } from "@/domains/integrations/types";
 import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "@/components/ui/select";
+import { useAuth } from "@/domains/auth/state/AuthContext";
 
 type AgentActionProps = {
     integrationIds: string[];
@@ -13,17 +14,20 @@ type AgentActionProps = {
 }
 
 const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) => {
+    const { token } = useAuth();
     const [integrations, setIntegrations] = useState<Integration[]>([]);
     const [selectedIntegrationIds, setSelectedIntegrationIds] = useState<string[]>(integrationIds);
 
-    const getIntegrations = async () => {
-        const integrations = await fetchIntegrations();
+    const getIntegrations = async (token: string) => {
+        const integrations = await fetchIntegrations(token);
         setIntegrations(integrations.integrations);
     }
 
     useEffect(() => {
-        getIntegrations();
-    }, []);
+        if(token) {
+            getIntegrations(token);
+        }
+    }, [token]);
 
     useEffect(() => {
         setSelectedIntegrationIds(integrationIds);

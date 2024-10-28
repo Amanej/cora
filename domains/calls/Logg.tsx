@@ -19,6 +19,7 @@ import { fetchAgentById } from "../agent/api"
 import { AgentData } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
 import { Call } from "./types"
+import { useAuth } from '../auth/state/AuthContext';
 
 const callLogs = [
   { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Kari Jackson", duration: "2:30" },
@@ -34,15 +35,16 @@ type Props = {
   id: string
 }
 
-export default function CallLogs({ id }: Props) { // Set to false for create mode
+export default function CallLogs({ id }: Props) {
+  const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
   const [agentData, setAgentData] = useState<AgentData | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
 
-  const fetchAgent = async (id: string) => {
+  const fetchAgent = async (id: string, token: string) => {
     console.log('Fetching agent with ID:', id);
     setIsLoading(true);
-    const agent = await fetchAgentById(id as string);
+    const agent = await fetchAgentById(id as string, token);
     console.log('Agent fetched:', agent);
     if (agent) {
       setAgentData(agent);
@@ -50,19 +52,19 @@ export default function CallLogs({ id }: Props) { // Set to false for create mod
     setIsLoading(false);
   };
 
-  const fetchCalls = async (agentId: string) => {
-    const agentCalls = await fetchCallsByAgentId(agentId);
+  const fetchCalls = async (agentId: string, token: string) => {
+    const agentCalls = await fetchCallsByAgentId(agentId, token);
     console.log('Calls fetched:', agentCalls);
     setCalls(agentCalls);
   }
 
 
   useEffect(() => {
-    if (id) {
-      fetchAgent(id);
-      fetchCalls(id);
+    if (id && token) {
+      fetchAgent(id, token);
+      fetchCalls(id, token);
     }
-  }, []);
+  }, [id, token]);
 
 
   return (
