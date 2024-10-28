@@ -1,13 +1,12 @@
 import APP_CONFIG from "@/lib/config";
 import { AgentData } from "../types";
+import { getLoggedInHeaders } from "@/domains/auth/utils";
 
-export const createAgent = async (agentData: AgentData) => {
+export const createAgent = async (agentData: AgentData, token: string) => {
     try {
         const response = await fetch(APP_CONFIG.backendUrl+'/agents', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
             body: JSON.stringify({...agentData, ownerId: '123'}),
         });
 
@@ -22,15 +21,13 @@ export const createAgent = async (agentData: AgentData) => {
     }
 };
 
-export const fetchAgents = async () => {
+export const fetchAgents = async (token: string) => {
     try {
         const url = APP_CONFIG.backendUrl+'/agents';
         console.log("fetchAgents called ",url);
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
         });
 
         if (!response.ok) {
@@ -45,15 +42,13 @@ export const fetchAgents = async () => {
     }
 };
 
-export const fetchAgentById = async (agentId: string): Promise<AgentData | null> => {
+export const fetchAgentById = async (agentId: string, token: string): Promise<AgentData | null> => {
     try {
         const url = `${APP_CONFIG.backendUrl}/agents/${agentId}`;
         //console.log(`Fetching agent with ID: ${agentId}`);
         const response = await fetch(url, {
             method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
         });
 
         if (!response.ok) {
@@ -74,13 +69,11 @@ export const fetchAgentById = async (agentId: string): Promise<AgentData | null>
 };
 
 
-export const deleteAgent = async (agentId: string) => {
+export const deleteAgent = async (agentId: string, token: string) => {
     try {
         const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentId, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
         });
 
         if (!response.ok) {
@@ -94,13 +87,11 @@ export const deleteAgent = async (agentId: string) => {
     }
 };
 
-export const updateAgent = async (agentId: string, agentData: Partial<AgentData>) => {
+export const updateAgent = async (agentId: string, agentData: Partial<AgentData>, token: string) => {
     try {
         const response = await fetch(APP_CONFIG.backendUrl+'/agents/'+agentId, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
             body: JSON.stringify({...agentData}),
         });
 
@@ -116,13 +107,11 @@ export const updateAgent = async (agentId: string, agentData: Partial<AgentData>
 };
 
 
-export const testCallAgent = async (agentId: string, phoneNumberToCall: string) => {
+export const testCallAgent = async (agentId: string, phoneNumberToCall: string, token: string) => {
     try {
         const response = await fetch(APP_CONFIG.backendUrl+'/calls/test-call', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: getLoggedInHeaders(token),
             body: JSON.stringify({agentId, phoneNumberToCall}),
         });
 
@@ -137,12 +126,10 @@ export const testCallAgent = async (agentId: string, phoneNumberToCall: string) 
     }
 };
 
-export const fetchIntegrations = async () => {
+export const fetchIntegrations = async (token: string) => {
     const response = await fetch(APP_CONFIG.backendUrl+'/integrations/all', {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: getLoggedInHeaders(token),
     });     
     const data = await response.json();
     return data;
