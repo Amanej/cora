@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { LogOut } from 'lucide-react';
 import SideBar, { SidebarPage } from '@/components/global/Sidebar';
 import { createCallsheet, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
@@ -79,7 +78,8 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
             id: null,
             items: callSheet.filter(item => !item.saved),
             agentId: agentId || '',
-            ownerId: '123'
+            ownerId: '123',
+            status: CallSheetStatus.Pending
         }
         if(callSheetData.items.length > 0) {
             await createCallsheet(callSheetData);
@@ -91,19 +91,10 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
     const processSheet = async () => {
         setIsProcessing(true);
         await saveNewItems();
-        // Trigger calls, and set items to being processed
-            // Asynchronously update status of each call item
 
-        // Simulating processing, replace with actual API call
         if(agentId && callSheetId) {
             await triggerProcessCallsheetWithAgent(agentId, callSheetId);
         }
-        /*
-        setTimeout(() => {
-            setCallSheet(prev => prev.map(row => ({ ...row, status: CallSheetStatus.Completed })));
-            setIsProcessing(false);
-        }, 2000);
-        */
        setIsProcessing(false);
     };
 
@@ -127,11 +118,6 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
         }
     }, [agentId]);
 
-    // console.log("parsedData ",callSheet);
-    console.log("agentId ", agentId);
-
-    console.log("selectedRow.metadata ", selectedRow?.metadata);
-
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
@@ -142,10 +128,6 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 <div className="flex justify-between items-center mb-6">
                     {/* Fix agent name */}
                     <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">Real estate prospector</span></p>
-                    <Button variant="ghost">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logg ut
-                    </Button>
                 </div>
 
                 <div {...getRootProps()} className="border-2 border-dashed p-4 mb-4 text-center cursor-pointer">
