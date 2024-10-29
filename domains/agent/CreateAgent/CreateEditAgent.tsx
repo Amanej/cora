@@ -51,7 +51,7 @@ export default function CreateEditAgent() {
   const searchId = searchParams.get('id');
 
   const fetchAgent = async (id: string, token: string) => {
-    // console.log('Fetching agent with ID:', id);
+    console.log('Fetching agent with ID:', id,  token);
     setIsEditing(true);
     setIsLoading(true);
     const agent = await fetchAgentById(id as string, token);
@@ -66,7 +66,7 @@ export default function CreateEditAgent() {
     if (searchId && token) {
       fetchAgent(searchId, token);
     }
-  }, []);
+  }, [token]);
 
   const agentData: AgentData = {
     title: _agentData.title || 'Customer Service Agent',
