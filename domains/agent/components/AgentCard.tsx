@@ -14,24 +14,26 @@ import clsx from "clsx";
 type AgentCardProps = {
     agent: AgentData;
     refreshAgents: () => void;
+    token: string | null;
 }
 
-const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
+const AgentCard = ({ agent, refreshAgents, token }: AgentCardProps) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
 
     const toggleAgentStatus = async (agentId: string | undefined) => {
         console.log("toggleAgentStatus", agentId);
         setIsUpdating(true);
-        if(isUpdating) {
+        if (isUpdating) {
             return;
         }
         try {
-            if(agentId) {
-            await updateAgent(agentId, {
-                status: agent.status === AgentStatus.Active ? AgentStatus.Inactive : AgentStatus.Active
-            });
-        }
+            if (agentId && token) {
+                await updateAgent(agentId, {
+                    status: agent.status === AgentStatus.Active ? AgentStatus.Inactive : AgentStatus.Active
+                }, token);
+                refreshAgents();
+            }
             setIsUpdating(false);
         } catch (error) {
             console.error("Error updating agent:", error);
@@ -42,11 +44,13 @@ const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
     const callDeleteAgent = async (agentId: string) => {
         console.log("deleteAgent called", agentId);
         setIsDeleting(true);
-        if(isDeleting) {
+        if (isDeleting) {
             return;
         }
         try {
-            await deleteAgent(agentId);
+            if (agentId && token) {
+                await deleteAgent(agentId, token);
+            }
             setIsDeleting(false);
             refreshAgents();
         } catch (error) {
@@ -60,48 +64,48 @@ const AgentCard = ({ agent, refreshAgents }: AgentCardProps) => {
     const isActive = agent.status === AgentStatus.Active;
     return (
         <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">
-            <div className="flex items-center space-x-3">
-              <CircleIcon className={clsx("h-3 w-3", isActive ? "fill-green-500 text-green-500" : "fill-red-500 text-red-500")} />
-              <span>{agent.title}</span>
-            </div>
-          </CardTitle>
-          <p className="text-sm text-link">{agent.type}</p>
-        </CardHeader>
-        <CardContent>
-          {/*<p className="text-xs text-muted-foreground">124 samtaler håndtert idag</p>*/}
-          <Separator className="my-2" />
-          <div className="flex space-x-2">
-            {showCallList &&
-                <Button variant="outline" size="sm">
-                    <Link href={`${ROUTES.CALL_SHEETS_BY_AGENT}${agent._id}`}>Ringelister</Link>
-                </Button>
-            }
-            {hasCalls &&
-                <Button variant="outline" size="sm">
-                    <Link href={`${ROUTES.CALL_LOGS_BY_AGENT}${agent._id}`}>Se samtale logger</Link>
-                </Button>
-            }
-            <Button variant="outline" size="sm"
-                onClick={() => {
-                    toggleAgentStatus(agent._id);
-                }}
-            >{isActive ? "Deaktiver" : "Aktiver"}</Button>
-            <Button variant="outline" size="sm">
-                <Link href={ROUTES.CREATE_AGENT+"?id="+agent._id}>Rediger</Link>
-            </Button>
-            <Button variant="outline" size="sm"
-                disabled={isDeleting}
-                onClick={() => {
-                    if(agent._id) {
-                        callDeleteAgent(agent._id);
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                    <div className="flex items-center space-x-3">
+                        <CircleIcon className={clsx("h-3 w-3", isActive ? "fill-green-500 text-green-500" : "fill-red-500 text-red-500")} />
+                        <span>{agent.title}</span>
+                    </div>
+                </CardTitle>
+                <p className="text-sm text-link">{agent.type}</p>
+            </CardHeader>
+            <CardContent>
+                {/*<p className="text-xs text-muted-foreground">124 samtaler håndtert idag</p>*/}
+                <Separator className="my-2" />
+                <div className="flex space-x-2">
+                    {showCallList &&
+                        <Button variant="outline" size="sm">
+                            <Link href={`${ROUTES.CALL_SHEETS_BY_AGENT}${agent._id}`}>Ringelister</Link>
+                        </Button>
                     }
-                }}
-            >{isDeleting ? "Sletter..." : "Slett"}</Button>
-          </div>
-        </CardContent>
-      </Card>
+                    {hasCalls &&
+                        <Button variant="outline" size="sm">
+                            <Link href={`${ROUTES.CALL_LOGS_BY_AGENT}${agent._id}`}>Se samtale logger</Link>
+                        </Button>
+                    }
+                    <Button variant="outline" size="sm"
+                        onClick={() => {
+                            toggleAgentStatus(agent._id);
+                        }}
+                    >{isActive ? "Deaktiver" : "Aktiver"}</Button>
+                    <Button variant="outline" size="sm">
+                        <Link href={ROUTES.CREATE_AGENT + "?id=" + agent._id}>Rediger</Link>
+                    </Button>
+                    <Button variant="outline" size="sm"
+                        disabled={isDeleting}
+                        onClick={() => {
+                            if (agent._id) {
+                                callDeleteAgent(agent._id);
+                            }
+                        }}
+                    >{isDeleting ? "Sletter..." : "Slett"}</Button>
+                </div>
+            </CardContent>
+        </Card>
     )
 }
 

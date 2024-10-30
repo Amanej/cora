@@ -18,6 +18,7 @@ import AgentActions from './components/AgentActions'
 import AgentKnowledgeBase from './components/AgentKnowledgeBase'
 import AgentPersona from './components/AgentPersona'
 import AgentHeader from './components/AgentHeader'
+import { useAuth } from '@/domains/auth/state/AuthContext'
 
 type PhoneNumberOption = {
   number: string;
@@ -39,6 +40,7 @@ const PHONENUMBER_OPTIONS: PhoneNumberOption[] = [
 ]
 
 export default function CreateEditAgent() {
+  const { token } = useAuth();
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
@@ -48,11 +50,11 @@ export default function CreateEditAgent() {
   const searchParams = useSearchParams();
   const searchId = searchParams.get('id');
 
-  const fetchAgent = async (id: string) => {
-    // console.log('Fetching agent with ID:', id);
+  const fetchAgent = async (id: string, token: string) => {
+    console.log('Fetching agent with ID:', id,  token);
     setIsEditing(true);
     setIsLoading(true);
-    const agent = await fetchAgentById(id as string);
+    const agent = await fetchAgentById(id as string, token);
     // console.log('Agent fetched:', agent);
     if (agent) {
       setAgentData(agent);
@@ -61,10 +63,10 @@ export default function CreateEditAgent() {
   };
 
   useEffect(() => {
-    if (searchId) {
-      fetchAgent(searchId);
+    if (searchId && token) {
+      fetchAgent(searchId, token);
     }
-  }, []);
+  }, [token]);
 
   const agentData: AgentData = {
     title: _agentData.title || 'Customer Service Agent',
@@ -82,7 +84,9 @@ export default function CreateEditAgent() {
 
   const handleSave = async () => {
     setIsLoading(true)
-    await createAgent({ ...agentData });
+    if (token) {
+      await createAgent({ ...agentData }, token);
+    }
     // @TODO - Support for uploading files and picking them from knowledgebase
     // console.log('Agent created')
     setIsLoading(false)
@@ -91,20 +95,17 @@ export default function CreateEditAgent() {
 
   const handleUpdate = async () => {
     setIsLoading(true)
-    if (searchId) {
-      await updateAgent(searchId, { ...agentData });
-      // console.log('Agent updated')
+    if (searchId && token) {
+      await updateAgent(searchId, { ...agentData }, token);
     }
     setIsLoading(false)
     router.push(ROUTES.MANAGE_AGENTS);
   }
 
   const handleTestAgent = async () => {
-    // e.preventDefault() 
-    // callApi(agentData.phoneNumberId, "FAIR_COLLECTION", agentData.persona === "mann_norsk" ? "NORWEGIAN" : "ENGLISH")
-    if (searchId) {
+    if (searchId && token) {
       setIsLoading(true)
-      await testCallAgent(searchId, testNumber)
+      await testCallAgent(searchId, testNumber, token)
       setIsLoading(false)
     }
   }

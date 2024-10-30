@@ -8,19 +8,21 @@ import { ROUTES } from "@/lib/routing"
 import { AgentData, AgentStatus } from "./types"
 import { fetchAgents } from "./api"
 import AgentCard from "./components/AgentCard"
-//import { useIsAuthenticated } from "@/domains/auth/hooks/isAuthenticated"
+import { useAuth } from "@/domains/auth/state/AuthContext"
 
 const Management = () => {
-  // const isAuthenticated = useIsAuthenticated();
+  const { token } = useAuth();
   const [agents, setAgents] = useState<AgentData[]>([]);
 
   useEffect(() => {
-    console.log("About to fetch agents")
-    callFetchAgents();
-  }, []);
+    if (token) {
+      console.log("About to fetch agents")
+      callFetchAgents(token);
+    }
+  }, [token]);
 
-  const callFetchAgents = async () => {
-    const agents = await fetchAgents();
+  const callFetchAgents = async (token: string) => {
+    const agents = await fetchAgents(token);
     if (agents) {
       setAgents(agents);
     }
@@ -38,7 +40,7 @@ const Management = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-    <SideBar currentPage={SidebarPage.Manage} />
+      <SideBar currentPage={SidebarPage.Manage} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
@@ -49,7 +51,13 @@ const Management = () => {
         {/* Agent list */}
         <div className="space-y-4">
           {sortedAgents.map((agent) => (
-            <AgentCard key={agent._id} agent={agent} refreshAgents={callFetchAgents} />
+            <AgentCard key={agent._id} agent={agent} refreshAgents={() => {
+              if (token) {
+                callFetchAgents(token)
+              }
+            }}
+              token={token}
+            />
           ))}
         </div>
 

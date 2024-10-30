@@ -13,12 +13,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import SideBar, { SidebarPage } from '@/components/global/Sidebar';
 import { createCallsheet, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
+import { useAuth } from '@/domains/auth/state/AuthContext';
 
 type Props = {
     agentId?: string;
 }
 
 const CallSheet: React.FC<Props> = ({ agentId }) => {
+    const { token } = useAuth();
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
     const [callSheetId, setCallSheetId] = useState<string | null>(null);
     const [hasFetchedCallsheet, setHasFetchedCallsheet] = useState(false);
@@ -81,8 +83,8 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
             ownerId: '123',
             status: CallSheetStatus.Pending
         }
-        if(callSheetData.items.length > 0) {
-            await createCallsheet(callSheetData);
+        if(callSheetData.items.length > 0 && token) {
+            await createCallsheet(callSheetData, token);
         } else {
             console.log("No new items to save");
         }
@@ -92,16 +94,15 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
         setIsProcessing(true);
         await saveNewItems();
 
-        if(agentId && callSheetId) {
-            await triggerProcessCallsheetWithAgent(agentId, callSheetId);
+        if(agentId && callSheetId && token) {
+            await triggerProcessCallsheetWithAgent(agentId, callSheetId, token);
         }
        setIsProcessing(false);
     };
 
 
-    const fetchCallsheet = async () => {
-        if(agentId) {
-            const callsheets = await getCallsheetsByAgent(agentId || '');
+    const fetchCallsheet = async (agentId: string, token: string) => {
+            const callsheets = await getCallsheetsByAgent(agentId, token);
             console.log("callsheets ", callsheets);
             const firstCallsheet = callsheets[0];
             if(firstCallsheet) {
@@ -109,14 +110,13 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
                 setCallSheetId(firstCallsheet.id);
             }
             setHasFetchedCallsheet(true);
-        }
     }
 
     useEffect(() => {
-        if(!hasFetchedCallsheet) {
-            fetchCallsheet();
+        if(!hasFetchedCallsheet && agentId && token) {
+            fetchCallsheet(agentId, token);
         }
-    }, [agentId]);
+    }, [agentId, token]);
 
     return (
         <div className="flex h-screen bg-gray-100">
