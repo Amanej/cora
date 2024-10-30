@@ -16,6 +16,7 @@ import { AgentData } from '@/domains/agent/types';
 import { fetchAgentById } from '@/domains/agent/api';
 import { useRouter } from 'next/navigation';
 import { CallSheetStatus, ICallSheet } from '../types';
+import { useAuth } from '@/domains/auth/state/AuthContext';
 
 const callsheets: ICallSheet[] = [
   { id: '1', items: [], agentId: '1', ownerId: '1', status: CallSheetStatus.Pending },
@@ -26,14 +27,15 @@ type Props = {
 }
 
 export default function Callsheets({ agentId }: Props) {
+  const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
   const [agentData, setAgentData] = useState<AgentData | null>(null);
   const router = useRouter();
 
-  const fetchAgent = async (id: string) => {
+  const fetchAgent = async (id: string, token: string) => {
     console.log('Fetching agent with ID:', id);
     setIsLoading(true);
-    const agent = await fetchAgentById(id as string);
+    const agent = await fetchAgentById(id as string, token);
     // console.log('Agent fetched:', agent);
     if (agent) {
       setAgentData(agent);
@@ -42,10 +44,10 @@ export default function Callsheets({ agentId }: Props) {
   };
 
   useEffect(() => {
-    if (agentId) {
-      fetchAgent(agentId);
+    if (agentId && token) {
+      fetchAgent(agentId, token);
     }
-  }, []);
+  }, [agentId, token]);
 
 
   return (
