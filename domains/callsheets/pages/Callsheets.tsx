@@ -17,10 +17,9 @@ import { fetchAgentById } from '@/domains/agent/api';
 import { useRouter } from 'next/navigation';
 import { CallSheetStatus, ICallSheet } from '../types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
-
-const callsheets: ICallSheet[] = [
-  { id: '1', items: [], agentId: '1', ownerId: '1', status: CallSheetStatus.Pending },
-]
+import { getCallsheetsByAgent } from '../api';
+import { ROUTES } from '@/lib/routing';
+import { Button } from '@/components/ui/button';
 
 type Props = {
     agentId: string
@@ -30,6 +29,7 @@ export default function Callsheets({ agentId }: Props) {
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
   const [agentData, setAgentData] = useState<AgentData | null>(null);
+  const [callsheets, setCallsheets] = useState<ICallSheet[]>([]);
   const router = useRouter();
 
   const fetchAgent = async (id: string, token: string) => {
@@ -43,9 +43,18 @@ export default function Callsheets({ agentId }: Props) {
     setIsLoading(false);
   };
 
+  const fetchCallsheets = async (agentId: string, token: string) => {
+    setIsLoading(true);
+    const callsheets = await getCallsheetsByAgent(agentId, token);
+    console.log("callsheets ", callsheets);
+    setCallsheets(callsheets);
+    setIsLoading(false);
+  }
+
   useEffect(() => {
     if (agentId && token) {
       fetchAgent(agentId, token);
+      fetchCallsheets(agentId, token);
     }
   }, [agentId, token]);
 
@@ -72,18 +81,24 @@ export default function Callsheets({ agentId }: Props) {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {callsheets.map((callsheet, index) => (
-                <TableRow key={index} onClick={() => {
-                  router.push(`/dashboard/agent/call-sheet/${callsheet.id}`);
+              {callsheets.map((callsheet: ICallSheet, index: number) => (
+                <TableRow key={index} className="cursor-pointer" onClick={() => {
+                  router.push(`${ROUTES.CALL_SHEET}${callsheet.id}`);
                 }}>
-                  <TableCell>{callsheet.agentId}</TableCell>
-                  <TableCell>{format(new Date(), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
+                  <TableCell>{callsheet.title || 'No title'}</TableCell>
+                  <TableCell>{callsheet.createdAt ? format(new Date(callsheet.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb }) : ''}</TableCell>
                   <TableCell>{callsheet.status}</TableCell>
                   <TableCell>{callsheet.items.length}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+        </div>
+
+        <div className="mt-4">
+          <Button onClick={() => router.push(`${ROUTES.CREATE_CALL_SHEET}${agentId}`)}>
+            New callsheet
+          </Button>
         </div>
 
       </main>

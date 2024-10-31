@@ -17,6 +17,19 @@ export const createCallsheet = async (callsheet: ICallSheet, token: string): Pro
   return response.json();
 };
 
+export const getCallsheetById = async (id: string, token: string): Promise<ICallSheet> => {
+    const response = await fetch(`${APP_CONFIG.backendUrl}/callsheets/${id}`, {
+      method: 'GET',
+      headers: getLoggedInHeaders(token),
+    });
+  
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+  
+    return await response.json();
+};
+
 export const getCallsheetsByAgent = async (agentId: string, token: string): Promise<ICallSheet[]> => {
   const response = await fetch(`${APP_CONFIG.backendUrl}/callsheets/agent/${agentId}`, {
     method: 'GET',

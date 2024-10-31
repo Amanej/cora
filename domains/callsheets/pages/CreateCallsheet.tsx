@@ -14,21 +14,19 @@ import SideBar, { SidebarPage } from '@/components/global/Sidebar';
 import { createCallsheet, getCallsheetById, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
+import { Input } from '@/components/ui/input';
 
 type Props = {
     agentId?: string;
-    sheetId?: string;
 }
 
-const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
+const CallSheet: React.FC<Props> = ({ agentId }) => {
     const { token } = useAuth();
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
-    const [callSheetId, setCallSheetId] = useState<string | null>(null);
-    const [hasFetchedCallsheet, setHasFetchedCallsheet] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [isUpdating, setIsUpdating] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
     const [selectedRow, setSelectedRow] = useState<ICallSheetItem | null>(null);
+    const [title, setTitle] = useState<string | null>(null);
 
     const parseData = (csvData: string) => {
         const rows = csvData.split('\n');
@@ -36,11 +34,7 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
         const parsedData: ICallSheetItem[] = rows.slice(1).map((row, index) => {
             const [name, phoneNumber, ...otherFields] = row.split(',');
             const metadata: Record<string, string> = {};
-            // console.log("otherFields ", otherFields);
-            // console.log("headers ", headers);
             otherFields.forEach((field, i) => {
-                console.log("field ", field, " i ", i);
-                console.log("headers[i] ", headers[i]);
                 if (headers[i]) {
                     metadata[headers[i]] = field.trim();
                 }
@@ -55,7 +49,9 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                 metadata
             };
         });
-        return parsedData;
+        // Filter out rows without phone numbers
+        const filteredData = parsedData.filter(item => item.phoneNumber && item.phoneNumber.trim() !== '');
+        return filteredData;
     }
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -75,20 +71,21 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
         reader.readAsText(file);
     }, []);
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+    const { getRootProps, getInputProps, open, isDragActive } = useDropzone({ onDrop });
 
     const saveNewItems = async () => {
         const callSheetData: ICallSheet = {
             id: null,
-            title: null,
+            title: title || '',
             items: callSheet.filter(item => !item.saved),
             agentId: agentId || '',
-            ownerId: '123',
+            ownerId: '123', // Fix serverside
             status: CallSheetStatus.Pending
         }
         if(callSheetData.items.length > 0 && token) {
             await createCallsheet(callSheetData, token);
         } else {
+            // TODO: Show error
             console.log("No new items to save");
         }
     }
@@ -97,36 +94,12 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
         return callSheet.filter(item => item.saved).length > 0;
     }
 
-    const processSheet = async () => {
-        setIsProcessing(true);
-        if(agentId && callSheetId && token) {
-            await triggerProcessCallsheetWithAgent(agentId, callSheetId, token);
-        }
-       setIsProcessing(false);
-    };
-
-    const updateSheet = async () => {
-        setIsUpdating(true);
+    const saveSheet = async () => {
+        setIsSaving(true);
         // Should update, not save new callsheet
         await saveNewItems();
-        setIsUpdating(false);
+        setIsSaving(false);
     }
-
-
-    const fetchCallsheet = async (sheetId: string, token: string) => {
-            const sheet = await getCallsheetById(sheetId, token);
-            console.log("sheet  ", sheet);
-            if(sheet) {
-                setCallSheet(sheet.items.map(item => ({...item, saved: true})));
-            }
-            setHasFetchedCallsheet(true);
-    }
-
-    useEffect(() => {
-        if(!hasFetchedCallsheet && sheetId && token) {
-            fetchCallsheet(sheetId, token);
-        }
-    }, [agentId, token]);
 
     return (
         <div className="flex h-screen bg-gray-100">
@@ -136,8 +109,15 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
             {/* Main content */}
             <main className="flex-1 p-8 overflow-auto">
                 <div className="flex justify-between items-center mb-6">
-                    {/* Fix agent name */}
-                    <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">Real estate prospector</span></p>
+                    <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">{title || "New sheet"}</span></p>
+                </div>
+
+                <div className="mb-4">
+                    <Input placeholder="Name callsheet" value={title || ''}
+                        onChange={(e) => {
+                            setTitle(e.target.value)
+                        }}
+                        className="text-3xl text-gray-800 font-bold border-none shadow-none" />
                 </div>
 
                 <div {...getRootProps()} className="border-2 border-dashed border-gray-400 p-4 mb-4 text-center cursor-pointer text-gray-800 bg-gray-200">
@@ -149,11 +129,8 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                     )}
                 </div>
 
-                <Button onClick={() => { }} className="mr-2" disabled={isUploading}>
+                <Button onClick={() => { open() }} className="mr-2" disabled={isUploading}>
                     {isUploading ? 'Uploading...' : 'Upload Callsheet'}
-                </Button>
-                <Button onClick={() => processSheet()} disabled={!hasItemsToSave() || isProcessing}>
-                    {isProcessing ? 'Processing...' : 'Process Sheet'}
                 </Button>
 
                 <div className="bg-white mt-4 text-gray-900 shadow-md rounded-lg overflow-hidden">
@@ -178,15 +155,9 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                 </div>
 
                 <div className="mt-4">
-                    <Button onClick={() => updateSheet()} disabled={hasItemsToSave() || isProcessing}>
-                        {isUpdating ? 'Updating...' : 'Update sheet'}
+                    <Button onClick={() => saveSheet()} disabled={hasItemsToSave() || isSaving}>
+                        {isSaving ? 'Saving...' : 'Save sheet'}
                     </Button>
-                </div>
-
-                <div className="flex justify-center mt-4">
-                    <nav className="inline-flex">
-                        <Button className="mr-2" size="sm">1</Button>
-                    </nav>
                 </div>
 
                 <Dialog open={!!selectedRow} onOpenChange={() => setSelectedRow(null)}>

@@ -18,6 +18,8 @@ export interface ICallSheetItem {
 
 export interface ICallSheet {
     id: string | null;
+    title: string | null;
+    createdAt?: Date;
     items: ICallSheetItem[];
     status: CallSheetStatus;
     agentId: string;

@@ -22,11 +22,7 @@ import { useAuth } from '../auth/state/AuthContext';
 import clsx from 'clsx';
 import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 
-type Props = {
-  id: string
-}
-
-export default function CallLogs({ id }: Props) {
+export default function CallLogs() {
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
   const [agents, setAgents] = useState<AgentData[]>([]);
@@ -40,6 +36,9 @@ export default function CallLogs({ id }: Props) {
     console.log('Agent fetched:', agents);
     if (agents) {
       setAgents(agents);
+      if (!selectedAgent && agents.length > 0) {
+        setSelectedAgent(agents[0]);
+      }
     }
     setIsLoading(false);
   };
@@ -52,11 +51,16 @@ export default function CallLogs({ id }: Props) {
 
 
   useEffect(() => {
-    if (id && token) {
+    if (token) {
       getAgents(token);
-      fetchCalls(selectedAgent?._id || id, token);
     }
-  }, [id, token]);
+  }, [token]);
+
+  useEffect(() => {
+    if (token && selectedAgent?._id) {
+      fetchCalls(selectedAgent?._id, token);
+    }
+  }, [token, selectedAgent?._id]);
 
   const handleShowTranscript = (call: Call) => {
     setSelectedCall(call);
@@ -84,7 +88,7 @@ export default function CallLogs({ id }: Props) {
           <div className="mb-4">
             <select
               className="w-full p-2 border rounded-md text-gray-800 bg-white"
-              value={selectedAgent?._id || id}
+              value={selectedAgent?._id}
               onChange={(e) => {
                 const agent = agents.find(a => a._id === e.target.value);
                 setSelectedAgent(agent || null);
@@ -129,6 +133,7 @@ export default function CallLogs({ id }: Props) {
                       <Button variant="ghost" size="icon" title="Les" onClick={() => handleShowTranscript(call)}>
                         <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
                       </Button>
+                      {/* TODO: Add delete call */}
                       <Button variant="ghost" size="icon" title="Slett">
                         <Trash2 className="h-4 w-4" />
                       </Button>
