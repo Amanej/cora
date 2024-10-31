@@ -47,8 +47,8 @@ export const getCallsheetsByAgent = async (agentId: string, token: string): Prom
   }));
 };
 
-export const triggerProcessCallsheetWithAgent = async (agentId: string, callSheetId: string, token: string): Promise<void> => {
-  const response = await fetch(`${APP_CONFIG.backendUrl}/agents/${agentId}/process-callsheet/${callSheetId}`, {
+export const triggerProcessCallsheet = async (callSheetId: string, token: string): Promise<void> => {
+  const response = await fetch(`${APP_CONFIG.backendUrl}/agents/process-callsheet/${callSheetId}`, {
     method: 'POST',
     headers: getLoggedInHeaders(token),
   });

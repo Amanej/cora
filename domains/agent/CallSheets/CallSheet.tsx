@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import SideBar, { SidebarPage } from '@/components/global/Sidebar';
-import { createCallsheet, getCallsheetById, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
+import { createCallsheet, getCallsheetById, triggerProcessCallsheet } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
 
@@ -23,7 +23,6 @@ type Props = {
 const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
     const { token } = useAuth();
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
-    const [callSheetId, setCallSheetId] = useState<string | null>(null);
     const [hasFetchedCallsheet, setHasFetchedCallsheet] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -99,8 +98,8 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
 
     const processSheet = async () => {
         setIsProcessing(true);
-        if(agentId && callSheetId && token) {
-            await triggerProcessCallsheetWithAgent(agentId, callSheetId, token);
+        if(sheetId && token) {
+            await triggerProcessCallsheet(sheetId, token);
         }
        setIsProcessing(false);
     };
@@ -115,7 +114,6 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
 
     const fetchCallsheet = async (sheetId: string, token: string) => {
             const sheet = await getCallsheetById(sheetId, token);
-            console.log("sheet  ", sheet);
             if(sheet) {
                 setCallSheet(sheet.items.map(item => ({...item, saved: true})));
             }

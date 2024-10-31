@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import SideBar, { SidebarPage } from '@/components/global/Sidebar';
-import { createCallsheet, getCallsheetById, getCallsheetsByAgent, triggerProcessCallsheetWithAgent } from '@/domains/callsheets/api';
+import { createCallsheet } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
 import { Input } from '@/components/ui/input';
