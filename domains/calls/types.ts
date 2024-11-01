@@ -14,4 +14,6 @@ export type Call = {
     createdAt: Date;
     transcript: string
     updatedAt: Date;
+    startedAt?: Date;
+    endedAt?: Date;
 }

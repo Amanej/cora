@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlayCircle, FileText, Trash2 } from "lucide-react"
+import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
 import { useEffect, useState } from "react"
 import { fetchAgents } from "../agent/api"
 import { AgentData } from "../agent/types"
@@ -72,6 +72,11 @@ export default function CallLogs() {
     document.getElementById('show-audio-dialog')?.click();
   }
 
+  const handleShowNote = (call: Call) => {
+    setSelectedCall(call);
+    document.getElementById('show-note-dialog')?.click();
+  }
+
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -114,17 +119,24 @@ export default function CallLogs() {
                 <TableHead>Nummer</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Varighet</TableHead>
+                <TableHead>Suksessfylt</TableHead>
                 <TableHead>Handlinger</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {calls.map((call, index) => {
+                const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
+                const durationInMinutes = Math.floor(duration / 60000);
+                const durationFormatted = durationInMinutes > 0 
+                  ? format(new Date(0).setMinutes(durationInMinutes), 'mm:ss')
+                  : '00:00';
                 return (
                   <TableRow key={index}>
                     <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
                     <TableCell>{call.phoneNumber}</TableCell>
                     <TableCell>{call.status}</TableCell>
-                    <TableCell>-</TableCell>
+                    <TableCell>{durationFormatted}</TableCell>
+                    <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
                       <Button variant="ghost" size="icon" title="Spill av" onClick={() => handlePlayAudio(call)}>
@@ -133,6 +145,10 @@ export default function CallLogs() {
                       <Button variant="ghost" size="icon" title="Les" onClick={() => handleShowTranscript(call)}>
                         <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
                       </Button>
+                      {call.note && (
+                        <Button variant="ghost" size="icon" title="Se notat" onClick={() => handleShowNote(call)}>
+                          <StickyNote className="h-4 w-4" />
+                      </Button>)}
                       {/* TODO: Add delete call */}
                       <Button variant="ghost" size="icon" title="Slett">
                         <Trash2 className="h-4 w-4" />
