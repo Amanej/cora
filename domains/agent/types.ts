@@ -14,9 +14,9 @@ export type AgentData = {
   _id?: string,
   title: string,
   phoneNumberId: string,
-  subTitle: string,
   type: AgentType,
   instructions: string,
+  openingLine: string,
   knowledgebase: {
     url: string,
     name: string
@@ -26,4 +26,9 @@ export type AgentData = {
   status: AgentStatus,
   templateId: string,
   persona: string,
+  endCallPhrases?: string[];
+  evaluation: {
+    summary?: string;
+    successEvaluation?: string;
+  };
 };

@@ -33,7 +33,6 @@ export default function Callsheets({ agentId }: Props) {
   const router = useRouter();
 
   const fetchAgent = async (id: string, token: string) => {
-    console.log('Fetching agent with ID:', id);
     setIsLoading(true);
     const agent = await fetchAgentById(id as string, token);
     // console.log('Agent fetched:', agent);

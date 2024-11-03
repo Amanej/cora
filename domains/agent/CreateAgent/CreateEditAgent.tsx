@@ -19,6 +19,7 @@ import AgentKnowledgeBase from './components/AgentKnowledgeBase'
 import AgentPersona from './components/AgentPersona'
 import AgentHeader from './components/AgentHeader'
 import { useAuth } from '@/domains/auth/state/AuthContext'
+import AgentAnalysis from './components/AgentAnalysis'
 
 type PhoneNumberOption = {
   number: string;
@@ -51,7 +52,6 @@ export default function CreateEditAgent() {
   const searchId = searchParams.get('id');
 
   const fetchAgent = async (id: string, token: string) => {
-    console.log('Fetching agent with ID:', id,  token);
     setIsEditing(true);
     setIsLoading(true);
     const agent = await fetchAgentById(id as string, token);
@@ -71,7 +71,6 @@ export default function CreateEditAgent() {
   const agentData: AgentData = {
     title: _agentData.title || 'Customer Service Agent',
     phoneNumberId: _agentData.phoneNumberId || '123456789',
-    subTitle: _agentData.subTitle || 'Support Agent',
     type: _agentData.type || AgentType.Incoming,
     instructions: _agentData.instructions || 'Handle customer inquiries',
     knowledgebase: _agentData.knowledgebase,
@@ -80,6 +79,9 @@ export default function CreateEditAgent() {
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',
     persona: _agentData.persona || '', // Add this line
+    openingLine: _agentData.openingLine || '',
+    endCallPhrases: _agentData.endCallPhrases || [],
+    evaluation: _agentData.evaluation || {},
   };
 
   const handleSave = async () => {
@@ -125,7 +127,7 @@ export default function CreateEditAgent() {
               onChange={(e) => {
                 setAgentData({ ..._agentData, title: e.target.value })
               }}
-              className="text-3xl font-bold" />
+              className="text-3xl font-bold border-t-0 border-l-0 border-r-0 rounded-none shadow-none" />
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -173,6 +175,14 @@ export default function CreateEditAgent() {
               </div>
 
               <div className="space-y-2">
+                <Label htmlFor="openingLine">Opening message</Label>
+                <Input placeholder="Opening message" value={_agentData.openingLine}
+                  onChange={(e) => {
+                    setAgentData({ ..._agentData, openingLine: e.target.value })
+                  }}
+                />
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="instructions">Instructions</Label>
                 <Textarea
                   id="instructions"
@@ -181,6 +191,16 @@ export default function CreateEditAgent() {
                   value={_agentData.instructions}
                   onChange={(e) => {
                     setAgentData({ ..._agentData, instructions: e.target.value })
+                  }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="endCallPhrases">End call triggers <span className="text-xs text-gray-500">(comma separated)</span></Label>
+                <Input placeholder="End call triggers" value={_agentData.endCallPhrases?.toString() || ''}
+                  onChange={(e) => {
+                    const endphrases = e.target.value.split(',');
+                    setAgentData({ ..._agentData, endCallPhrases: endphrases })
                   }}
                 />
               </div>
@@ -194,6 +214,19 @@ export default function CreateEditAgent() {
               </div>*/}
 
               <AgentKnowledgeBase agentData={agentData} />
+
+              <Separator />
+
+              <AgentAnalysis
+                summary={_agentData.evaluation?.summary || ''}
+                successEvaluation={_agentData.evaluation?.successEvaluation || ''}
+                setSummary={(summary) => {
+                  setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, summary } })
+                }}
+                setSuccessEvaluation={(successEvaluation) => {
+                  setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, successEvaluation } })
+                }}
+              />
 
               <Separator />
 
@@ -215,6 +248,6 @@ export default function CreateEditAgent() {
           </CardContent>
         </Card>
       </main>
-    </div>
+    </div >
   )
 }
