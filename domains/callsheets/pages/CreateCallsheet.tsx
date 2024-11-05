@@ -15,12 +15,15 @@ import { createCallsheet } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
 import { Input } from '@/components/ui/input';
+import { ROUTES } from '@/lib/routing';
+import { useRouter } from 'next/navigation';
 
 type Props = {
     agentId?: string;
 }
 
 const CallSheet: React.FC<Props> = ({ agentId }) => {
+    const router = useRouter();
     const { token } = useAuth();
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -84,6 +87,7 @@ const CallSheet: React.FC<Props> = ({ agentId }) => {
         }
         if(callSheetData.items.length > 0 && token) {
             await createCallsheet(callSheetData, token);
+            router.push(ROUTES.CALL_SHEETS_BY_AGENT + "/" + agentId)
         } else {
             // TODO: Show error
             console.log("No new items to save");
