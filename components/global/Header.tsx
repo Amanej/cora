@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
+import { ROUTES } from '@/lib/routing'
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -17,15 +19,15 @@ const Header = () => {
 			</Link>
 			<nav className="ml-auto flex gap-4 sm:gap-6">
 				<div className={`md:flex gap-4 sm:gap-6 bg-black ${isMenuOpen ? 'flex flex-col absolute top-14 right-4 bg-white p-4 shadow-md animate-in fade-in slide-in-from-top-5 duration-300' : 'hidden'}`}>
-					<Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
-						Features
-					</Link>
-					<Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
-						Use Cases
-					</Link>
-					<Link className="text-sm font-medium underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
-						Request access
-					</Link>
+					<SignedOut>
+						<SignInButton />
+					</SignedOut>
+					<SignedIn>
+						<Link className="text-sm font-medium hover:underline underline-offset-4" href={ROUTES.MANAGE_AGENTS}>
+							Dashboard
+						</Link>
+						<UserButton />
+					</SignedIn>
 				</div>
 				<button className="md:hidden" onClick={toggleMenu}>
 					<svg
