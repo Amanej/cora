@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useAuth } from '@clerk/clerk-react'
 import Link from 'next/link'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { ROUTES } from '@/lib/routing'
@@ -8,9 +9,20 @@ import { ROUTES } from '@/lib/routing'
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+	const { getToken, isLoaded, userId } = useAuth()
+	console.log(" userId ", userId, " isLoaded ", isLoaded, " token ", getToken())
+
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen)
 	}
+
+	const isLoggedIn = async () => {
+		const token = await getToken()
+		console.log(" token ", token)
+		return token
+	}
+
+	// isLoggedIn()
 
 	return (
 		<header className="px-4 lg:px-6 h-14 flex items-center">
@@ -18,7 +30,7 @@ const Header = () => {
 				<img src="/Logo.svg" alt="Logo" className="h-4 m:h-6 w-auto" />
 			</Link>
 			<nav className="ml-auto flex gap-4 sm:gap-6">
-				<div className={`md:flex gap-4 sm:gap-6 bg-black ${isMenuOpen ? 'flex flex-col absolute top-14 right-4 bg-white p-4 shadow-md animate-in fade-in slide-in-from-top-5 duration-300' : 'hidden'}`}>
+				<div className={`md:flex gap-4 sm:gap-6 items-center bg-black ${isMenuOpen ? 'flex flex-col absolute top-14 right-4 bg-white p-4 shadow-md animate-in fade-in slide-in-from-top-5 duration-300' : 'hidden'}`}>
 					<SignedOut>
 						<SignInButton />
 					</SignedOut>
