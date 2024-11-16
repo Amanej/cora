@@ -45,7 +45,6 @@ export const fetchAgents = async (token: string) => {
 export const fetchAgentById = async (agentId: string, token: string): Promise<AgentData | null> => {
     try {
         const url = `${APP_CONFIG.backendUrl}/agents/${agentId}`;
-        //console.log(`Fetching agent with ID: ${agentId}`);
         const response = await fetch(url, {
             method: 'GET',
             headers: getLoggedInHeaders(token),

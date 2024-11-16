@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
 import { AgentData } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
@@ -21,10 +21,13 @@ import { Call } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
 import clsx from 'clsx';
 import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 export default function CallLogs() {
   const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
+  const [showPickUpsOnly, setShowPickUpsOnly] = useState(true);
   const [agents, setAgents] = useState<AgentData[]>([]);
   const [selectedAgent, setSelectedAgent] = useState<AgentData | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
@@ -77,6 +80,13 @@ export default function CallLogs() {
     document.getElementById('show-note-dialog')?.click();
   }
 
+  const filteredCalls = useMemo(() => {
+    if (!showPickUpsOnly) return calls;
+    
+    return calls.filter(call => {
+      return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
+    });
+  }, [calls, showPickUpsOnly]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -111,6 +121,15 @@ export default function CallLogs() {
           </div>
         </div>
 
+        <div className="mb-4 pl-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
+              setShowPickUpsOnly(checked as boolean);
+            }} />
+            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only reached calls</Label>
+          </div>
+        </div>
+
         <div className="bg-white text-gray-900 shadow-md rounded-lg overflow-hidden">
           <Table>
             <TableHeader>
@@ -124,7 +143,7 @@ export default function CallLogs() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {calls.map((call, index) => {
+              {filteredCalls.map((call, index) => {
                 const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
                 const durationInMinutes = Math.floor(duration / 60000);
                 const durationFormatted = durationInMinutes > 0 
@@ -214,6 +233,37 @@ export default function CallLogs() {
               <Button variant="secondary" onClick={() => {
                 setSelectedCall(null)
                 document.getElementById('show-transcript-dialog')?.click();
+              }}>
+                Lukk
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="hidden" id="show-note-dialog"></button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
+            <DialogHeader>
+              <DialogTitle>Notat</DialogTitle>
+              <DialogDescription>
+                Notat fra samtalen
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedCall?.note ? (
+                <div className="whitespace-pre-wrap">
+                  {selectedCall.note}
+                </div>
+              ) : (
+                <p>Ingen notat tilgjengelig</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => {
+                setSelectedCall(null)
+                document.getElementById('show-note-dialog')?.click();
               }}>
                 Lukk
               </Button>
