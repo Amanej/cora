@@ -10,7 +10,7 @@ const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 
 	const { getToken, isLoaded, userId } = useAuth()
-	console.log(" userId ", userId, " isLoaded ", isLoaded, " token ", getToken())
+	// console.log(" userId ", userId, " isLoaded ", isLoaded, " token ", getToken())
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen)
