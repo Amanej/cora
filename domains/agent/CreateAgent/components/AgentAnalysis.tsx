@@ -1,5 +1,6 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import AgentStructuredSummary from "./AgentStructuredSummary";
 
 type Props = {
     summary: string;
@@ -30,6 +31,7 @@ const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvalu
                     />
                 </div>
             </div>
+            <AgentStructuredSummary />
         </div>
 
     )

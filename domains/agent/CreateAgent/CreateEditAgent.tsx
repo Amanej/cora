@@ -20,6 +20,7 @@ import AgentPersona from './components/AgentPersona'
 import AgentHeader from './components/AgentHeader'
 import { useAuth } from '@/domains/auth/state/AuthContext'
 import AgentAnalysis from './components/AgentAnalysis'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 type PhoneNumberOption = {
   number: string;
@@ -129,112 +130,139 @@ export default function CreateEditAgent() {
               }}
               className="text-3xl font-bold border-t-0 border-l-0 border-r-0 rounded-none shadow-none" />
           </CardHeader>
+          <CardContent> 
+
+          <Tabs defaultValue="persona" className="mb-4">
+              <TabsList>
+            <TabsTrigger value="persona">Persona</TabsTrigger>
+            <TabsTrigger value="conversation">Conversation</TabsTrigger>
+            <TabsTrigger value="analysis">Analysis</TabsTrigger>
+            <TabsTrigger value="knowledgebase">Knowledgebase</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+          <TabsContent value="persona">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="space-y-6">
+                  <div className="grid grid-cols-2 gap-4">
+                    <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Telefon nummer</Label>
+                      <Select
+                        value={_agentData.phoneNumberId}
+                        onValueChange={(value) => {
+                          setAgentData({ ..._agentData, phoneNumberId: value })
+                        }}
+                      >
+                        <SelectTrigger id="phone">
+                          <SelectValue placeholder="Select a phone number" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PHONENUMBER_OPTIONS.map((option) => (
+                            <SelectItem key={option.externalId} value={option.externalId}>
+                              {option.number}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="type">Type</Label>
+                      <Select
+                        onValueChange={(value) => {
+                          setAgentData({ ..._agentData, type: value as AgentType })
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={AgentType.Incoming} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={AgentType.Incoming}>Inngående</SelectItem>
+                          <SelectItem value={AgentType.Outgoing}>Utgående</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="analysis">
+            <Card>
+              <CardContent className="pt-6">
+                <AgentAnalysis
+                  summary={_agentData.evaluation?.summary || ''}
+                  successEvaluation={_agentData.evaluation?.successEvaluation || ''}
+                  setSummary={(summary) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, summary } })}
+                  setSuccessEvaluation={(successEvaluation) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, successEvaluation } })}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="conversation">
+            <Card>
+              <CardContent className="pt-6">
+
+                <div className="space-y-2">
+                  <Label htmlFor="openingLine">Opening message</Label>
+                  <Input placeholder="Opening message" value={_agentData.openingLine}
+                    onChange={(e) => {
+                      setAgentData({ ..._agentData, openingLine: e.target.value })
+                    }}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="instructions">Instructions</Label>
+                  <Textarea
+                    id="instructions"
+                    placeholder="Beskriv hvordan du ønsker at agenten skal oppføre seg"
+                    className="min-h-[200px]"
+                    value={_agentData.instructions}
+                    onChange={(e) => {
+                      setAgentData({ ..._agentData, instructions: e.target.value })
+                    }}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="endCallPhrases">End call triggers <span className="text-xs text-gray-500">(comma separated)</span></Label>
+                  <Input placeholder="End call triggers" value={_agentData.endCallPhrases?.toString() || ''}
+                    onChange={(e) => {
+                      const endphrases = e.target.value.split(',');
+                      setAgentData({ ..._agentData, endCallPhrases: endphrases })
+                    }}
+                  />
+                </div>
+
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="knowledgebase">
+            <Card>
+              <CardContent className="pt-6">
+                <AgentKnowledgeBase agentData={agentData} />
+              </CardContent>
+            </Card>
+          </TabsContent>
+          <TabsContent value="settings">
+            <Card>
+              <CardContent className="pt-6">
+                <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
+                  setAgentData({ ...agentData, integrationIds: ids })
+                }} />
+
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4">
           <CardContent>
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-4">
-
-                <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefon nummer</Label>
-                  <Select
-                    value={_agentData.phoneNumberId}
-                    onValueChange={(value) => {
-                      setAgentData({ ..._agentData, phoneNumberId: value })
-                    }}
-                  >
-                    <SelectTrigger id="phone">
-                      <SelectValue placeholder="Select a phone number" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PHONENUMBER_OPTIONS.map((option) => (
-                        <SelectItem key={option.externalId} value={option.externalId}>
-                          {option.number}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="type">Type</Label>
-                  <Select
-                    onValueChange={(value) => {
-                      setAgentData({ ..._agentData, type: value as AgentType })
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={AgentType.Incoming} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={AgentType.Incoming}>Inngående</SelectItem>
-                      <SelectItem value={AgentType.Outgoing}>Utgående</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="openingLine">Opening message</Label>
-                <Input placeholder="Opening message" value={_agentData.openingLine}
-                  onChange={(e) => {
-                    setAgentData({ ..._agentData, openingLine: e.target.value })
-                  }}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="instructions">Instructions</Label>
-                <Textarea
-                  id="instructions"
-                  placeholder="Beskriv hvordan du ønsker at agenten skal oppføre seg"
-                  className="min-h-[200px]"
-                  value={_agentData.instructions}
-                  onChange={(e) => {
-                    setAgentData({ ..._agentData, instructions: e.target.value })
-                  }}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="endCallPhrases">End call triggers <span className="text-xs text-gray-500">(comma separated)</span></Label>
-                <Input placeholder="End call triggers" value={_agentData.endCallPhrases?.toString() || ''}
-                  onChange={(e) => {
-                    const endphrases = e.target.value.split(',');
-                    setAgentData({ ..._agentData, endCallPhrases: endphrases })
-                  }}
-                />
-              </div>
-
-              {/*<div className="space-y-2">
-                <Label>Samtale flyt</Label>
-                <Button variant="outline">
-                  <PenSquare className="mr-2 h-4 w-4" />
-                  Rediger samtaleflyt
-                </Button>
-              </div>*/}
-
-              <AgentKnowledgeBase agentData={agentData} />
-
-              <Separator />
-
-              <AgentAnalysis
-                summary={_agentData.evaluation?.summary || ''}
-                successEvaluation={_agentData.evaluation?.successEvaluation || ''}
-                setSummary={(summary) => {
-                  setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, summary } })
-                }}
-                setSuccessEvaluation={(successEvaluation) => {
-                  setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, successEvaluation } })
-                }}
-              />
-
-              <Separator />
-
-              <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
-                setAgentData({ ...agentData, integrationIds: ids })
-              }} />
-
-              <Separator />
+            <div className="space-y-6 mt-4">
 
               <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} />
 
