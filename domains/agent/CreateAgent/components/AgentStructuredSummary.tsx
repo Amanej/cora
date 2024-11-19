@@ -6,19 +6,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Trash2 } from 'lucide-react'
 import { Dialog, DialogTitle, DialogHeader, DialogContent } from '@/components/ui/dialog'
-import { AgentStructuredSummaryFields } from '../../types'
+import { AgentStructuredSummaryFields, AgentStructuredSummaryType } from '../../types'
 
-type FieldType = 'string' | 'boolean' | 'number'
-
-interface Field {
-    name: string
-    type: FieldType
-    description: string
-    required: boolean
-}
 
 type Props = {  
     structuredSummary: AgentStructuredSummaryFields[] | undefined;
@@ -27,10 +19,10 @@ type Props = {
 
 const AgentStructuredSummary = ({ structuredSummary, setStructuredSummary }: Props) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [fields, setFields] = useState<Field[]>([])
-    const [newField, setNewField] = useState<Field>({
+    const [fields, setFields] = useState<AgentStructuredSummaryFields[]>(structuredSummary ? structuredSummary : [])
+    const [newField, setNewField] = useState<AgentStructuredSummaryFields>({
         name: '',
-        type: 'string',
+        type: AgentStructuredSummaryType.String,
         description: '',
         required: false
     })
@@ -38,12 +30,14 @@ const AgentStructuredSummary = ({ structuredSummary, setStructuredSummary }: Pro
     const addField = () => {
         if (newField.name) {
             setFields([...fields, newField])
-            setNewField({ name: '', type: 'string', description: '', required: false })
+            setNewField({ name: '', type: AgentStructuredSummaryType.String, description: '', required: false })
         }
+        setStructuredSummary(fields)
     }
 
     const removeField = (index: number) => {
         setFields(fields.filter((_, i) => i !== index))
+        setStructuredSummary(fields)
     }
 
     return (
@@ -71,15 +65,15 @@ const AgentStructuredSummary = ({ structuredSummary, setStructuredSummary }: Pro
                                 <Label htmlFor="fieldType" className="text-gray-800">Field Type</Label>
                                 <Select
                                     value={newField.type}
-                                    onValueChange={(value: FieldType) => setNewField({ ...newField, type: value })}
+                                    onValueChange={(value: AgentStructuredSummaryType) => setNewField({ ...newField, type: value })}
                                 >
                                     <SelectTrigger id="fieldType" className="text-gray-800">
                                         <SelectValue placeholder="Select field type" className="text-gray-800" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="string">String</SelectItem>
-                                        <SelectItem value="boolean">Boolean</SelectItem>
-                                        <SelectItem value="number">Number</SelectItem>
+                                        <SelectItem value={AgentStructuredSummaryType.String}>String</SelectItem>
+                                        <SelectItem value={AgentStructuredSummaryType.Boolean}>Boolean</SelectItem>
+                                        <SelectItem value={AgentStructuredSummaryType.Number}>Number</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>

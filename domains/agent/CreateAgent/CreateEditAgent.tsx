@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
-import { AgentData, AgentType, AgentStatus } from '../types'
+import { AgentData, AgentType, AgentStatus, AgentRecordingSetting } from '../types'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -21,6 +21,7 @@ import AgentHeader from './components/AgentHeader'
 import { useAuth } from '@/domains/auth/state/AuthContext'
 import AgentAnalysis from './components/AgentAnalysis'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import AgentSettings from './components/AgentSettings'
 
 type PhoneNumberOption = {
   number: string;
@@ -83,6 +84,7 @@ export default function CreateEditAgent() {
     openingLine: _agentData.openingLine || '',
     endCallPhrases: _agentData.endCallPhrases || [],
     evaluation: _agentData.evaluation || {},
+    settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON },
   };
 
   const handleSave = async () => {
@@ -138,7 +140,7 @@ export default function CreateEditAgent() {
                 <TabsTrigger value="conversation">Conversation</TabsTrigger>
                 <TabsTrigger value="analysis">Analysis</TabsTrigger>
                 <TabsTrigger value="knowledgebase">Knowledgebase</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
+                <TabsTrigger value="settings">Handlinger & Innstillinger</TabsTrigger>
               </TabsList>
               <TabsContent value="persona">
                 <Card>
@@ -207,7 +209,7 @@ export default function CreateEditAgent() {
                   <CardContent className="pt-6">
 
                     <div className="space-y-2">
-                      <Label htmlFor="openingLine">Opening message</Label>
+                      <Label htmlFor="openingLine">Første beskjed</Label>
                       <Input placeholder="Opening message" value={_agentData.openingLine}
                         onChange={(e) => {
                           setAgentData({ ..._agentData, openingLine: e.target.value })
@@ -215,7 +217,7 @@ export default function CreateEditAgent() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="instructions">Instructions</Label>
+                      <Label htmlFor="instructions">Instrukser</Label>
                       <Textarea
                         id="instructions"
                         placeholder="Beskriv hvordan du ønsker at agenten skal oppføre seg"
@@ -228,8 +230,8 @@ export default function CreateEditAgent() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="endCallPhrases">End call triggers <span className="text-xs text-gray-500">(comma separated)</span></Label>
-                      <Input placeholder="End call triggers" value={_agentData.endCallPhrases?.toString() || ''}
+                      <Label htmlFor="endCallPhrases">Avslutt samtale <span className="text-xs text-gray-500">(komma separert)</span></Label>
+                      <Input placeholder="Avslutt samtale utløsere" value={_agentData.endCallPhrases?.toString() || ''}
                         onChange={(e) => {
                           const endphrases = e.target.value.split(',');
                           setAgentData({ ..._agentData, endCallPhrases: endphrases })
@@ -253,7 +255,16 @@ export default function CreateEditAgent() {
                     <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
                       setAgentData({ ...agentData, integrationIds: ids })
                     }} />
-
+                    <Separator className="my-4" />
+                    <AgentSettings 
+                      recordingType={_agentData?.settings?.recordingType}
+                      setRecordingType={(recordingType) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, recordingType } 
+                        })
+                      }}
+                    />
                   </CardContent>
                 </Card>
               </TabsContent>

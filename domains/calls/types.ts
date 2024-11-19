@@ -1,3 +1,5 @@
+import { AgentRecordingSetting } from "../agent/types";
+
 export type Call = {
     agentId: string;
     phoneNumber: string;
@@ -16,4 +18,8 @@ export type Call = {
     updatedAt: Date;
     startedAt?: Date;
     endedAt?: Date;
+    settings?: {
+        recordingType?: AgentRecordingSetting;
+        acceptedRecording?: boolean;
+    }
 }

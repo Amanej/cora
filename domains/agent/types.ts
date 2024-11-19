@@ -22,6 +22,12 @@ export type AgentStructuredSummaryFields = {
   required?: boolean;
 }
 
+export enum AgentRecordingSetting {
+  ON = 'on',
+  OFF = 'off',
+  CONDITIONAL = 'conditional',
+}
+
 export type AgentData = {
   _id?: string,
   title: string,
@@ -43,5 +49,8 @@ export type AgentData = {
     summary?: string;
     successEvaluation?: string;
     structuredSummary?: AgentStructuredSummaryFields[];
+  };
+  settings: {
+    recordingType: AgentRecordingSetting;
   };
 };
