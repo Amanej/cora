@@ -1,15 +1,18 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import AgentStructuredSummary from "./AgentStructuredSummary";
+import { AgentStructuredSummaryFields } from "../../types";
 
 type Props = {
     summary: string;
     successEvaluation: string;
     setSummary: (summary: string) => void;
     setSuccessEvaluation: (successEvaluation: string) => void;
+    structuredSummary: AgentStructuredSummaryFields[] | undefined;
+    setStructuredSummary: (structuredSummary: AgentStructuredSummaryFields[] | undefined) => void;
 }
 
-const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvaluation }: Props) => {
+const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvaluation, structuredSummary, setStructuredSummary }: Props) => {
     return (
 
         <div className="space-y-6">
@@ -31,7 +34,10 @@ const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvalu
                     />
                 </div>
             </div>
-            <AgentStructuredSummary />
+            <AgentStructuredSummary
+                structuredSummary={structuredSummary}
+                setStructuredSummary={setStructuredSummary}
+            />
         </div>
 
     )

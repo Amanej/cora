@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trash2 } from 'lucide-react'
 import { Dialog, DialogTitle, DialogHeader, DialogContent } from '@/components/ui/dialog'
+import { AgentStructuredSummaryFields } from '../../types'
 
 type FieldType = 'string' | 'boolean' | 'number'
 
@@ -19,7 +20,12 @@ interface Field {
     required: boolean
 }
 
-const AgentStructuredSummary = () => {
+type Props = {  
+    structuredSummary: AgentStructuredSummaryFields[] | undefined;
+    setStructuredSummary: (structuredSummary: AgentStructuredSummaryFields[] | undefined) => void;
+}
+
+const AgentStructuredSummary = ({ structuredSummary, setStructuredSummary }: Props) => {
     const [isOpen, setIsOpen] = useState(false)
     const [fields, setFields] = useState<Field[]>([])
     const [newField, setNewField] = useState<Field>({
@@ -100,6 +106,7 @@ const AgentStructuredSummary = () => {
                         <Button onClick={() => {
                             addField()
                             setIsOpen(false)
+                            // @TODO - update structuredSummary and feed structured summary to fields
                         }}>Add Field</Button>
                     </div>
 

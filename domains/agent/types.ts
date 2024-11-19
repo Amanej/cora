@@ -9,6 +9,18 @@ export enum AgentType {
   Outgoing = 'Outgoing',
 }
 
+export enum AgentStructuredSummaryType {
+  Boolean = 'boolean',
+  String = 'string',
+  Number = 'number',
+}
+
+export type AgentStructuredSummaryFields = {
+  name: string;
+  type: AgentStructuredSummaryType;
+  description?: string;
+  required?: boolean;
+}
 
 export type AgentData = {
   _id?: string,
@@ -30,5 +42,6 @@ export type AgentData = {
   evaluation: {
     summary?: string;
     successEvaluation?: string;
+    structuredSummary?: AgentStructuredSummaryFields[];
   };
 };
