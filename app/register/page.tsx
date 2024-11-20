@@ -17,7 +17,7 @@ import { ROUTES } from "@/lib/routing";
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-export default function LoginForm() {
+export default function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const { login } = useAuth()
@@ -26,18 +26,19 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch(APP_CONFIG.backendUrl+"/users/signin", {
+      const response = await fetch(APP_CONFIG.backendUrl+"/users/register", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
       const data = await response.json()
-      if (data.user.token) {
-        login(data.user.token)
+      if (data.token) {
+        login(data.token)
         router.push(ROUTES.MANAGE_AGENTS)
       } else {
         // Handle login error
-        console.error('Login failed:', data.message)
+        console.error('Login failed:', data.message);
+        // Show
       }
     } catch (error) {
       console.error('Login error:', error)
@@ -48,9 +49,9 @@ export default function LoginForm() {
     <div className="m-auto">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">Register</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account.
+            Enter your email below to register to your account.
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -78,7 +79,7 @@ export default function LoginForm() {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full" type="submit">Sign in</Button>
+            <Button className="w-full" type="submit">Register</Button>
           </CardFooter>
         </form>
       </Card>

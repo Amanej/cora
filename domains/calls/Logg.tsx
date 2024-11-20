@@ -12,58 +12,79 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlayCircle, FileText, Trash2, LogOut } from "lucide-react"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { fetchAgentById } from "../agent/api"
-import { AgentData } from "../agent/types"
+import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { fetchAgents } from "../agent/api"
+import { AgentData, AgentRecordingSetting } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
 import { Call } from "./types"
+import { useAuth } from '../auth/state/AuthContext';
+import clsx from 'clsx';
+import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
-const callLogs = [
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Kari Jackson", duration: "2:30" },
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Stefan Mani", duration: "2:30" },
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Ali Abdulla", duration: "2:30" },
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Bjørg Per", duration: "2:30" },
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Ingrid Fagerborg", duration: "2:30" },
-  { date: "18. sept 24 kl 20:35", number: "22 22 55 55", name: "Manuela Snilsberg", duration: "2:30" },
-  // Add more log entries as needed
-]
-
-type Props = {
-  id: string
-}
-
-export default function CallLogs({ id }: Props) { // Set to false for create mode
+export default function CallLogs() {
+  const { token } = useAuth();
   const [isLoading, setIsLoading] = useState(false)
-  const [agentData, setAgentData] = useState<AgentData | null>(null);
+  const [showPickUpsOnly, setShowPickUpsOnly] = useState(true);
+  const [agents, setAgents] = useState<AgentData[]>([]);
+  const [selectedAgent, setSelectedAgent] = useState<AgentData | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
+  const [selectedCall, setSelectedCall] = useState<Call | null>(null);
 
-  const fetchAgent = async (id: string) => {
-    console.log('Fetching agent with ID:', id);
+  const getAgents = async (token: string) => {
     setIsLoading(true);
-    const agent = await fetchAgentById(id as string);
-    console.log('Agent fetched:', agent);
-    if (agent) {
-      setAgentData(agent);
+    const agents = await fetchAgents(token);
+    if (agents) {
+      setAgents(agents);
+      if (!selectedAgent && agents.length > 0) {
+        setSelectedAgent(agents[0]);
+      }
     }
     setIsLoading(false);
   };
 
-  const fetchCalls = async (agentId: string) => {
-    const agentCalls = await fetchCallsByAgentId(agentId);
-    console.log('Calls fetched:', agentCalls);
+  const fetchCalls = async (agentId: string, token: string) => {
+    const agentCalls = await fetchCallsByAgentId(agentId, token);
     setCalls(agentCalls);
   }
 
 
   useEffect(() => {
-    if (id) {
-      fetchAgent(id);
-      fetchCalls(id);
+    if (token) {
+      getAgents(token);
     }
-  }, []);
+  }, [token]);
 
+  useEffect(() => {
+    if (token && selectedAgent?._id) {
+      fetchCalls(selectedAgent?._id, token);
+    }
+  }, [token, selectedAgent?._id]);
+
+  const handleShowTranscript = (call: Call) => {
+    setSelectedCall(call);
+    document.getElementById('show-transcript-dialog')?.click();
+  }
+
+  const handlePlayAudio = (call: Call) => {
+    setSelectedCall(call);
+    document.getElementById('show-audio-dialog')?.click();
+  }
+
+  const handleShowNote = (call: Call) => {
+    setSelectedCall(call);
+    document.getElementById('show-note-dialog')?.click();
+  }
+
+  const filteredCalls = useMemo(() => {
+    if (!showPickUpsOnly) return calls;
+    
+    return calls.filter(call => {
+      return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
+    });
+  }, [calls, showPickUpsOnly]);
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -73,11 +94,38 @@ export default function CallLogs({ id }: Props) { // Set to false for create mod
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="flex justify-between items-center mb-6">
-          <p className="text-sm font-light text-black">Logger &gt; <span className="font-bold">{agentData?.title || 'Unknown'}</span></p>
-          <Button variant="ghost">
-            <LogOut className="mr-2 h-4 w-4" />
-            Logg ut
-          </Button>
+          <p className="text-sm font-light text-black">Logger</p>
+        </div>
+
+        <div>
+          <div className="mb-4">
+            <select
+              className="w-full p-2 border rounded-md text-gray-800 bg-white"
+              value={selectedAgent?._id}
+              onChange={(e) => {
+                const agent = agents.find(a => a._id === e.target.value);
+                setSelectedAgent(agent || null);
+                if (token) {
+                  fetchCalls(e.target.value, token);
+                }
+              }}
+            >
+              {agents.map((agent) => (
+                <option key={agent._id} value={agent._id}>
+                  {agent.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="mb-4 pl-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
+              setShowPickUpsOnly(checked as boolean);
+            }} />
+            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only reached calls</Label>
+          </div>
         </div>
 
         <div className="bg-white text-gray-900 shadow-md rounded-lg overflow-hidden">
@@ -86,50 +134,146 @@ export default function CallLogs({ id }: Props) { // Set to false for create mod
               <TableRow>
                 <TableHead>Dato</TableHead>
                 <TableHead>Nummer</TableHead>
-                <TableHead>Navn</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Varighet</TableHead>
+                <TableHead>Suksessfylt</TableHead>
                 <TableHead>Handlinger</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {calls.map((call, index) => (
-                <TableRow key={index}>
-                  <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
-                  <TableCell>{call.phoneNumber}</TableCell>
-                  <TableCell>{call.agentId}</TableCell>
-                  <TableCell>{call.status}</TableCell>
-                </TableRow>
-              ))}
-              {callLogs.map((log, index) => (
-                <TableRow key={index}>
-                  <TableCell>{log.date}</TableCell>
-                  <TableCell>{log.number}</TableCell>
-                  <TableCell>{log.name}</TableCell>
-                  <TableCell>{log.duration}</TableCell>
-                  <TableCell>
+              {filteredCalls.map((call, index) => {
+                const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
+                const durationFormatted = duration > 0 
+                  ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
+                  : '00:00';
+                const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
+                return (
+                  <TableRow key={index}>
+                    <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
+                    <TableCell>{call.phoneNumber}</TableCell>
+                    <TableCell>{call.status}</TableCell>
+                    <TableCell>{durationFormatted}</TableCell>
+                    <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
+                    <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="icon" title="Spill av">
-                        <PlayCircle className="h-4 w-4" />
+                      {!hideSound &&                      
+                        <Button variant="ghost" size="icon" title="Spill av" onClick={() => handlePlayAudio(call)}>
+                          <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
+                        </Button>
+                      }
+                      <Button variant="ghost" size="icon" title="Les" onClick={() => handleShowTranscript(call)}>
+                        <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
                       </Button>
-                      <Button variant="ghost" size="icon" title="Les">
-                        <FileText className="h-4 w-4" />
-                      </Button>
+                      {call.note && (
+                        <Button variant="ghost" size="icon" title="Se notat" onClick={() => handleShowNote(call)}>
+                          <StickyNote className="h-4 w-4" />
+                      </Button>)}
+                      {/* TODO: Add delete call */}
                       <Button variant="ghost" size="icon" title="Slett">
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              }
+              )}
             </TableBody>
           </Table>
         </div>
 
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="hidden" id="show-audio-dialog"></button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
+            <DialogHeader>
+              <DialogTitle>Lydopptak</DialogTitle>
+              <DialogDescription>
+                Lytt til samtalen
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedCall?.recordingUrl ? (
+                <audio controls className="w-full" autoPlay>
+                  <source src={selectedCall.recordingUrl} type="audio/mpeg" />
+                  Din nettleser støtter ikke lydavspilling
+                </audio>
+              ) : (
+                <p>Ingen lydopptak tilgjengelig</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => {
+                setSelectedCall(null)
+                document.getElementById('show-audio-dialog')?.click();
+              }}>
+                Lukk
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            {/* This is hidden and controlled programmatically */}
+            <button className="hidden" id="show-transcript-dialog"></button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
+            <DialogHeader>
+              <DialogTitle>Samtalelogg</DialogTitle>
+              <DialogDescription>
+                Transkripsjon av samtalen
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4 whitespace-pre-wrap">
+              {selectedCall?.transcript || 'Ingen transkripsjon tilgjengelig'}
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => {
+                setSelectedCall(null)
+                document.getElementById('show-transcript-dialog')?.click();
+              }}>
+                Lukk
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <button className="hidden" id="show-note-dialog"></button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
+            <DialogHeader>
+              <DialogTitle>Notat</DialogTitle>
+              <DialogDescription>
+                Notat fra samtalen
+              </DialogDescription>
+            </DialogHeader>
+            <div className="py-4">
+              {selectedCall?.note ? (
+                <div className="whitespace-pre-wrap">
+                  {selectedCall.note}
+                </div>
+              ) : (
+                <p>Ingen notat tilgjengelig</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button variant="secondary" onClick={() => {
+                setSelectedCall(null)
+                document.getElementById('show-note-dialog')?.click();
+              }}>
+                Lukk
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         <div className="flex justify-center mt-4">
           <nav className="inline-flex">
-            <Button variant="outline" size="sm">1</Button>
-            <Button variant="outline" size="sm">2</Button>
-            <Button variant="outline" size="sm">3</Button>
+            <Button variant="default" size="sm">1</Button>
           </nav>
         </div>
       </main>
