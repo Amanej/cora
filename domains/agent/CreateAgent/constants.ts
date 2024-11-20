@@ -1,4 +1,4 @@
-import { AgentData, AgentStatus, AgentType } from "../types";
+import { AgentData, AgentRecordingSetting, AgentStatus, AgentType } from "../types";
 
 export const DEFAULT_INSTRUCTIONS = `### **[Identity]**
 - Beskriv hvem du er og hva du gjør
@@ -16,9 +16,17 @@ export const DEFAULT_INSTRUCTIONS = `### **[Identity]**
 export const defaultAgentData: AgentData = {
     title: '',
     phoneNumberId: '+4746164687',
-    subTitle: '',
     type: AgentType.Incoming,
     instructions: DEFAULT_INSTRUCTIONS,
+    openingLine: '',
+    evaluation: {
+        summary: '',
+        successEvaluation: '',
+        structuredSummary: [],
+    },
+    settings: {
+        recordingType: AgentRecordingSetting.ON,
+    },
     knowledgebase: [],
     integrationIds: [],
     createdAt: new Date(),

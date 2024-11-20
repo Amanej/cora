@@ -22,6 +22,7 @@ type Props = {
 
 const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
     const { token } = useAuth();
+    const [sheet, setSheet] = useState<ICallSheet | null>(null);
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
     const [hasFetchedCallsheet, setHasFetchedCallsheet] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
@@ -116,6 +117,7 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
             const sheet = await getCallsheetById(sheetId, token);
             if(sheet) {
                 setCallSheet(sheet.items.map(item => ({...item, saved: true})));
+                setSheet(sheet);
             }
             setHasFetchedCallsheet(true);
     }
@@ -135,7 +137,7 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
             <main className="flex-1 p-8 overflow-auto">
                 <div className="flex justify-between items-center mb-6">
                     {/* Fix agent name */}
-                    <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">{/** Agent name **/}</span></p>
+                    <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">{sheet?.title}</span></p>
                 </div>
 
                 <div {...getRootProps()} className="border-2 border-dashed border-gray-400 p-4 mb-4 text-center cursor-pointer text-gray-800 bg-gray-200">

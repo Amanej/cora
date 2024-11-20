@@ -15,7 +15,7 @@ import {
 import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
-import { AgentData } from "../agent/types"
+import { AgentData, AgentRecordingSetting } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
 import { Call } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
@@ -36,7 +36,6 @@ export default function CallLogs() {
   const getAgents = async (token: string) => {
     setIsLoading(true);
     const agents = await fetchAgents(token);
-    console.log('Agent fetched:', agents);
     if (agents) {
       setAgents(agents);
       if (!selectedAgent && agents.length > 0) {
@@ -48,7 +47,6 @@ export default function CallLogs() {
 
   const fetchCalls = async (agentId: string, token: string) => {
     const agentCalls = await fetchCallsByAgentId(agentId, token);
-    console.log('Calls fetched:', agentCalls);
     setCalls(agentCalls);
   }
 
@@ -145,10 +143,10 @@ export default function CallLogs() {
             <TableBody>
               {filteredCalls.map((call, index) => {
                 const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
-                const durationInMinutes = Math.floor(duration / 60000);
-                const durationFormatted = durationInMinutes > 0 
-                  ? format(new Date(0).setMinutes(durationInMinutes), 'mm:ss')
+                const durationFormatted = duration > 0 
+                  ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
                   : '00:00';
+                const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
                 return (
                   <TableRow key={index}>
                     <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -158,9 +156,11 @@ export default function CallLogs() {
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="icon" title="Spill av" onClick={() => handlePlayAudio(call)}>
-                        <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
-                      </Button>
+                      {!hideSound &&                      
+                        <Button variant="ghost" size="icon" title="Spill av" onClick={() => handlePlayAudio(call)}>
+                          <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
+                        </Button>
+                      }
                       <Button variant="ghost" size="icon" title="Les" onClick={() => handleShowTranscript(call)}>
                         <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
                       </Button>
