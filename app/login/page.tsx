@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from '@/domains/auth/state/AuthContext'
+import APP_CONFIG from "@/lib/config";
 import { ROUTES } from "@/lib/routing";
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -25,14 +26,14 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const response = await fetch('/api/authenticate', {
+      const response = await fetch(APP_CONFIG.backendUrl+"/users/signin", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       })
       const data = await response.json()
-      if (data.success) {
-        login(data.token)
+      if (data.user.token) {
+        login(data.user.token)
         router.push(ROUTES.MANAGE_AGENTS)
       } else {
         // Handle login error
