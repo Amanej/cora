@@ -9,6 +9,12 @@ export const triggerSlackIntegrationExample = async ({name, phoneNumber, note}:{
       await sendSlackMessage(text, exampleChannel);
 }
 
+export const triggerSlackAccessControlExample = async ({buildingId, phoneNumberToAdd, addedBy, phoneNumberAddedBy}:{buildingId: number, phoneNumberToAdd: string, addedBy: string, phoneNumberAddedBy: string}) => {
+  const text = `*Legg til bruker* \n BuildingId: ${buildingId} \n phoneNumberToAdd: ${phoneNumberToAdd} \n AddedBy: ${addedBy} \n phoneNumberAddedBy: ${phoneNumberAddedBy}.`;
+  const exampleChannel = "C07TLFG4KPS";
+  await sendSlackMessage(text, exampleChannel);
+}
+
 
 export const triggerSlackMessage = async ({name, email, phoneNumber, useCase, lang}:{name?: string, email?: string, phoneNumber: string, useCase: string, lang: string}) => {
     if(phoneNumber !== "+4746164687") {
