@@ -79,21 +79,21 @@ const AgentCard = ({ agent, refreshAgents, token }: AgentCardProps) => {
                 <div className="flex space-x-2">
                     {showCallList &&
                         <Button variant="outline" size="sm">
-                            <Link href={`${ROUTES.CALL_SHEETS_BY_AGENT}${agent._id}`}>Ringelister</Link>
+                            <Link href={`${ROUTES.CALL_SHEETS_BY_AGENT}${agent._id}`}>Callsheets</Link>
                         </Button>
                     }
                     {hasCalls &&
                         <Button variant="outline" size="sm">
-                            <Link href={`${ROUTES.CALL_LOGS_BY_AGENT}${agent._id}`}>Se samtale logger</Link>
+                            <Link href={`${ROUTES.CALL_LOGS_BY_AGENT}${agent._id}`}>Se call logs</Link>
                         </Button>
                     }
                     <Button variant="outline" size="sm"
                         onClick={() => {
                             toggleAgentStatus(agent._id);
                         }}
-                    >{isActive ? "Deaktiver" : "Aktiver"}</Button>
+                    >{isActive ? "Deactivate" : "Activate"}</Button>
                     <Button variant="outline" size="sm">
-                        <Link href={ROUTES.CREATE_AGENT + "?id=" + agent._id}>Rediger</Link>
+                        <Link href={ROUTES.CREATE_AGENT + "?id=" + agent._id}>Edit</Link>
                     </Button>
                     <Button variant="outline" size="sm"
                         disabled={isDeleting}
@@ -102,7 +102,7 @@ const AgentCard = ({ agent, refreshAgents, token }: AgentCardProps) => {
                                 callDeleteAgent(agent._id);
                             }
                         }}
-                    >{isDeleting ? "Sletter..." : "Slett"}</Button>
+                    >{isDeleting ? "Deleting..." : "Delete"}</Button>
                 </div>
             </CardContent>
         </Card>

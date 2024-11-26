@@ -22,17 +22,17 @@ export async function POST(req: NextRequest) {
                 "results": [
                     {
                         "toolCallId": typedInfo.message.toolCallList[0].id,
-                        "result": "Beskjeden din er sendt til kundesenteret."
+                        "result": "Your message has been sent to the customer service desk."
                     }
                 ]
             };
             return NextResponse.json(vapiResponse, { status: 200 });
         } catch (error) {
             console.log("error ", error);
-            return NextResponse.json({ message: 'Klarte ikke sende beskjed til kundesenteret', error }, { status: 500 });
+            return NextResponse.json({ message: 'Failed to send message to customer service desk', error }, { status: 500 });
         }
     } catch (error) {
         console.log("error ", error);
-        return NextResponse.json({ message: 'Klarte ikke sende beskjed til kundesenteret', error }, { status: 500 });
+        return NextResponse.json({ message: 'Failed to send message to customer service desk', error }, { status: 500 });
     }
 }

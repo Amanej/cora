@@ -22,17 +22,17 @@ export async function POST(req: NextRequest) {
                 "results": [
                     {
                         "toolCallId": typedInfo.message.toolCallList[0].id,
-                        "result": "Brukeren er lagt til i access control."
+                        "result": "The user has been added to access control."
                     }
                 ]
             };
             return NextResponse.json(vapiResponse, { status: 200 });
         } catch (error) {
             console.log("error ", error);
-            return NextResponse.json({ message:     'Klarte ikke sende beskjed til kundesenteret', error }, { status: 500 });
+            return NextResponse.json({ message: 'Failed to add user to access control', error }, { status: 500 });
         }
     } catch (error) {
         console.log("error ", error);
-        return NextResponse.json({ message: 'Klarte ikke sende beskjed til kundesenteret', error }, { status: 500 });
+        return NextResponse.json({ message: 'Failed to add user to access control', error }, { status: 500 });
     }
 }

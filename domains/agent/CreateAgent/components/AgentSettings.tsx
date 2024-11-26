@@ -10,18 +10,18 @@ interface AgentSettingsProps {
 export default function AgentSettings({ recordingType, setRecordingType }: AgentSettingsProps) {
   return (
     <div className="space-y-2">
-      <Label htmlFor="recordingType">Innspillingstype</Label>
+      <Label htmlFor="recordingType">Recording type</Label>
       <Select
         value={recordingType ? recordingType : AgentRecordingSetting.ON}
         onValueChange={(value) => setRecordingType(value as AgentRecordingSetting)}
       >
         <SelectTrigger id="recordingType">
-          <SelectValue placeholder="Velg innspillingstype" />
+          <SelectValue placeholder="Select recording type" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value={AgentRecordingSetting.ON}>På</SelectItem>
-          <SelectItem value={AgentRecordingSetting.OFF}>Av</SelectItem>
-          <SelectItem value={AgentRecordingSetting.CONDITIONAL}>Betinget</SelectItem>
+          <SelectItem value={AgentRecordingSetting.ON}>On</SelectItem>
+          <SelectItem value={AgentRecordingSetting.OFF}>Off</SelectItem>
+          <SelectItem value={AgentRecordingSetting.CONDITIONAL}>Conditional</SelectItem>
         </SelectContent>
       </Select>
     </div>

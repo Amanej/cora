@@ -17,7 +17,7 @@ const AgentHeader = ({ isEditing, title }: AgentHeaderProps) => {
                 <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <p className="text-sm font-light text-black">Agenter &gt; {isEditing ? title : "Create agent"}</p>
+            <p className="text-sm font-light text-black">Agents &gt; {isEditing ? title : "Create agent"}</p>
           </div>
         </div>
     )
