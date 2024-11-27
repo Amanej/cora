@@ -1,5 +1,4 @@
 import { lookupAccessControl } from '@/domains/integrations/accessControl';
-import { howMuchDoIOweInTotal } from '@/domains/integrations/debtcollection';
 import { VAPI_Payload } from '@/services/vapi/types';
 import { NextRequest, NextResponse } from 'next/server';
 

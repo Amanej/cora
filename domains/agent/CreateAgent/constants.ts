@@ -1,16 +1,16 @@
 import { AgentData, AgentRecordingSetting, AgentStatus, AgentType } from "../types";
 
 export const DEFAULT_INSTRUCTIONS = `### **[Identity]**
-- Beskriv hvem du er og hva du gjør
+- Describe who you are and what you do
 
 ### **[Style]**
-- Beskriv stil og tone i dialogen
+- Describe the style and tone of the conversation
 
 ### **[Response Guideline]**
-- Beskriv guidelines for hvordan agenten skal oppføre seg
+- Describe guidelines for how the agent should behave
 
 ### **[Task]**
-- Beskrive oppgavene agent skal utføre
+- Describe the tasks the agent should perform
 `;
 
 export const defaultAgentData: AgentData = {

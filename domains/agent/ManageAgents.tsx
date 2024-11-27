@@ -45,7 +45,7 @@ const Management = () => {
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-black">Agenter</h2>
+          <h2 className="text-2xl font-bold text-black">Agents</h2>
         </div>
 
         {/* Agent list */}
@@ -65,7 +65,7 @@ const Management = () => {
         <div className="mt-8">
           <Link href={ROUTES.CREATE_AGENT} className="inline-flex items-center py-2 px-4 text-white bg-blue-500 rounded-xl font-bold">
             <PlusIcon className="mr-2 h-4 w-4" />
-            Opprett agent
+            Create agent
           </Link>
         </div>
       </main>

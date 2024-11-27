@@ -39,7 +39,7 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
 
     return (
         <div className="space-y-2">
-            <Label>Handlinger</Label>
+            <Label>Actions</Label>
             <div className="space-y-1">
                 {selectedIntegrationIds.map((integrationId) => {
                     const selectedIntegration = integrations.find((integration) => integration.id === integrationId);
@@ -72,7 +72,7 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder={"Velg en handling"} />
+                      <SelectValue placeholder={"Select an action"} />
                     </SelectTrigger>
                     <SelectContent>
                         {integrations.map((integration: Integration) => (

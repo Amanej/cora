@@ -140,7 +140,7 @@ export default function CreateEditAgent() {
                 <TabsTrigger value="conversation">Conversation</TabsTrigger>
                 <TabsTrigger value="analysis">Analysis</TabsTrigger>
                 <TabsTrigger value="knowledgebase">Knowledgebase</TabsTrigger>
-                <TabsTrigger value="settings">Handlinger & Innstillinger</TabsTrigger>
+                <TabsTrigger value="settings">Actions & Settings</TabsTrigger>
               </TabsList>
               <TabsContent value="persona">
                 <Card>
@@ -149,7 +149,7 @@ export default function CreateEditAgent() {
                       <div className="grid grid-cols-2 gap-4">
                         <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Telefon nummer</Label>
+                          <Label htmlFor="phone">Phone number</Label>
                           <Select
                             value={_agentData.phoneNumberId}
                             onValueChange={(value) => {
@@ -179,8 +179,8 @@ export default function CreateEditAgent() {
                               <SelectValue placeholder={AgentType.Incoming} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value={AgentType.Incoming}>Inngående</SelectItem>
-                              <SelectItem value={AgentType.Outgoing}>Utgående</SelectItem>
+                              <SelectItem value={AgentType.Incoming}>Incoming</SelectItem>
+                              <SelectItem value={AgentType.Outgoing}>Outgoing</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -209,7 +209,7 @@ export default function CreateEditAgent() {
                   <CardContent className="pt-6">
 
                     <div className="space-y-2">
-                      <Label htmlFor="openingLine">Første beskjed</Label>
+                      <Label htmlFor="openingLine">First message</Label>
                       <Input placeholder="Opening message" value={_agentData.openingLine}
                         onChange={(e) => {
                           setAgentData({ ..._agentData, openingLine: e.target.value })
@@ -217,10 +217,10 @@ export default function CreateEditAgent() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="instructions">Instrukser</Label>
+                      <Label htmlFor="instructions">Instructions</Label>
                       <Textarea
                         id="instructions"
-                        placeholder="Beskriv hvordan du ønsker at agenten skal oppføre seg"
+                        placeholder="Describe how you want the agent to behave"
                         className="min-h-[200px]"
                         value={_agentData.instructions}
                         onChange={(e) => {
@@ -230,8 +230,8 @@ export default function CreateEditAgent() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="endCallPhrases">Avslutt samtale <span className="text-xs text-gray-500">(komma separert)</span></Label>
-                      <Input placeholder="Avslutt samtale utløsere" value={_agentData.endCallPhrases?.toString() || ''}
+                      <Label htmlFor="endCallPhrases">End call phrases <span className="text-xs text-gray-500">(comma separated)</span></Label>
+                      <Input placeholder="End call phrases" value={_agentData.endCallPhrases?.toString() || ''}
                         onChange={(e) => {
                           const endphrases = e.target.value.split(',');
                           setAgentData({ ..._agentData, endCallPhrases: endphrases })
@@ -283,7 +283,7 @@ export default function CreateEditAgent() {
                 <Button disabled={isLoading} onClick={() => {
                   isEditing ? handleUpdate() : handleSave()
                 }}>
-                  {isLoading ? 'Laster...' : (isEditing ? 'Oppdatere agent' : 'Opprett agent')}</Button>
+                  {isLoading ? 'Loading...' : (isEditing ? 'Update agent' : 'Create agent')}</Button>
               </div>
             </div>
           </CardContent>
