@@ -9,6 +9,7 @@ type AgentPersonaProps = {
 
 export enum PERSONAS {
     BRITISH = "british",
+    BRITISH_FEMALE = "britishFemale",
     NORWEGIAN = "norwegian",
     AMERICAN_FEMALE = "americanFemale",
     AMERICAN_MALE = "americanMale",
@@ -35,6 +36,7 @@ const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
                 <SelectContent>
                     <SelectItem value={PERSONAS.NORWEGIAN}>🇳🇴 Male - Norwegian</SelectItem>
                     <SelectItem value={PERSONAS.BRITISH}>🇬🇧 Male -  British</SelectItem>
+                    <SelectItem value={PERSONAS.BRITISH_FEMALE}>🇬🇧 Female - British</SelectItem>
                     <SelectItem value={PERSONAS.AMERICAN_FEMALE}>🇺🇸 Female - American</SelectItem>
                     <SelectItem value={PERSONAS.AMERICAN_MALE}>🇺🇸 Male - American</SelectItem>
                     <SelectItem value={PERSONAS.SPANISH_ELDER_FEMALE}>🇪🇸 Female - Spanish Elder</SelectItem>
