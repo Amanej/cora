@@ -3,6 +3,7 @@ export enum useCase {
     "DEBT_COLLECTION" = "DEBT_COLLECTION",
     "CUSTOMER_SERVICE" = "CUSTOMER_SERVICE",
     "LEAD_QUALIFICATION" = "LEAD_QUALIFICATION",
+    "REAL_ESTATE" = "REAL_ESTATE",
     /*
     "APPOINTMENT_BOOKING" = "APPOINTMENT_BOOKING"
     "FAIR_COLLECTION" = "FAIR_COLLECTION",
@@ -35,6 +36,7 @@ const NORWEGIAN_ASSISTANTS = {
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c",
     [useCase.CUSTOMER_SERVICE]: "2a6c9d5f-8d4c-48a3-a4fb-5018c7e2f430",
     [useCase.LEAD_QUALIFICATION]: "b671996c-1776-4084-a58d-e7b187277065",
+    [useCase.REAL_ESTATE]: "b671996c-1776-4084-a58d-e7b187277065", // Missing
     /*
     [useCase.APPOINTMENT_BOOKING]: ""
     [useCase.FAIR_COLLECTION]: "884e518a-08c4-4650-a73e-00eeae4e1243", // "d27af6d4-6eda-4269-b430-a5d786a790d7", // "c9c749e0-9325-4d28-841a-0232f6d8c1db",
@@ -50,6 +52,7 @@ const SWEDISH_ASSISTANTS = {
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.CUSTOMER_SERVICE]: "22bb7dad-670c-4ef7-90d0-d16c18132170",
     [useCase.LEAD_QUALIFICATION]: "ef081b59-5111-4bd9-b628-9585d8030069",
+    [useCase.REAL_ESTATE]: "ef081b59-5111-4bd9-b628-9585d8030069", // Missing
     /*
     [useCase.APPOINTMENT_BOOKING]: ""
     [useCase.FAIR_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
@@ -65,6 +68,7 @@ const ENGLISH_ASSISTANTS = {
     [useCase.DEBT_COLLECTION]: "b232ce78-b5c6-4481-8f1a-06b01456918c", // Missing
     [useCase.CUSTOMER_SERVICE]: "30187067-b023-4fb7-b7d4-f91d0089eeb5",
     [useCase.LEAD_QUALIFICATION]: "2529deba-e5a8-4465-b057-ede6dfe661db",
+    [useCase.REAL_ESTATE]: "3edb5051-75e4-41ec-90f3-3b89f1972535",
     /*
     [useCase.FAIR_COLLECTION]: "99cd9d0d-9777-46c7-b731-f3501a40d922", // "b232ce78-b5c6-4481-8f1a-06b01456918c",
     [useCase.SVEA_FINANS]: "0df67b57-deb7-4016-bb85-1eb86ba70d61", // Missing
@@ -101,10 +105,10 @@ export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCa
     const body = {
         assistantId: assistantId,
 
-        phoneNumberId: "c895bb88-d52d-40da-83e7-002883450d5e",
+        phoneNumberId: "e354916c-659a-489e-b141-a1e0ddb13712", // - US  // "c895bb88-d52d-40da-83e7-002883450d5e", - NO
         customer: {
             numberE164CheckEnabled: true,
-            number: phoneNumberToCall || "+4740568399"
+            number: phoneNumberToCall
         }
     };
     const options = {
