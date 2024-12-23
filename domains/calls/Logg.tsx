@@ -17,12 +17,13 @@ import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
 import { AgentData, AgentRecordingSetting } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
-import { Call } from "./types"
+import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
 import clsx from 'clsx';
 import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { formatEndingReason } from './utils';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -49,7 +50,6 @@ export default function CallLogs() {
     const agentCalls = await fetchCallsByAgentId(agentId, token);
     setCalls(agentCalls);
   }
-
 
   useEffect(() => {
     if (token) {
@@ -85,6 +85,10 @@ export default function CallLogs() {
       return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
     });
   }, [calls, showPickUpsOnly]);
+
+  const formattedEndingReason = (endingReason: ENDING_REASON) => {
+    return formatEndingReason(endingReason)
+  }
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -137,6 +141,7 @@ export default function CallLogs() {
                 <TableHead>Status</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Successful</TableHead>
+                <TableHead>Ending reason</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -154,6 +159,7 @@ export default function CallLogs() {
                     <TableCell>{call.status}</TableCell>
                     <TableCell>{durationFormatted}</TableCell>
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
+                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
                       {!hideSound &&                      
