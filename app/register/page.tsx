@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button"
+import { Loader } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -20,12 +21,15 @@ import { useState } from "react"
 export default function RegisterForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
   const { login } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
+      setIsLoading(true)
       const response = await fetch(APP_CONFIG.backendUrl+"/users/register", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -33,15 +37,19 @@ export default function RegisterForm() {
       })
       const data = await response.json()
       if (data.token) {
-        login(data.token)
+        const user = {approved: data.user.approved, email: data.user.email, name: data.user.name};
+        login(data.token, user)
         router.push(ROUTES.MANAGE_AGENTS)
       } else {
         // Handle login error
         console.error('Login failed:', data.message);
         // Show
+        setError("Could not register. Send an email to support@corafone.com if you need help.")
       }
     } catch (error) {
       console.error('Login error:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -78,8 +86,13 @@ export default function RegisterForm() {
               />
             </div>
           </CardContent>
+          {error && (
+            <div className="px-6 pb-2">
+              <p className="text-sm text-red-500">{error}</p>
+            </div>
+          )}
           <CardFooter>
-            <Button className="w-full" type="submit">Register</Button>
+            <Button className="w-full" type="submit" disabled={isLoading}>{isLoading ? "Registering..." : "Register"}</Button>
           </CardFooter>
         </form>
       </Card>

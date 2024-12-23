@@ -2,17 +2,19 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { PlusIcon } from "lucide-react"
+import { PlusIcon, Loader } from "lucide-react"
 import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 import { ROUTES } from "@/lib/routing"
 import { AgentData, AgentStatus } from "./types"
 import { fetchAgents } from "./api"
 import AgentCard from "./components/AgentCard"
 import { useAuth } from "@/domains/auth/state/AuthContext"
+import { useRouter } from "next/navigation"
 
 const Management = () => {
-  const { token } = useAuth();
+  const { token, isApproved, isAuthenticated } = useAuth();
   const [agents, setAgents] = useState<AgentData[]>([]);
+  const router = useRouter()
 
   useEffect(() => {
     if (token) {
@@ -37,6 +39,25 @@ const Management = () => {
   };
 
   const sortedAgents = orderAgentsByStatus(agents);
+
+  if (!isAuthenticated) {
+    router.push(ROUTES.LOGIN)
+  }
+
+  const notApproved = !isApproved()
+  
+  if (notApproved) {
+    return (
+      <div className="flex h-screen bg-gray-100">
+        <main className="flex-1 p-8">
+          <div className="flex text-gray-800">
+            <Loader className="animate-spin mr-2" /> Checking your account...
+          </div>
+        </main>
+    </div>
+    )
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
