@@ -152,6 +152,7 @@ export default function CallLogs() {
                   ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
                   : '00:00';
                 const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
+                const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
                 return (
                   <TableRow key={index}>
                     <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -159,7 +160,7 @@ export default function CallLogs() {
                     <TableCell>{call.status}</TableCell>
                     <TableCell>{durationFormatted}</TableCell>
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
-                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail ? "- Voicemail" : ""}</TableCell>
+                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
                       {!hideSound &&                      
