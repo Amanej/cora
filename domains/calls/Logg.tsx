@@ -159,7 +159,7 @@ export default function CallLogs() {
                     <TableCell>{call.status}</TableCell>
                     <TableCell>{durationFormatted}</TableCell>
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
-                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"}</TableCell>
+                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail ? "- Voicemail" : ""}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
                       {!hideSound &&                      

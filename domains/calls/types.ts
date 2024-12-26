@@ -11,7 +11,8 @@ export type Call = {
         endingReason: ENDING_REASON | null,
         typeOfOutcome: null,
         booleanValue: null,
-        numericValue: null
+        numericValue: null,
+        receivedVoicemail?: boolean
     }
     createdAt: Date;
     transcript: string
