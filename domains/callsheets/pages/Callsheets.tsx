@@ -66,7 +66,7 @@ export default function Callsheets({ agentId }: Props) {
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
         <div className="flex justify-between items-center mb-6">
-          <p className="text-sm font-light text-black">Ringelister &gt; <span className="font-bold">{agentData?.title || 'Unknown'}</span></p>
+          <p className="text-sm font-light text-black">Callsheets &gt; <span className="font-bold">{agentData?.title || 'Unknown'}</span></p>
         </div>
 
         <div className="bg-white text-gray-900 shadow-md rounded-lg overflow-hidden">

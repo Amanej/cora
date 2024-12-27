@@ -14,6 +14,9 @@ import SideBar, { SidebarPage } from '@/components/global/Sidebar';
 import { createCallsheet, getCallsheetById, triggerProcessCallsheet } from '@/domains/callsheets/api';
 import { CallSheetStatus, ICallSheet, ICallSheetItem } from '@/domains/callsheets/types';
 import { useAuth } from '@/domains/auth/state/AuthContext';
+import { FileText } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/routing';
 
 type Props = {
     agentId?: string;
@@ -21,6 +24,7 @@ type Props = {
 }
 
 const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
+    const router = useRouter();
     const { token } = useAuth();
     const [sheet, setSheet] = useState<ICallSheet | null>(null);
     const [callSheet, setCallSheet] = useState<ICallSheetItem[]>([]);
@@ -29,6 +33,7 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [isUpdating, setIsUpdating] = useState(false);
     const [selectedRow, setSelectedRow] = useState<ICallSheetItem | null>(null);
+    const [selectedRows, setSelectedRows] = useState<ICallSheetItem[]>([]);
 
     const parseData = (csvData: string) => {
         const rows = csvData.split('\n');
@@ -112,7 +117,6 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
         setIsUpdating(false);
     }
 
-
     const fetchCallsheet = async (sheetId: string, token: string) => {
             const sheet = await getCallsheetById(sheetId, token);
             if(sheet) {
@@ -122,12 +126,40 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
             setHasFetchedCallsheet(true);
     }
 
+    const copySelectedItemsToNewSheet = async () => {
+        setIsProcessing(true);
+        const callSheetData: ICallSheet = {
+            id: null,
+            title: sheet?.title + " - Selected",
+            items: selectedRows,
+            agentId: sheet?.agentId || '',
+            ownerId: '123', // Fix serverside
+            status: CallSheetStatus.Pending
+        }
+        if(selectedRows.length > 0 && token) {
+            try {
+                const newSheetCreated = await createCallsheet(callSheetData, token);
+                console.log("newSheetCreated ", newSheetCreated);
+                // @ts-ignore - it does exist
+                router.push(ROUTES.CALL_SHEET + "/" + newSheetCreated._id)
+            } catch (error) {
+                setIsProcessing(false);
+                console.log("Error creating new sheet ", error);
+            }
+        } else {
+            // TODO: Show error
+            console.log("Could not copy selected items to sheet ")
+        }
+        setIsProcessing(false);
+    }
+
     useEffect(() => {
         if(!hasFetchedCallsheet && sheetId && token) {
             fetchCallsheet(sheetId, token);
         }
     }, [agentId, token]);
 
+    const currentAgentId = sheet?.agentId || agentId;
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
@@ -138,6 +170,7 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                 <div className="flex justify-between items-center mb-6">
                     {/* Fix agent name */}
                     <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">{sheet?.title}</span></p>
+                    <Button className="underline" onClick={() => router.push(ROUTES.CALL_SHEETS_BY_AGENT + "/" + currentAgentId)} variant="link" size="sm">Callsheets by agent</Button>
                 </div>
 
                 <div {...getRootProps()} className="border-2 border-dashed border-gray-400 p-4 mb-4 text-center cursor-pointer text-gray-800 bg-gray-200">
@@ -163,23 +196,57 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                                 <TableHead>Name</TableHead>
                                 <TableHead>Phone Number</TableHead>
                                 <TableHead>Status</TableHead>
+                                <TableHead>Details</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
                             {callSheet.map((log) => (
-                                <TableRow key={log.id} onClick={() => setSelectedRow(log)} className="cursor-pointer">
+                                <TableRow 
+                                    key={log.id} 
+                                    onClick={(e) => {
+                                        // Add to selection
+                                        const newSelection = selectedRows?.includes(log) 
+                                            ? selectedRows.filter(r => r !== log)
+                                            : [...(selectedRows || []), log];
+                                        setSelectedRows(newSelection);
+                                    }}
+                                    className={`cursor-pointer ${selectedRows?.includes(log) ? 'bg-blue-100' : ''}`}
+                                >
                                     <TableCell>{log.name}</TableCell>
                                     <TableCell>{log.phoneNumber}</TableCell>
                                     <TableCell>{log.saved ? log.status : 'New'}</TableCell>
+                                    <TableCell>
+                                        <FileText 
+                                            className="cursor-pointer text-blue-500"
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Prevent row click event
+                                                setSelectedRow(log); // Set the selected row
+                                            }}
+                                        />
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
                     </Table>
+                    {selectedRows.length > 0 && (
+                        <div className="m-2">
+                            <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => setSelectedRows([])}
+                            >
+                                Deselect all
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-4">
                     <Button onClick={() => updateSheet()} disabled={hasItemsToSave() || isProcessing}>
                         {isUpdating ? 'Updating...' : 'Update sheet'}
+                    </Button>
+                    <Button className="ml-2" onClick={() => copySelectedItemsToNewSheet()} disabled={selectedRows.length === 0 || isProcessing}>
+                        {isUpdating ? 'Creating...' : 'Create new sheet'}
                     </Button>
                 </div>
 
