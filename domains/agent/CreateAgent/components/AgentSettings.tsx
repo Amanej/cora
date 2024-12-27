@@ -33,6 +33,7 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
         </Select>
       </div>
       <Separator className="my-4" />
+      {/*
       <div className="space-y-2">
         <Label htmlFor="recordingType">Voicemail behaviour</Label>
         <Select
@@ -48,6 +49,7 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
           </SelectContent>
         </Select>
       </div>
+      */}
       <div className="space-y-2 mt-4">
         <Label htmlFor="voicemailMessage">Voicemail message</Label>
         <Input placeholder="Leave blank to let the agent come up with something" value={voicemailMessage?.toString() || ''}
