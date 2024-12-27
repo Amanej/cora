@@ -28,6 +28,11 @@ export enum AgentRecordingSetting {
   CONDITIONAL = 'conditional',
 }
 
+export enum AgentVoicemailBehaviour {
+  LEAVE_VOICEMAIL = 'leave_voicemail',
+  HANG_UP = 'hang_up',
+}
+
 export type AgentData = {
   _id?: string,
   title: string,
@@ -52,5 +57,7 @@ export type AgentData = {
   };
   settings: {
     recordingType: AgentRecordingSetting;
+    voicemailBehaviour?: AgentVoicemailBehaviour;
+    voicemailMessage?: string;
   };
 };

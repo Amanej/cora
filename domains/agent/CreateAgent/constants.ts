@@ -1,4 +1,4 @@
-import { AgentData, AgentRecordingSetting, AgentStatus, AgentType } from "../types";
+import { AgentData, AgentRecordingSetting, AgentStatus, AgentType, AgentVoicemailBehaviour } from "../types";
 
 export const DEFAULT_INSTRUCTIONS = `### **[Identity]**
 - Describe who you are and what you do
@@ -26,6 +26,8 @@ export const defaultAgentData: AgentData = {
     },
     settings: {
         recordingType: AgentRecordingSetting.ON,
+        voicemailBehaviour: AgentVoicemailBehaviour.LEAVE_VOICEMAIL,
+        voicemailMessage: '',
     },
     knowledgebase: [],
     integrationIds: [],

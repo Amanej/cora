@@ -266,6 +266,20 @@ export default function CreateEditAgent() {
                           settings: { ..._agentData.settings, recordingType } 
                         })
                       }}
+                      voicemailBehaviour={_agentData?.settings?.voicemailBehaviour}
+                      setVoicemailBehaviour={(voicemailBehaviour) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, voicemailBehaviour } 
+                        })
+                      }}
+                      voicemailMessage={_agentData?.settings?.voicemailMessage}
+                      setVoicemailMessage={(voicemailMessage) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, voicemailMessage } 
+                        })
+                      }}
                     />
                   </CardContent>
                 </Card>
