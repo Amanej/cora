@@ -15,7 +15,7 @@ import {
 import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
-import { AgentData, AgentRecordingSetting } from "../agent/types"
+import { AgentData, AgentRecordingSetting, AgentType } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
 import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
@@ -90,6 +90,8 @@ export default function CallLogs() {
     return formatEndingReason(endingReason)
   }
 
+  const isSelectedAgentOutbound = selectedAgent?.type === AgentType.Outgoing;
+
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -141,6 +143,7 @@ export default function CallLogs() {
                 <TableHead>Status</TableHead>
                 <TableHead>Duration</TableHead>
                 <TableHead>Successful</TableHead>
+                {isSelectedAgentOutbound && <TableHead>Reached</TableHead>}
                 <TableHead>Ending reason</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -153,6 +156,7 @@ export default function CallLogs() {
                   : '00:00';
                 const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
                 const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
+                const reached = call.status === 'Completed' && duration > 0 && !endedBecauseOfVoicemail && !call.outcome.receivedVoicemail;
                 return (
                   <TableRow key={index}>
                     <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -160,6 +164,7 @@ export default function CallLogs() {
                     <TableCell>{call.status}</TableCell>
                     <TableCell>{durationFormatted}</TableCell>
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
+                    {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
                     <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
