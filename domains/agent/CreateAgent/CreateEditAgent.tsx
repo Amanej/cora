@@ -35,13 +35,16 @@ const PHONENUMBER_OPTIONS: PhoneNumberOption[] = [
     externalId: "e354916c-659a-489e-b141-a1e0ddb13712",
     countryCode: "US",
   },
-  /*
   {
-    number: "+4746164687",
-    externalId: "c895bb88-d52d-40da-83e7-002883450d5e",
+    number: "+4732994591",
+    externalId: "c8471c8c-133f-4df2-abab-b1ad4d7cf59d",
+    countryCode: "NO",
+  },
+  {
+    number: "+4732994597",
+    externalId: "e31add50-a0c2-4c0f-bb10-5518b198ad2f",
     countryCode: "NO",
   }
-  */
 ]
 
 export default function CreateEditAgent() {
