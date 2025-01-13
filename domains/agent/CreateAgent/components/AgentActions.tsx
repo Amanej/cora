@@ -23,6 +23,11 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
         setIntegrations(integrations.integrations);
     }
 
+    const updateAgent = () => {
+        // console.log("Update agent called with ", selectedIntegrationIds)
+        setIntegrationIds(selectedIntegrationIds);
+    }
+
     useEffect(() => {
         if(token) {
             getIntegrations(token);
@@ -33,9 +38,12 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
         setSelectedIntegrationIds(integrationIds);
     }, [integrationIds]);
 
-    const updateAgent = () => {
-        setIntegrationIds(selectedIntegrationIds);
-    }
+    useEffect(() => {
+        updateAgent();
+    }, [selectedIntegrationIds]);
+
+
+    // console.log("Selected integration ids", selectedIntegrationIds)
 
     return (
         <div className="space-y-2">
@@ -63,12 +71,12 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
             </div>
             <Select
                 onValueChange={(value) => {
+                    // console.log("Value changed to ", value)
                         if(selectedIntegrationIds.includes(value)) {
                             setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== value));
                         } else {
                             setSelectedIntegrationIds([...selectedIntegrationIds, value]);
                         }
-                        updateAgent();
                     }}
                   >
                     <SelectTrigger>

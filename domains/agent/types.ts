@@ -59,5 +59,6 @@ export type AgentData = {
     recordingType: AgentRecordingSetting;
     voicemailBehaviour?: AgentVoicemailBehaviour;
     voicemailMessage?: string;
+    transferCallTo?: string;
   };
 };
