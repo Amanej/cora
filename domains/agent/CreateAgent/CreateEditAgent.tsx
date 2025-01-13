@@ -283,6 +283,13 @@ export default function CreateEditAgent() {
                           settings: { ..._agentData.settings, voicemailMessage } 
                         })
                       }}
+                      transferCallTo={_agentData?.settings?.transferCallTo}
+                      setTransferCallTo={(transferCallTo) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, transferCallTo } 
+                        })
+                      }}
                     />
                   </CardContent>
                 </Card>

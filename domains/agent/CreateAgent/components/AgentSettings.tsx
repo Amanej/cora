@@ -3,6 +3,9 @@ import { AgentRecordingSetting, AgentVoicemailBehaviour } from '../../types'
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from '@/components/ui/separator';
+// import PhoneNumberInput, { E164Number } from '@/domains/phonenumber/components/PhoneNumberInput';
+import { useState } from 'react';
+import { PhoneInput } from '@/components/ui/phone-input';
 
 interface AgentSettingsProps {
   recordingType?: AgentRecordingSetting;
@@ -11,9 +14,11 @@ interface AgentSettingsProps {
   setVoicemailBehaviour: (type: AgentVoicemailBehaviour) => void;
   voicemailMessage?: string;
   setVoicemailMessage: (message: string) => void;
+  transferCallTo?: string;
+  setTransferCallTo: (number: string) => void;
 }
 
-export default function AgentSettings({ recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage }: AgentSettingsProps) {
+export default function AgentSettings({ recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo }: AgentSettingsProps) {
   return (
     <>
       <div className="space-y-2">
@@ -57,6 +62,18 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
             setVoicemailMessage(e.target.value)
           }}
         />
+      </div>
+      <Separator className="my-4" />
+      <div className="space-y-2">
+        <Label htmlFor="transferCallTo">Transfer to</Label>
+        <PhoneInput value={transferCallTo} onChange={setTransferCallTo} placeholder="Add number to transfer to" defaultCountry="GB" />
+        {/*        
+          <Input placeholder="Add number to transfer to" value={transferCallTo?.toString() || ''}
+            onChange={(e) => {
+              setTransferCallTo(e.target.value)
+            }}
+          />
+        */}
       </div>
     </>
   )
