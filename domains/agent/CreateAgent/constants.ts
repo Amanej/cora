@@ -28,6 +28,32 @@ export const defaultAgentData: AgentData = {
         recordingType: AgentRecordingSetting.ON,
         voicemailBehaviour: AgentVoicemailBehaviour.LEAVE_VOICEMAIL,
         voicemailMessage: '',
+        repeatCalls: {
+            enabled: false,
+            delay: {
+                hours: null,
+            },
+            max: {
+                perDay: null,
+                allTime: null,
+            },
+            schedule: {
+                days: {
+                    monday: false,
+                    tuesday: false,
+                    wednesday: false,
+                    thursday: false,
+                    friday: false,
+                    saturday: false,
+                    sunday: false,
+                },
+                hours: {
+                    from: "09:00",
+                    to: "16:00",
+                },
+                timezone: null,
+            },
+        },
     },
     knowledgebase: [],
     integrationIds: [],

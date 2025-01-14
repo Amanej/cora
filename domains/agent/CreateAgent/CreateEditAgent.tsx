@@ -290,6 +290,13 @@ export default function CreateEditAgent() {
                           settings: { ..._agentData.settings, transferCallTo } 
                         })
                       }}
+                      repeatCalls={_agentData?.settings?.repeatCalls}
+                      setRepeatCalls={(repeatCalls) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, repeatCalls } 
+                        })
+                      }}
                     />
                   </CardContent>
                 </Card>
