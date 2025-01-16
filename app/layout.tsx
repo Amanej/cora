@@ -7,6 +7,7 @@ import { FacebookPixel } from "@/lib/tracking/pixels/facebook";
 import { GoogleTagBody, GoogleTagHead } from "@/lib/tracking/pixels/google";
 import { LinkedInPixel } from "@/lib/tracking/pixels/linkedin";
 import { AuthProvider } from '@/domains/auth/state/AuthContext';
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -43,6 +44,7 @@ export default function RootLayout({
           <div className="flex flex-col min-h-screen">
             <Header />
             {children}
+            <Toaster />
             <Footer />
           </div>
           <LinkedInPixel />
