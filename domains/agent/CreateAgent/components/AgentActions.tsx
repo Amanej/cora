@@ -29,7 +29,7 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
     }
 
     useEffect(() => {
-        if(token) {
+        if (token) {
             getIntegrations(token);
         }
     }, [token]);
@@ -53,18 +53,18 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
                     const selectedIntegration = integrations.find((integration) => integration.id === integrationId);
                     return (
                         <div className="flex items-center justify-between" key={integrationId}>
-                        <div>
-                            <span>{selectedIntegration?.name}</span><span className="text-gray-400 ml-2">{selectedIntegration?.description}</span>
+                            <div>
+                                <span>{selectedIntegration?.name}</span><span className="text-gray-400 ml-2">{selectedIntegration?.description}</span>
+                            </div>
+                            <div className="flex">
+                                <Trash className="h-4 w-4 text-gray-400"
+                                    onClick={() => {
+                                        setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== integrationId));
+                                    }}
+                                />
+                                {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
+                            </div>
                         </div>
-                        <div className="flex">
-                            <Trash className="h-4 w-4 text-gray-400"
-                                onClick={() => {
-                                    setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== integrationId));
-                                }}
-                            />
-                            {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
-                        </div>
-                    </div>
 
                     )
                 })}
@@ -72,22 +72,22 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
             <Select
                 onValueChange={(value) => {
                     // console.log("Value changed to ", value)
-                        if(selectedIntegrationIds.includes(value)) {
-                            setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== value));
-                        } else {
-                            setSelectedIntegrationIds([...selectedIntegrationIds, value]);
-                        }
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={"Select an action"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {integrations.map((integration: Integration) => (
-                            <SelectItem disabled={selectedIntegrationIds.includes(integration.id)} key={integration.id} value={integration.id}>{integration.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                    if (selectedIntegrationIds.includes(value)) {
+                        setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== value));
+                    } else {
+                        setSelectedIntegrationIds([...selectedIntegrationIds, value]);
+                    }
+                }}
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder={"Select an action"} />
+                </SelectTrigger>
+                <SelectContent>
+                    {integrations.map((integration: Integration) => (
+                        <SelectItem disabled={selectedIntegrationIds.includes(integration.id)} key={integration.id} value={integration.id}>{integration.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
     )
 }

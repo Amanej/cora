@@ -22,6 +22,7 @@ import { useAuth } from '@/domains/auth/state/AuthContext'
 import AgentAnalysis from './components/AgentAnalysis'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AgentSettings from './components/AgentSettings'
+import { useToast } from '@/hooks/use-toast'
 
 type PhoneNumberOption = {
   number: string;
@@ -48,6 +49,7 @@ const PHONENUMBER_OPTIONS: PhoneNumberOption[] = [
 ]
 
 export default function CreateEditAgent() {
+  const { toast } = useToast()
   const { token } = useAuth();
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
@@ -106,10 +108,26 @@ export default function CreateEditAgent() {
   const handleUpdate = async () => {
     setIsLoading(true)
     if (searchId && token) {
-      await updateAgent(searchId, { ...agentData }, token);
+      try {
+        await updateAgent(searchId, { ...agentData }, token);
+        setIsLoading(false)
+        toast({
+          title: "Agent updated",
+          description: `Successfully updated ${agentData.title}`,
+          className: "text-gray-700",
+        })
+      } catch (error) {
+        setIsLoading(false)
+        // console.error("Error updating agent", error)
+        toast({
+          title: "Agent updated",
+          description: `Successfully updated ${agentData.title}`,
+          variant: "destructive"
+        })
+      }
     }
-    setIsLoading(false)
-    router.push(ROUTES.MANAGE_AGENTS);
+    // router.push(ROUTES.MANAGE_AGENTS);
+
   }
 
   const handleTestAgent = async () => {
@@ -120,6 +138,7 @@ export default function CreateEditAgent() {
     }
   }
 
+  // console.log("agentData", agentData)
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -288,6 +307,13 @@ export default function CreateEditAgent() {
                         setAgentData({ 
                           ..._agentData, 
                           settings: { ..._agentData.settings, transferCallTo } 
+                        })
+                      }}
+                      repeatCalls={_agentData?.settings?.repeatCalls}
+                      setRepeatCalls={(repeatCalls) => {
+                        setAgentData({ 
+                          ..._agentData, 
+                          settings: { ..._agentData.settings, repeatCalls } 
                         })
                       }}
                     />

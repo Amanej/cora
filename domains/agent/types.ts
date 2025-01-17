@@ -33,6 +33,43 @@ export enum AgentVoicemailBehaviour {
   HANG_UP = 'hang_up',
 }
 
+
+export type AgentRepeatCallsMax = {
+  perDay: number | null;
+  allTime: number | null;
+}
+
+export type AgentRepeatCallsDays = {
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
+}
+
+export type AgentRepeatCallsHours = {
+  from: string | null;
+  to: string | null;
+}
+
+export type AgentRepeatCallsSchedule = {
+  timezone: string | null;
+  days: AgentRepeatCallsDays;
+  hours: AgentRepeatCallsHours;
+}
+
+export type AgentRepeatCalls = {
+  enabled?: boolean;
+  delay?: {
+      hours: number | null;
+  };
+  max?: AgentRepeatCallsMax;
+  schedule?: AgentRepeatCallsSchedule;
+}
+
+
 export type AgentData = {
   _id?: string,
   title: string,
@@ -60,5 +97,6 @@ export type AgentData = {
     voicemailBehaviour?: AgentVoicemailBehaviour;
     voicemailMessage?: string;
     transferCallTo?: string;
+    repeatCalls?: AgentRepeatCalls;
   };
 };
