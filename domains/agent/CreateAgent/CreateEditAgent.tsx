@@ -114,7 +114,7 @@ export default function CreateEditAgent() {
         toast({
           title: "Agent updated",
           description: `Successfully updated ${agentData.title}`,
-          className: "text-gray-700",
+          className: "text-gray-700 bg-white",
         })
       } catch (error) {
         setIsLoading(false)
