@@ -23,8 +23,13 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
         setIntegrations(integrations.integrations);
     }
 
+    const updateAgent = () => {
+        // console.log("Update agent called with ", selectedIntegrationIds)
+        setIntegrationIds(selectedIntegrationIds);
+    }
+
     useEffect(() => {
-        if(token) {
+        if (token) {
             getIntegrations(token);
         }
     }, [token]);
@@ -33,53 +38,56 @@ const AgentActions = ({ integrationIds, setIntegrationIds }: AgentActionProps) =
         setSelectedIntegrationIds(integrationIds);
     }, [integrationIds]);
 
-    const updateAgent = () => {
-        setIntegrationIds(selectedIntegrationIds);
-    }
+    useEffect(() => {
+        updateAgent();
+    }, [selectedIntegrationIds]);
+
+
+    // console.log("Selected integration ids", selectedIntegrationIds)
 
     return (
         <div className="space-y-2">
-            <Label>Handlinger</Label>
+            <Label>Actions</Label>
             <div className="space-y-1">
                 {selectedIntegrationIds.map((integrationId) => {
                     const selectedIntegration = integrations.find((integration) => integration.id === integrationId);
                     return (
                         <div className="flex items-center justify-between" key={integrationId}>
-                        <div>
-                            <span>{selectedIntegration?.name}</span><span className="text-gray-400 ml-2">{selectedIntegration?.description}</span>
+                            <div>
+                                <span>{selectedIntegration?.name}</span><span className="text-gray-400 ml-2">{selectedIntegration?.description}</span>
+                            </div>
+                            <div className="flex">
+                                <Trash className="h-4 w-4 text-gray-400"
+                                    onClick={() => {
+                                        setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== integrationId));
+                                    }}
+                                />
+                                {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
+                            </div>
                         </div>
-                        <div className="flex">
-                            <Trash className="h-4 w-4 text-gray-400"
-                                onClick={() => {
-                                    setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== integrationId));
-                                }}
-                            />
-                            {/*<PenSquare className="h-4 w-4 text-gray-400 ml-2" />*/}
-                        </div>
-                    </div>
 
                     )
                 })}
             </div>
             <Select
                 onValueChange={(value) => {
-                        if(selectedIntegrationIds.includes(value)) {
-                            setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== value));
-                        } else {
-                            setSelectedIntegrationIds([...selectedIntegrationIds, value]);
-                        }
-                        updateAgent();
-                    }}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder={"Velg en handling"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {integrations.map((integration: Integration) => (
-                            <SelectItem disabled={selectedIntegrationIds.includes(integration.id)} key={integration.id} value={integration.id}>{integration.name}</SelectItem>
-                        ))}
-                    </SelectContent>
-                  </Select>
+                    // console.log("Value changed to ", value)
+                    if (selectedIntegrationIds.includes(value)) {
+                        setSelectedIntegrationIds(selectedIntegrationIds.filter((integration) => integration !== value));
+                    } else {
+                        setSelectedIntegrationIds([...selectedIntegrationIds, value]);
+                    }
+                }}
+            >
+                <SelectTrigger>
+                    <SelectValue placeholder={"Select an action"} />
+                </SelectTrigger>
+                <SelectContent>
+                    {integrations.map((integration: Integration) => (
+                        <SelectItem disabled={selectedIntegrationIds.includes(integration.id)} key={integration.id} value={integration.id}>{integration.name}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
         </div>
     )
 }

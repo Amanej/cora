@@ -15,14 +15,15 @@ import {
 import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
-import { AgentData } from "../agent/types"
+import { AgentData, AgentRecordingSetting, AgentType } from "../agent/types"
 import { fetchCallsByAgentId } from "./api"
-import { Call } from "./types"
+import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
 import clsx from 'clsx';
 import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { formatEndingReason } from './utils';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -36,7 +37,6 @@ export default function CallLogs() {
   const getAgents = async (token: string) => {
     setIsLoading(true);
     const agents = await fetchAgents(token);
-    console.log('Agent fetched:', agents);
     if (agents) {
       setAgents(agents);
       if (!selectedAgent && agents.length > 0) {
@@ -48,10 +48,8 @@ export default function CallLogs() {
 
   const fetchCalls = async (agentId: string, token: string) => {
     const agentCalls = await fetchCallsByAgentId(agentId, token);
-    console.log('Calls fetched:', agentCalls);
     setCalls(agentCalls);
   }
-
 
   useEffect(() => {
     if (token) {
@@ -87,6 +85,12 @@ export default function CallLogs() {
       return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
     });
   }, [calls, showPickUpsOnly]);
+
+  const formattedEndingReason = (endingReason: ENDING_REASON) => {
+    return formatEndingReason(endingReason)
+  }
+
+  const isSelectedAgentOutbound = selectedAgent?.type === AgentType.Outgoing;
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -134,21 +138,25 @@ export default function CallLogs() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Dato</TableHead>
-                <TableHead>Nummer</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Number</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Varighet</TableHead>
-                <TableHead>Suksessfylt</TableHead>
-                <TableHead>Handlinger</TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Successful</TableHead>
+                {isSelectedAgentOutbound && <TableHead>Reached</TableHead>}
+                <TableHead>Ending reason</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCalls.map((call, index) => {
                 const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
-                const durationInMinutes = Math.floor(duration / 60000);
-                const durationFormatted = durationInMinutes > 0 
-                  ? format(new Date(0).setMinutes(durationInMinutes), 'mm:ss')
+                const durationFormatted = duration > 0 
+                  ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
                   : '00:00';
+                const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
+                const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
+                const reached = call.status === 'Completed' && duration > 0 && !endedBecauseOfVoicemail && !call.outcome.receivedVoicemail;
                 return (
                   <TableRow key={index}>
                     <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -156,20 +164,24 @@ export default function CallLogs() {
                     <TableCell>{call.status}</TableCell>
                     <TableCell>{durationFormatted}</TableCell>
                     <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
+                    {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
+                    <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
                     <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="icon" title="Spill av" onClick={() => handlePlayAudio(call)}>
-                        <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
-                      </Button>
-                      <Button variant="ghost" size="icon" title="Les" onClick={() => handleShowTranscript(call)}>
+                      {!hideSound &&                      
+                        <Button variant="ghost" size="icon" title="Play" onClick={() => handlePlayAudio(call)}>
+                          <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
+                        </Button>
+                      }
+                      <Button variant="ghost" size="icon" title="Read transcript" onClick={() => handleShowTranscript(call)}>
                         <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
                       </Button>
                       {call.note && (
-                        <Button variant="ghost" size="icon" title="Se notat" onClick={() => handleShowNote(call)}>
+                        <Button variant="ghost" size="icon" title="Read note" onClick={() => handleShowNote(call)}>
                           <StickyNote className="h-4 w-4" />
                       </Button>)}
                       {/* TODO: Add delete call */}
-                      <Button variant="ghost" size="icon" title="Slett">
+                      <Button variant="ghost" size="icon" title="Delete">
                         <Trash2 className="h-4 w-4" />
                       </Button>
                       </div>
@@ -188,19 +200,19 @@ export default function CallLogs() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
             <DialogHeader>
-              <DialogTitle>Lydopptak</DialogTitle>
+              <DialogTitle>Audio recording</DialogTitle>
               <DialogDescription>
-                Lytt til samtalen
+                Listen to the call
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
               {selectedCall?.recordingUrl ? (
                 <audio controls className="w-full" autoPlay>
                   <source src={selectedCall.recordingUrl} type="audio/mpeg" />
-                  Din nettleser støtter ikke lydavspilling
+                  Your browser does not support audio playback
                 </audio>
               ) : (
-                <p>Ingen lydopptak tilgjengelig</p>
+                <p>No audio recording available</p>
               )}
             </div>
             <DialogFooter>
@@ -208,7 +220,7 @@ export default function CallLogs() {
                 setSelectedCall(null)
                 document.getElementById('show-audio-dialog')?.click();
               }}>
-                Lukk
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -221,20 +233,20 @@ export default function CallLogs() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
             <DialogHeader>
-              <DialogTitle>Samtalelogg</DialogTitle>
+              <DialogTitle>Call transcript</DialogTitle>
               <DialogDescription>
-                Transkripsjon av samtalen
+                Transcript of the call
               </DialogDescription>
             </DialogHeader>
             <div className="py-4 whitespace-pre-wrap">
-              {selectedCall?.transcript || 'Ingen transkripsjon tilgjengelig'}
+              {selectedCall?.transcript || 'No transcript available'}
             </div>
             <DialogFooter>
               <Button variant="secondary" onClick={() => {
                 setSelectedCall(null)
                 document.getElementById('show-transcript-dialog')?.click();
               }}>
-                Lukk
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -246,9 +258,9 @@ export default function CallLogs() {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
             <DialogHeader>
-              <DialogTitle>Notat</DialogTitle>
+              <DialogTitle>Note</DialogTitle>
               <DialogDescription>
-                Notat fra samtalen
+                Note from the call
               </DialogDescription>
             </DialogHeader>
             <div className="py-4">
@@ -257,7 +269,7 @@ export default function CallLogs() {
                   {selectedCall.note}
                 </div>
               ) : (
-                <p>Ingen notat tilgjengelig</p>
+                <p>No note available</p>
               )}
             </div>
             <DialogFooter>
@@ -265,7 +277,7 @@ export default function CallLogs() {
                 setSelectedCall(null)
                 document.getElementById('show-note-dialog')?.click();
               }}>
-                Lukk
+                Close
               </Button>
             </DialogFooter>
           </DialogContent>

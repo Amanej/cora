@@ -9,6 +9,66 @@ export enum AgentType {
   Outgoing = 'Outgoing',
 }
 
+export enum AgentStructuredSummaryType {
+  Boolean = 'boolean',
+  String = 'string',
+  Number = 'number',
+}
+
+export type AgentStructuredSummaryFields = {
+  name: string;
+  type: AgentStructuredSummaryType;
+  description?: string;
+  required?: boolean;
+}
+
+export enum AgentRecordingSetting {
+  ON = 'on',
+  OFF = 'off',
+  CONDITIONAL = 'conditional',
+}
+
+export enum AgentVoicemailBehaviour {
+  LEAVE_VOICEMAIL = 'leave_voicemail',
+  HANG_UP = 'hang_up',
+}
+
+
+export type AgentRepeatCallsMax = {
+  perDay: number | null;
+  allTime: number | null;
+}
+
+export type AgentRepeatCallsDays = {
+  monday: boolean;
+  tuesday: boolean;
+  wednesday: boolean;
+  thursday: boolean;
+  friday: boolean;
+  saturday: boolean;
+  sunday: boolean;
+}
+
+export type AgentRepeatCallsHours = {
+  from: string | null;
+  to: string | null;
+}
+
+export type AgentRepeatCallsSchedule = {
+  timezone: string | null;
+  days: AgentRepeatCallsDays;
+  hours: AgentRepeatCallsHours;
+}
+
+export type AgentRepeatCalls = {
+  enabled?: boolean;
+  delay?: {
+      hours: number | null;
+  };
+  max?: AgentRepeatCallsMax;
+  schedule?: AgentRepeatCallsSchedule;
+}
+
 
 export type AgentData = {
   _id?: string,
@@ -30,5 +90,13 @@ export type AgentData = {
   evaluation: {
     summary?: string;
     successEvaluation?: string;
+    structuredSummary?: AgentStructuredSummaryFields[];
+  };
+  settings: {
+    recordingType: AgentRecordingSetting;
+    voicemailBehaviour?: AgentVoicemailBehaviour;
+    voicemailMessage?: string;
+    transferCallTo?: string;
+    repeatCalls?: AgentRepeatCalls;
   };
 };

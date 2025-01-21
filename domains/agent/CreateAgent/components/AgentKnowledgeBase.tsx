@@ -11,7 +11,7 @@ type AgentKnowledgeBaseProps = {
 const AgentKnowledgeBase = ({ agentData }: AgentKnowledgeBaseProps) => {
     return (
         <div className="space-y-2">
-            <Label>Kunnskapsbank</Label>
+            <Label>Knowledge base</Label>
             <div className="flex space-x-4">
                 {/* TODO: Add knowledgebase files */}
                 {agentData.knowledgebase.length > 0 &&
@@ -27,7 +27,7 @@ const AgentKnowledgeBase = ({ agentData }: AgentKnowledgeBaseProps) => {
                         )}
                     </>
                 }
-                <Button variant="outline">Last opp</Button>
+                <Button variant="outline">Upload</Button>
             </div>
         </div>
     )
