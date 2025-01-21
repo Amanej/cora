@@ -1,4 +1,11 @@
 import type { Metadata } from "next";
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton
+} from '@clerk/nextjs'
 import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/global/Header";
@@ -39,8 +46,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>
-          <GoogleTagBody />
+        <ClerkProvider>
+          <AuthProvider>
+            <GoogleTagBody />
           <div className="flex flex-col min-h-screen">
             <Header />
             {children}
@@ -49,6 +57,7 @@ export default function RootLayout({
           </div>
           <LinkedInPixel />
         </AuthProvider>
+        </ClerkProvider>
       </body>
     </html>
   );
