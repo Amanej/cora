@@ -4,10 +4,13 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/domains/auth/state/AuthContext'
 import { ROUTES } from '@/lib/routing'
+import { useRouter } from 'next/navigation'
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
 	const { logout, isAuthenticated, isApproved } = useAuth()
+
+	const router = useRouter();	
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen)
@@ -28,6 +31,7 @@ const Header = () => {
 					{isAuthenticated && isApproved() &&					
 						<Link className="text-sm font-medium hover:underline underline-offset-4" href="#" onClick={() => {
 							logout()
+							router.push(ROUTES.LOGIN)
 						}}>
 							Logout
 						</Link>
