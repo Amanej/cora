@@ -142,7 +142,7 @@ export default function CreateEditAgent() {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <SideBar currentPage={SidebarPage.Manage} />
+      <SideBar currentPage={SidebarPage.CreateAgent} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">

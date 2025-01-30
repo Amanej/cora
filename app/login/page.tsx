@@ -33,7 +33,7 @@ export default function LoginForm() {
       })
       const data = await response.json()
       if (data.user.token) {
-        const user = {approved: data.user.approved, email: data.user.email, name: data.user.name};
+        const user = {approved: data.user.approved, email: data.user.email, name: data.user.name, max_calls: data.user.max_calls};
         login(data.user.token, user)
         router.push(ROUTES.MANAGE_AGENTS)
       } else {
