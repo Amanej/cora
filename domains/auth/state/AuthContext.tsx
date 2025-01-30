@@ -6,15 +6,17 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
+  user: IUser | null;
   login: (token: string, user: IUser | null) => void;
   logout: () => void;
   isApproved: () => boolean;
 }
 
-interface IUser {
+export interface IUser {
   name: string;
   email: string;
   approved: boolean;
+  max_calls: number;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -38,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     setToken(token);
     if (user) {
-      setUser(user)
+      setUser({...user, max_calls: 1})
     }
   };
 
@@ -66,7 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // console.log("token", token);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout, token, isApproved }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, token, isApproved, user }}>
       {children}
     </AuthContext.Provider>
   );
