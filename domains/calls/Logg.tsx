@@ -24,6 +24,7 @@ import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, Di
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatEndingReason } from './utils';
+import { Separator } from '@/components/ui/separator';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -33,6 +34,9 @@ export default function CallLogs() {
   const [selectedAgent, setSelectedAgent] = useState<AgentData | null>(null);
   const [calls, setCalls] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
+  const [showRealtime, setShowRealtime] = useState(false);
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const getAgents = async (token: string) => {
     setIsLoading(true);
@@ -51,6 +55,12 @@ export default function CallLogs() {
     setCalls(agentCalls);
   }
 
+  const fetchCallsIfAgentIsSelected = async () => {
+    if (token && selectedAgent?._id) {
+      fetchCalls(selectedAgent?._id, token);
+    }
+  }
+
   useEffect(() => {
     if (token) {
       getAgents(token);
@@ -58,10 +68,19 @@ export default function CallLogs() {
   }, [token]);
 
   useEffect(() => {
-    if (token && selectedAgent?._id) {
-      fetchCalls(selectedAgent?._id, token);
-    }
+    fetchCallsIfAgentIsSelected();
   }, [token, selectedAgent?._id]);
+
+  useEffect(() => {
+    if(token && selectedAgent?._id && showRealtime) { 
+      const THIRTY_SECONDS = 30*1000;
+      const interval = setInterval(() => {
+        fetchCallsIfAgentIsSelected();
+      }, THIRTY_SECONDS);
+
+      return () => clearInterval(interval);
+    }
+  }, [token, selectedAgent?._id, showRealtime]);
 
   const handleShowTranscript = (call: Call) => {
     setSelectedCall(call);
@@ -127,10 +146,16 @@ export default function CallLogs() {
 
         <div className="mb-4 pl-4">
           <div className="flex items-center space-x-2">
+          <Checkbox id="realtime" checked={showRealtime} onCheckedChange={(checked) => {
+              setShowRealtime(checked as boolean);
+            }} />
+            <Label htmlFor="realtime" className="text-sm text-gray-800 font-light">Watch</Label>
+            <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
+            <p className="text-sm text-gray-800 font-light">Only show:</p>
             <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
               setShowPickUpsOnly(checked as boolean);
             }} />
-            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only reached calls</Label>
+            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Reached</Label>
           </div>
         </div>
 
