@@ -1,6 +1,7 @@
 'use client'
 
-import { format } from 'date-fns';
+import { format, isSameDay } from 'date-fns';
+import { useSearchParams } from 'next/navigation';
 import { nb } from 'date-fns/locale';
 import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 import { Button } from "@/components/ui/button"
@@ -25,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { formatEndingReason } from './utils';
 import { Separator } from '@/components/ui/separator';
+import { DatePicker } from '@/components/base/DatePicker';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -35,8 +37,10 @@ export default function CallLogs() {
   const [calls, setCalls] = useState<Call[]>([]);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [showRealtime, setShowRealtime] = useState(false);
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [date, setDate] = useState<Date | undefined>(undefined);
+
+  const searchParams = useSearchParams();
+  const searchId = searchParams.get('agentId');
 
   const getAgents = async (token: string) => {
     setIsLoading(true);
@@ -71,16 +75,30 @@ export default function CallLogs() {
     fetchCallsIfAgentIsSelected();
   }, [token, selectedAgent?._id]);
 
-  useEffect(() => {
-    if(token && selectedAgent?._id && showRealtime) { 
-      const THIRTY_SECONDS = 30*1000;
+  const refreshLogsRealtime = () => {       
+    if (token && selectedAgent?._id && showRealtime) {
+      const THIRTY_SECONDS = 30 * 1000;
       const interval = setInterval(() => {
         fetchCallsIfAgentIsSelected();
       }, THIRTY_SECONDS);
 
       return () => clearInterval(interval);
     }
+  }
+
+  useEffect(() => {
+    refreshLogsRealtime();
   }, [token, selectedAgent?._id, showRealtime]);
+
+  const setSelectedAgentFromSearchParams = () => {
+    if (searchId && agents.length > 0) {
+      setSelectedAgent(agents.find(a => a._id === searchId) || null);
+    }
+  }
+
+  useEffect(() => {
+    setSelectedAgentFromSearchParams();
+  }, [searchId, agents]);
 
   const handleShowTranscript = (call: Call) => {
     setSelectedCall(call);
@@ -98,12 +116,20 @@ export default function CallLogs() {
   }
 
   const filteredCalls = useMemo(() => {
-    if (!showPickUpsOnly) return calls;
-    
-    return calls.filter(call => {
+    const sameDayCalls = calls.filter(call => {
+      if (date) {
+        return isSameDay(call.createdAt, date);
+      }
+      return true;
+    });
+
+    if (!showPickUpsOnly) return sameDayCalls;
+
+    console.log("LOGG - date ",date);
+    return sameDayCalls.filter(call => {
       return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
     });
-  }, [calls, showPickUpsOnly]);
+  }, [calls, showPickUpsOnly, date]);
 
   const formattedEndingReason = (endingReason: ENDING_REASON) => {
     return formatEndingReason(endingReason)
@@ -146,16 +172,19 @@ export default function CallLogs() {
 
         <div className="mb-4 pl-4">
           <div className="flex items-center space-x-2">
-          <Checkbox id="realtime" checked={showRealtime} onCheckedChange={(checked) => {
+            <Checkbox id="realtime" checked={showRealtime} onCheckedChange={(checked) => {
               setShowRealtime(checked as boolean);
             }} />
             <Label htmlFor="realtime" className="text-sm text-gray-800 font-light">Watch</Label>
-            <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
-            <p className="text-sm text-gray-800 font-light">Only show:</p>
+
             <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
               setShowPickUpsOnly(checked as boolean);
             }} />
-            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Reached</Label>
+            <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only Reached</Label>
+
+            <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
+
+            <DatePicker date={date} onChange={setDate} />
           </div>
         </div>
 
@@ -176,7 +205,7 @@ export default function CallLogs() {
             <TableBody>
               {filteredCalls.map((call, index) => {
                 const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
-                const durationFormatted = duration > 0 
+                const durationFormatted = duration > 0
                   ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
                   : '00:00';
                 const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
@@ -192,23 +221,23 @@ export default function CallLogs() {
                     {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
                     <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
                     <TableCell>
-                    <div className="flex space-x-2">
-                      {!hideSound &&                      
-                        <Button variant="ghost" size="icon" title="Play" onClick={() => handlePlayAudio(call)}>
-                          <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
+                      <div className="flex space-x-2">
+                        {!hideSound &&
+                          <Button variant="ghost" size="icon" title="Play" onClick={() => handlePlayAudio(call)}>
+                            <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
+                          </Button>
+                        }
+                        <Button variant="ghost" size="icon" title="Read transcript" onClick={() => handleShowTranscript(call)}>
+                          <FileText className={clsx("h-4 w-4", call.transcript?.length > 0 ? "" : "opacity-50")} />
                         </Button>
-                      }
-                      <Button variant="ghost" size="icon" title="Read transcript" onClick={() => handleShowTranscript(call)}>
-                        <FileText className={clsx("h-4 w-4", call.transcript?.length > 0  ? "" : "opacity-50")} />
-                      </Button>
-                      {call.note && (
-                        <Button variant="ghost" size="icon" title="Read note" onClick={() => handleShowNote(call)}>
-                          <StickyNote className="h-4 w-4" />
-                      </Button>)}
-                      {/* TODO: Add delete call */}
-                      <Button variant="ghost" size="icon" title="Delete">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                        {call.note && (
+                          <Button variant="ghost" size="icon" title="Read note" onClick={() => handleShowNote(call)}>
+                            <StickyNote className="h-4 w-4" />
+                          </Button>)}
+                        {/* TODO: Add delete call */}
+                        <Button variant="ghost" size="icon" title="Delete">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
