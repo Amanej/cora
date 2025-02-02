@@ -344,3 +344,59 @@ export default function CreateEditAgent() {
     </div >
   )
 }
+
+
+export const SkeletonLoader = () => {
+  return (
+    <div className="flex h-screen bg-gray-100 animate-pulse">
+      {/* Sidebar */}
+      <SideBar currentPage={SidebarPage.CreateAgent} />
+
+      {/* Main content */}
+      <main className="flex-1 p-8 overflow-auto">
+        <div className="h-8 bg-gray-300 rounded w-1/3 mb-6"></div>
+
+        <Card>
+          <CardHeader>
+            <div className="h-10 bg-gray-300 rounded w-full"></div>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="persona" className="mb-4">
+              <TabsList>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+              </TabsList>
+              <TabsContent value="persona">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="h-10 bg-gray-300 rounded w-full"></div>
+                        <div className="h-10 bg-gray-300 rounded w-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              {/* Repeat similar structure for other tabs */}
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4">
+          <CardContent>
+            <div className="space-y-6 mt-4">
+              <div className="h-10 bg-gray-300 rounded w-full"></div>
+              <div className="flex justify-end space-x-6">
+                <div className="h-10 bg-gray-300 rounded w-32"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
+}
