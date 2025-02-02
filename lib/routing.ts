@@ -4,6 +4,7 @@ export const ROUTES = {
     MANAGE_AGENTS: '/dashboard/manage',
     CREATE_AGENT: '/dashboard/create-agent',
     LOGG: '/dashboard/logg',
+    SETTINGS: '/dashboard/settings',
     FAIR_COLLECTION: '/examples/fair-collection',
     SVEA_FINANS: '/examples/svea-finans',
     SELGER: '/examples/selger',

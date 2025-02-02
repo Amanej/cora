@@ -3,6 +3,7 @@ import Link from "next/link"
 
 export enum SidebarPage {
     Manage = "manage",
+    CreateAgent = "create-agent",
     Logg = "logg",
     Innstillinger = "innstillinger",
 }
@@ -19,10 +20,13 @@ const SideBar: React.FC<SideBarProps> = ({ currentPage }) => {
                 <Link href={ROUTES.MANAGE_AGENTS} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Manage ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded font-medium`}>
                     Agents
                 </Link>
+                <Link href={ROUTES.CREATE_AGENT} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.CreateAgent ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded font-medium`}>
+                    Create
+                </Link>
                 <Link href={ROUTES.LOGG} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Logg ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
                     Logs
                 </Link>
-                <Link href="#" className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Innstillinger ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
+                <Link href={ROUTES.SETTINGS} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Innstillinger ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
                     Settings
                 </Link>
             </nav>

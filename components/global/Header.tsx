@@ -2,9 +2,15 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useAuth } from '@/domains/auth/state/AuthContext'
+import { ROUTES } from '@/lib/routing'
+import { useRouter } from 'next/navigation'
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const { logout, isAuthenticated, isApproved } = useAuth()
+
+	const router = useRouter();	
 
 	const toggleMenu = () => {
 		setIsMenuOpen(!isMenuOpen)
@@ -12,20 +18,29 @@ const Header = () => {
 
 	return (
 		<header className="px-4 lg:px-6 h-14 flex items-center">
-			<Link className="flex items-center justify-center" href="/">
+			<Link className="flex items-center justify-center" href="https://corafone.com/">
 				<img src="/Logo.svg" alt="Logo" className="h-4 m:h-6 w-auto" />
 			</Link>
 			<nav className="ml-auto flex gap-4 sm:gap-6">
 				<div className={`md:flex gap-4 sm:gap-6 bg-black ${isMenuOpen ? 'flex flex-col absolute top-14 right-4 bg-white p-4 shadow-md animate-in fade-in slide-in-from-top-5 duration-300' : 'hidden'}`}>
-					<Link className="text-sm font-medium hover:underline underline-offset-4" href="#features">
-						Features
-					</Link>
-					<Link className="text-sm font-medium hover:underline underline-offset-4" href="#use-cases">
-						Use Cases
-					</Link>
-					<Link className="text-sm font-medium underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
-						Request access
-					</Link>
+					{!isAuthenticated || !isApproved() &&
+						<Link className="text-sm font-medium hover:underline underline-offset-4" href={ROUTES.LOGIN}>
+							Login
+						</Link>
+					}
+					{isAuthenticated && isApproved() &&					
+						<Link className="text-sm font-medium hover:underline underline-offset-4" href="#" onClick={() => {
+							logout()
+							router.push(ROUTES.LOGIN)
+						}}>
+							Logout
+						</Link>
+					}
+					{!isAuthenticated &&					
+						<Link className="text-sm font-medium underline underline-offset-4" href="https://tally.so/r/31vx9Q" target="_blank">
+							Request access
+						</Link>
+					}
 				</div>
 				<button className="md:hidden" onClick={toggleMenu}>
 					<svg
