@@ -20,7 +20,6 @@ interface AgentSettingsProps {
 }
 
 export default function AgentSettings({ recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo, repeatCalls, setRepeatCalls }: AgentSettingsProps) {
-  console.log("repeatCalls", repeatCalls)
   return (
     <>
       <div className="space-y-2">
