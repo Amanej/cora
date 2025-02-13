@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     setToken(token);
     if (user) {
-      setUser({...user, max_calls: 1})
+      setUser({...user, max_calls: user.max_calls || 1})
     }
   };
 
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     })
     const data = await response.json()
-    console.log("data", data)
+    console.log("fetchUser data", data)
     setUser(data)
   }
 
