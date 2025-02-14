@@ -13,11 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlayCircle, FileText, Trash2, StickyNote } from "lucide-react"
+import { PlayCircle, FileText, Trash2, StickyNote, Phone } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
 import { AgentData, AgentRecordingSetting, AgentType } from "../agent/types"
-import { fetchCallsByAgentId } from "./api"
+import { fetchCallsByAgentId, triggerCall } from "./api"
 import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
 import clsx from 'clsx';
@@ -65,6 +65,15 @@ export default function CallLogs() {
   const fetchCallsIfAgentIsSelected = async () => {
     if (token && selectedAgent?._id) {
       fetchCalls(selectedAgent?._id, token);
+    }
+  }
+
+  const handleTriggerCall = async (call: Call) => {
+    console.log("LOGG - trigger call", call);
+    // @ts-ignore
+    if (call._id && token) {
+      // @ts-ignore
+      await triggerCall(call._id, token);
     }
   }
 
@@ -175,7 +184,7 @@ export default function CallLogs() {
               </div>
             </div>
 
-            <div className="mb-4 pl-4">
+            <div className="flex mb-4 pl-4 justify-between items-center">
               <div className="flex items-center space-x-2">
                 <Checkbox id="realtime" checked={showRealtime} onCheckedChange={(checked) => {
                   setShowRealtime(checked as boolean);
@@ -190,6 +199,9 @@ export default function CallLogs() {
                 <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
 
                 <DatePicker date={date} onChange={setDate} />
+              </div>
+              <div className="flex items-center space-x-2">
+                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Total calls:</span> {filteredCalls.length}</p>
               </div>
             </div>
 
@@ -216,6 +228,7 @@ export default function CallLogs() {
                     const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
                     const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
                     const reached = call.status === 'Completed' && duration > 0 && !endedBecauseOfVoicemail && !call.outcome.receivedVoicemail;
+                    const isQueued = call.status === 'Queued';
                     return (
                       <TableRow key={index}>
                         <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -239,6 +252,11 @@ export default function CallLogs() {
                               <Button variant="ghost" size="icon" title="Read note" onClick={() => handleShowNote(call)}>
                                 <StickyNote className="h-4 w-4" />
                               </Button>)}
+                            {isQueued && (
+                              <Button variant="ghost" size="icon" title="Trigger call" onClick={() => handleTriggerCall(call)}>
+                                <Phone className="h-4 w-4" />
+                              </Button>
+                            )}
                             {/* TODO: Add delete call */}
                             <Button variant="ghost" size="icon" title="Delete">
                               <Trash2 className="h-4 w-4" />

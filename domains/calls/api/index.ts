@@ -31,3 +31,12 @@ export const deleteCall = async (callId: string, token: string): Promise<void> =
     throw error;
   }
 };
+
+export const triggerCall = async (callId: string, token: string): Promise<void> => {
+  try {
+    await axios.post(`${APP_CONFIG.backendUrl}/calls/trigger/${callId}`, { headers: getLoggedInHeaders(token) });
+  } catch (error) {
+    console.error('Error triggering call:', error);
+    throw error;
+  }
+};
