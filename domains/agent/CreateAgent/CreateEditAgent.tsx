@@ -27,7 +27,7 @@ export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
-  const [testNumber, setTestNumber] = useState(defaultAgentData.phoneNumberId)
+  const [testNumber, setTestNumber] = useState('')
   const router = useRouter();
 
   const searchParams = useSearchParams();
