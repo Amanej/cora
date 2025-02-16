@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsAuthenticated(true);
     setToken(token);
     if (user) {
-      setUser({...user, max_calls: 1})
+      setUser({...user, max_calls: user.max_calls || 1})
     }
   };
 
@@ -57,15 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     })
     const data = await response.json()
-    console.log("data", data)
     setUser(data)
   }
 
   const isApproved = () => {
     return user?.approved ?? false
   }
-
-  // console.log("token", token);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, token, isApproved, user }}>
