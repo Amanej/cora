@@ -27,12 +27,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatEndingReason } from './utils';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/base/DatePicker';
-import { useRouter } from 'next/navigation';
-
 
 export default function CallLogs() {
   const { token } = useAuth();
-  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false)
   const [showPickUpsOnly, setShowPickUpsOnly] = useState(true);
   const [agents, setAgents] = useState<AgentData[]>([]);
@@ -69,11 +66,12 @@ export default function CallLogs() {
   }
 
   const handleTriggerCall = async (call: Call) => {
-    console.log("LOGG - trigger call", call);
+    // console.log("LOGG - trigger call", call);
     // @ts-ignore
     if (call._id && token) {
       // @ts-ignore
       await triggerCall(call._id, token);
+      await fetchCallsIfAgentIsSelected();
     }
   }
 

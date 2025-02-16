@@ -57,15 +57,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     })
     const data = await response.json()
-    console.log("fetchUser data", data)
     setUser(data)
   }
 
   const isApproved = () => {
     return user?.approved ?? false
   }
-
-  // console.log("token", token);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout, token, isApproved, user }}>
