@@ -1,5 +1,5 @@
-import { failedCallSlackMessage, triggerSlackMessage } from '@/services/slack';
-import { LANG, triggerCustomerSurveyCall, useCase } from '@/services/vapi';
+import { failedCallSlackMessage } from '@/services/slack';
+import { LANG, useCase } from '@/services/vapi';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
