@@ -18,6 +18,8 @@ export enum PERSONAS {
     SPANISH_ELDER_FEMALE = "spanishElderFemale",
     SPANISH_FEMALE = "spanishFemale",
     SPANISH_MALE = "spanishMale",
+    FRENCH_MALE = "frenchMale",
+    FRENCH_FEMALE = "frenchFemale",
     GERMAN_FEMALE = "germanFemale",
     ITALIAN_MALE = "italianMale",
     SWEDISH_FEMALE = "swedishFemale",
@@ -52,6 +54,8 @@ const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
                     <SelectItem value={PERSONAS.SPANISH_MALE}>🇪🇸 Male - Spanish</SelectItem>
                     <SelectItem value={PERSONAS.GERMAN_FEMALE}>🇩🇪 Female - German</SelectItem>
                     <SelectItem value={PERSONAS.ITALIAN_MALE}>🇮🇹 Male - Italian</SelectItem>
+                    <SelectItem value={PERSONAS.FRENCH_MALE}>🇫🇷 Male - French</SelectItem>
+                    <SelectItem value={PERSONAS.FRENCH_FEMALE}>🇫🇷 Female - French</SelectItem>
                 </SelectContent>
             </Select>
         </div>

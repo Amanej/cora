@@ -20,7 +20,7 @@ const TestAgent = ({ isEditing, testNumber, setTestNumber, handleTestAgent, isLo
                         <Input
                             id="phoneNumber"
                             type="tel"
-                            placeholder="Test nummber"
+                            placeholder="Test number"
                             value={testNumber}
                             onChange={(e) => setTestNumber(e.target.value)}
                         />
