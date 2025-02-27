@@ -235,7 +235,10 @@ export default function CallLogs() {
                         <TableCell>{durationFormatted}</TableCell>
                         <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
                         {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
-                        <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
+                        <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
+
+                          {call.outcome.vulnerability && <span>⚠️</span>}
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             {!hideSound &&
