@@ -13,6 +13,7 @@ export type Call = {
         booleanValue: null,
         numericValue: null,
         receivedVoicemail?: boolean
+        vulnerability?: boolean
     }
     createdAt: Date;
     transcript: string
