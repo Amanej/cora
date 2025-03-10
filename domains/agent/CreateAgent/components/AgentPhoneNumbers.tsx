@@ -38,7 +38,7 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
 
     const selectedNumberHasDifferentAgent = !isCurrentPhoneNumber && selectedNumberHasAgent && isIncoming;
 
-    console.log("PhoneNumberId ", phoneNumberId, "numbers", numbers)
+    // console.log("PhoneNumberId ", phoneNumberId, "numbers", numbers)
     return (
         <div className="space-y-2">
             <Label htmlFor="phone">Phone number</Label>
