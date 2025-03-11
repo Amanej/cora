@@ -23,39 +23,6 @@ type AgentRepeatCallsFormProps = {
 }
 
 const AgentRepeatCallsForm = ({ schedule, setSchedule, setMax, max, setRepeatCallDelay, delay, enabled, setEnabled, days, setDays, hours, setHours }: AgentRepeatCallsFormProps) => {
-    /*
-    const [cron, setCron] = useState<{
-        delay: string;
-        timezone: string;
-        enabled: boolean;
-    }>({
-        delay: '',
-        timezone: '',
-        enabled: false,
-    });
-
-    const [days, setDays] = useState<AgentRepeatCallsDays>({
-        monday: false,
-        tuesday: false,
-        wednesday: false,
-        thursday: false,
-        friday: false,
-        saturday: false,
-        sunday: false
-    });
-
-    const [hours, setHours] = useState<AgentRepeatCallsHours>({
-        from: null,
-        to: null,
-    });
-    */
-
-    /*
-    console.log("enabled ", enabled)
-    console.log("Max ", max)
-    console.log("Days ", schedule?.days)
-    console.log("Hours ", schedule?.hours)
-    */
     return (
         <div className="grid grid-cols-2 gap-4">
 
