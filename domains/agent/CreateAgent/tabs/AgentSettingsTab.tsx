@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import AgentActions from "../components/AgentActions"
 import AgentSettings from "../components/AgentSettings"
-import { AgentData } from "../../types"
+import { AgentData, AgentType } from "../../types"
 
 interface AgentSettingsTabProps {
   agentData: AgentData
@@ -12,6 +12,7 @@ interface AgentSettingsTabProps {
 }
 
 export default function AgentSettingsTab({ agentData, setAgentData }: AgentSettingsTabProps) {
+  const isInbound = agentData.type === AgentType.Incoming;
   return (
     <Card>
       <CardContent className="pt-6">
