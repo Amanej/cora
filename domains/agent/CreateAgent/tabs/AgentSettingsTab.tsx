@@ -59,6 +59,13 @@ export default function AgentSettingsTab({ agentData, setAgentData }: AgentSetti
               settings: { ...agentData.settings, repeatCalls }
             })
           }}
+          localization={agentData?.settings?.localization}
+          setLocalization={(localization) => {
+            setAgentData({
+              ...agentData,
+              settings: { ...agentData.settings, localization }
+            })
+          }}
         />
       </CardContent>
     </Card>
