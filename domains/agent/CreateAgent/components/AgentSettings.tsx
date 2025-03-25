@@ -7,6 +7,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import AgentRepeatCallsForm from './AgentRepeatCalls';
 
 interface AgentSettingsProps {
+  isInbound?: boolean;
   recordingType?: AgentRecordingSetting;
   setRecordingType: (type: AgentRecordingSetting) => void;
   voicemailBehaviour?: AgentVoicemailBehaviour;
@@ -19,7 +20,7 @@ interface AgentSettingsProps {
   setRepeatCalls: (repeatCalls: AgentRepeatCalls) => void;
 }
 
-export default function AgentSettings({ recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo, repeatCalls, setRepeatCalls }: AgentSettingsProps) {
+export default function AgentSettings({ isInbound, recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo, repeatCalls, setRepeatCalls }: AgentSettingsProps) {
   return (
     <>
       <div className="space-y-2">
@@ -76,10 +77,12 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
           />
         */}
       </div>
-      <Separator className="my-4" />
-      <div className="space-y-2">
-        <Label htmlFor="repeatCalls">Repeat calls</Label>
-        <AgentRepeatCallsForm 
+      {!isInbound && (
+        <>
+          <Separator className="my-4" />
+          <div className="space-y-2">
+            <Label htmlFor="repeatCalls">Repeat calls</Label>
+          <AgentRepeatCallsForm 
           schedule={repeatCalls?.schedule} 
           setSchedule={(schedule) => setRepeatCalls({ ...repeatCalls, schedule: schedule })} 
           days={repeatCalls?.schedule?.days || { monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false }} 
@@ -91,9 +94,11 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
           setRepeatCallDelay={(delay) => setRepeatCalls({ ...repeatCalls, delay: { hours: delay } })} 
           delay={repeatCalls?.delay?.hours} 
           enabled={repeatCalls?.enabled} 
-          setEnabled={(enabled) => setRepeatCalls({ ...repeatCalls, enabled: enabled })} 
-        />
-      </div>
+            setEnabled={(enabled) => setRepeatCalls({ ...repeatCalls, enabled: enabled })} 
+            />
+          </div>
+        </>
+      )}
     </>
   )
 }

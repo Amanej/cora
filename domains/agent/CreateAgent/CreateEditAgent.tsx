@@ -123,6 +123,7 @@ export default function CreateEditAgent() {
   }
 
   console.log("agentData", agentData)
+  const isInbound = agentData.type === AgentType.Incoming;
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
