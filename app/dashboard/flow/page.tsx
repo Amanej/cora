@@ -13,7 +13,7 @@ import ReactFlow, {
   useEdgesState
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-
+import { NODES, EDGES } from './exampleFlow';
 const initialNodes: Node[] = [
   {
     id: '1',
@@ -33,8 +33,8 @@ const initialEdges: Edge[] = [
 ];
 
 export default function FlowEditor() {
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState(NODES);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(EDGES);
 
   const onConnect = useCallback(
     (connection: Connection) => {

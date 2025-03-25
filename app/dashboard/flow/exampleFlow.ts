@@ -1,4 +1,4 @@
-const NODES =[
+export const NODES =[
     {
         "id": "1",
         "type": "input",
@@ -290,7 +290,7 @@ const NODES =[
     }
 ];
 
-const EDGES = [
+export const EDGES = [
     {
         "id": "e1-2",
         "source": "1",
