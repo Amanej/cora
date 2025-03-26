@@ -1,6 +1,7 @@
 export const ROUTES = {
     HOME: '/',
     DASHBOARD: '/dashboard',
+    ANALYTICS: '/dashboard/analytics/new',
     MANAGE_AGENTS: '/dashboard/manage',
     CREATE_AGENT: '/dashboard/create-agent',
     LOGG: '/dashboard/logg',

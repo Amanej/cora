@@ -6,6 +6,7 @@ export enum SidebarPage {
     CreateAgent = "create-agent",
     Logg = "logg",
     Innstillinger = "innstillinger",
+    Analytics = "analytics",
 }
 
 interface SideBarProps {
@@ -28,6 +29,9 @@ const SideBar: React.FC<SideBarProps> = ({ currentPage }) => {
                 </Link>
                 <Link href={ROUTES.SETTINGS} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Innstillinger ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
                     Settings
+                </Link>
+                <Link href={ROUTES.ANALYTICS} className={`flex items-center py-2 px-4 text-black ${currentPage === SidebarPage.Analytics ? 'bg-gray-200' : 'hover:bg-gray-100'} rounded`}>
+                    Analytics
                 </Link>
             </nav>
         </aside>
