@@ -64,7 +64,8 @@ export const formatMetricValue = (total: number, percentage: number): number => 
 };
 
 const WHITELISTED_AGENTS = [
-  '67e548d75e99abd5f8dd2a39'
+  '67e548d75e99abd5f8dd2a39',
+  '67e5977ed5b60a6320206aed'
 ]
 
 const getMetricCalculationConfig = (
