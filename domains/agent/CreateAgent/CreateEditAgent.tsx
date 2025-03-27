@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
 import { fetchUserPhoneNumbers } from '@/domains/phonenumber/api'
-import { AgentData, AgentType, AgentStatus, AgentRecordingSetting } from '../types'
+import { AgentData, AgentType, AgentStatus, AgentRecordingSetting, IndustryStandard } from '../types'
 import { Button } from "@/components/ui/button"
 import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
@@ -20,6 +20,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import AgentConversation from './components/AgentConversation'
 import AgentSettingsTab from './tabs/AgentSettingsTab'
 import AgentPersonaTab from './tabs/AgentPersonaTab'
+import { extractVariables } from '../utils'
 
 export default function CreateEditAgent() {
   const { toast } = useToast()
@@ -76,7 +77,7 @@ export default function CreateEditAgent() {
     openingLine: _agentData.openingLine || '',
     endCallPhrases: _agentData.endCallPhrases || [],
     evaluation: _agentData.evaluation || {},
-    settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON },
+    settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON, industryStandard: IndustryStandard.None, timezone: 'America/New_York', currency: 'USD' },
   };
 
   const handleSave = async () => {
@@ -114,15 +115,18 @@ export default function CreateEditAgent() {
 
   }
 
-  const handleTestAgent = async () => {
+  const handleTestAgent = async (testValues: Record<string, string>) => {
     if (searchId && token) {
       setIsLoading(true)
-      await testCallAgent(searchId, testNumber, token)
+      await testCallAgent(searchId, testNumber, token, testValues)
       setIsLoading(false)
     }
   }
 
-  console.log("agentData", agentData)
+  // console.log("agentData", agentData)
+  const isInbound = agentData.type === AgentType.Incoming;
+  const conversationVariables = extractVariables(agentData.instructions || "")
+  // console.log("conversationVariables", conversationVariables)
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
@@ -161,8 +165,10 @@ export default function CreateEditAgent() {
                       successEvaluation={_agentData.evaluation?.successEvaluation || ''}
                       setSummary={(summary) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, summary } })}
                       setSuccessEvaluation={(successEvaluation) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, successEvaluation } })}
-                      structuredSummary={_agentData.evaluation?.structuredSummary}
+                      structuredSummary={_agentData.evaluation?.structuredSummary || []}
                       setStructuredSummary={(structuredSummary) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, structuredSummary } })}
+                      industryStandard={_agentData.settings?.industryStandard || IndustryStandard.None}
+                      setIndustryStandard={(industryStandard) => setAgentData({ ..._agentData, settings: { ..._agentData.settings, industryStandard } })}
                     />
                   </CardContent>
                 </Card>
@@ -188,8 +194,7 @@ export default function CreateEditAgent() {
         <Card className="mt-4">
           <CardContent>
             <div className="space-y-6 mt-4">
-
-              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} />
+              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} variables={conversationVariables} />
 
               <div className="flex justify-end space-x-6">
                 <Button disabled={isLoading} onClick={() => {

@@ -14,6 +14,24 @@ export type Call = {
         numericValue: null,
         receivedVoicemail?: boolean
         vulnerability?: boolean
+        collectionAnalysis?: {
+            paymentMade?: {
+                total_debt_owed: number,
+                payment_received: boolean,
+            },
+            paymentPlan?: {
+                plan_accepted: boolean,
+                total_debt_owed: number,
+                pay_frequency: string,
+                amount_agreed: number,
+            },
+            typeOfHardship?: string,
+            income_expenditure_analysis?: boolean,
+        },
+        contactAnalysis?: {
+            was_the_right_number?: boolean,
+            was_the_right_party?: boolean,
+        }
     }
     createdAt: Date;
     transcript: string

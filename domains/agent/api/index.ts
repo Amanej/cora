@@ -106,12 +106,12 @@ export const updateAgent = async (agentId: string, agentData: Partial<AgentData>
 };
 
 
-export const testCallAgent = async (agentId: string, phoneNumberToCall: string, token: string) => {
+export const testCallAgent = async (agentId: string, phoneNumberToCall: string, token: string, testValues: Record<string, string>) => {
     try {
         const response = await fetch(APP_CONFIG.backendUrl+'/calls/test-call', {
             method: 'POST',
             headers: getLoggedInHeaders(token),
-            body: JSON.stringify({agentId, phoneNumberToCall}),
+            body: JSON.stringify({agentId, phoneNumberToCall, callVariables: testValues}),
         });
 
         if (!response.ok) {

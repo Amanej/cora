@@ -219,6 +219,7 @@ export default function CallLogs() {
                 </TableHeader>
                 <TableBody>
                   {filteredCalls.map((call, index) => {
+                    console.log("LOGG - call", call)
                     const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
                     const durationFormatted = duration > 0
                       ? format(new Date(0).setMilliseconds(duration), 'mm:ss')

@@ -11,7 +11,6 @@ import { Trash2 } from 'lucide-react'
 import { Dialog, DialogTitle, DialogHeader, DialogContent } from '@/components/ui/dialog'
 import { AgentStructuredSummaryFields, AgentStructuredSummaryType } from '../../types'
 
-
 type Props = {  
     structuredSummary: AgentStructuredSummaryFields[] | undefined;
     setStructuredSummary: (structuredSummary: AgentStructuredSummaryFields[] | undefined) => void;
