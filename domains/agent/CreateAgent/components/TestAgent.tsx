@@ -58,7 +58,7 @@ const TestAgentDialog = ({ variables, isLoading, handleTestAgent, isEditing }: T
                     <PlusCircle className="h-5 w-5" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px] bg-white text-gray-800" aria-describedby="Enter variables to test the agent">
+            <DialogContent className="bg-white text-gray-800" aria-describedby="Enter variables to test the agent">
                 <DialogHeader>
                     <DialogTitle>Test Agent with Variables</DialogTitle>
                 </DialogHeader>
