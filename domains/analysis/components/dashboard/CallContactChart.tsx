@@ -66,7 +66,7 @@ export const CallContactChart: React.FC<CallContactChartProps> = ({ data }) => {
                   />
                 ))}
               </Pie>
-              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartTooltip content={<ChartTooltipContent className="bg-white" />} />
               <ChartLegend content={<ChartLegendContent />} />
             </PieChart>
           </ChartContainer>

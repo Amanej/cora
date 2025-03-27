@@ -6,7 +6,7 @@ import MainAnalysisDashboard from '@/domains/analysis/MainDashboard';
 
 export default function AnalyticsPage() {
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex bg-gray-100">
     {/* Sidebar */}
     <SideBar currentPage={SidebarPage.Analytics} />    
     <MainAnalysisDashboard />
