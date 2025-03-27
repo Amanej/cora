@@ -219,6 +219,7 @@ export default function CallLogs() {
                 </TableHeader>
                 <TableBody>
                   {filteredCalls.map((call, index) => {
+                    console.log("LOGG - call", call)
                     const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
                     const durationFormatted = duration > 0
                       ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
@@ -235,7 +236,10 @@ export default function CallLogs() {
                         <TableCell>{durationFormatted}</TableCell>
                         <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
                         {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
-                        <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}</TableCell>
+                        <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
+
+                          {call.outcome.vulnerability && <span>⚠️</span>}
+                        </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
                             {!hideSound &&

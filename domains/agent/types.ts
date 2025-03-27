@@ -70,6 +70,14 @@ export type AgentRepeatCalls = {
 }
 
 
+export enum IndustryStandard {
+  None = "none",
+  ConsumerDutyUK = "consumer-duty-uk",
+  FDCPAUS = "fdcpa-us"
+}
+
+
+
 export type AgentData = {
   _id?: string,
   title: string,
@@ -94,6 +102,11 @@ export type AgentData = {
   };
   settings: {
     recordingType: AgentRecordingSetting;
+    industryStandard?: IndustryStandard;
+    localization?: {
+      timezone?: string;
+      currency?: string;
+    };
     voicemailBehaviour?: AgentVoicemailBehaviour;
     voicemailMessage?: string;
     transferCallTo?: string;

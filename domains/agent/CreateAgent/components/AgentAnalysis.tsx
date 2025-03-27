@@ -1,17 +1,30 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { AgentStructuredSummaryFields } from "../../types";
+import BestPractices from "./Analysis/BestPractices";
+import { IndustryStandard, AgentStructuredSummaryFields } from "@/domains/agent/types";
+import AgentStructuredSummary from "./AgentStructuredSummary";
 
 type Props = {
     summary: string;
     successEvaluation: string;
     setSummary: (summary: string) => void;
     setSuccessEvaluation: (successEvaluation: string) => void;
-    structuredSummary: AgentStructuredSummaryFields[] | undefined;
-    setStructuredSummary: (structuredSummary: AgentStructuredSummaryFields[] | undefined) => void;
+    structuredSummary: AgentStructuredSummaryFields[];
+    setStructuredSummary: (structuredSummary: AgentStructuredSummaryFields[]) => void;
+    industryStandard?: IndustryStandard;
+    setIndustryStandard?: (industryStandard: IndustryStandard) => void;
 }
 
-const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvaluation, structuredSummary, setStructuredSummary }: Props) => {
+const AgentAnalysis = ({ 
+    summary, 
+    successEvaluation, 
+    setSummary, 
+    setSuccessEvaluation, 
+    structuredSummary,
+    setStructuredSummary,
+    industryStandard = IndustryStandard.None,
+    setIndustryStandard = () => {}
+}: Props) => {
     return (
 
         <div className="space-y-6">
@@ -33,13 +46,22 @@ const AgentAnalysis = ({ summary, successEvaluation, setSummary, setSuccessEvalu
                     />
                 </div>
             </div>
-            {/* 
-                    
+            
+            <BestPractices
+                industryStandard={industryStandard}
+                setIndustryStandard={setIndustryStandard}
+            />
+            
+            {false &&            
                 <AgentStructuredSummary
                     structuredSummary={structuredSummary}
-                    setStructuredSummary={setStructuredSummary}
+                    setStructuredSummary={(structuredSummary) => {
+                        if (structuredSummary) {
+                            setStructuredSummary(structuredSummary);
+                        }
+                    }}
                 />
-            */}
+            }
         </div>
 
     )
