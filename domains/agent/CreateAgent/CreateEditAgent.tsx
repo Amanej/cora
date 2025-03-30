@@ -179,7 +179,7 @@ export default function CreateEditAgent() {
               <TabsContent value="knowledgebase">
                 <Card>
                   <CardContent className="pt-6">
-                    <AgentKnowledgeBase agentData={agentData} />
+                    <AgentKnowledgeBase agentData={agentData} token={token} />
                   </CardContent>
                 </Card>
               </TabsContent>
