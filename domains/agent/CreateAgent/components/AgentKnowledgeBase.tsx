@@ -7,14 +7,15 @@ import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import APP_CONFIG from "@/lib/config";
-import { getLoggedInHeaders } from "@/domains/auth/utils";
+import { getLoggedInHeadersWithFile } from "@/domains/auth/utils";
 
 type AgentKnowledgeBaseProps = {
     agentData: AgentData;
+    agentId?: string | null;
     token?: string | null;
 }
 
-const AgentKnowledgeBase = ({ agentData, token }: AgentKnowledgeBaseProps) => {
+const AgentKnowledgeBase = ({ agentData, token, agentId }: AgentKnowledgeBaseProps) => {
     const [isUploading, setIsUploading] = useState(false);
 
     const onDrop = async (acceptedFiles: File[]) => {
@@ -24,11 +25,12 @@ const AgentKnowledgeBase = ({ agentData, token }: AgentKnowledgeBaseProps) => {
             
             const formData = new FormData();
             formData.append('file', file);
+            formData.append('agentId', agentId || '');
 
             const response = await fetch(`${APP_CONFIG.backendUrl}/integrations/file`, {
                 method: 'POST',
                 body: formData,
-                headers: getLoggedInHeaders(token || '')
+                headers: getLoggedInHeadersWithFile(token || '')
             });
 
             if (!response.ok) {

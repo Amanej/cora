@@ -47,7 +47,6 @@ export default function CreateEditAgent() {
 
   const fetchNumbers = async (token: string) => {
     const numbers = await fetchUserPhoneNumbers(token);
-    console.log('Fetched phone numbers:', numbers);
     return numbers;
   };
 
@@ -179,7 +178,7 @@ export default function CreateEditAgent() {
               <TabsContent value="knowledgebase">
                 <Card>
                   <CardContent className="pt-6">
-                    <AgentKnowledgeBase agentData={agentData} token={token} />
+                    <AgentKnowledgeBase agentData={agentData} token={token} agentId={searchId} />
                   </CardContent>
                 </Card>
               </TabsContent>
