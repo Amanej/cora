@@ -27,11 +27,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<IUser | null>(null);
 
   useEffect(() => {
+    // console.log("Checking for user");
     const token = localStorage.getItem('token');
     if (token) {
+      // console.log("Token found ",token);
       setToken(token);
       setIsAuthenticated(true);
-      fetchUser()
+      fetchUser(token)
     }
   }, []);
 
@@ -50,13 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(null);
   };
 
-  const fetchUser = async () => {
+  const fetchUser = async (_token: string) => {
+    // console.log("Fetching user");
+    const tokenToSend = _token.length > 0 ? _token : token;
     const response = await fetch(APP_CONFIG.backendUrl+"/users/me", {
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `${tokenToSend}`
       }
     })
     const data = await response.json()
+    // console.log("User fetched", data);
     setUser(data)
   }
 

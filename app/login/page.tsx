@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useAuth } from '@/domains/auth/state/AuthContext'
+import { toast } from "@/hooks/use-toast";
 import APP_CONFIG from "@/lib/config";
 import { ROUTES } from "@/lib/routing";
 import { useRouter } from "next/navigation"
@@ -20,7 +21,7 @@ import { useState } from "react"
 export default function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const { login } = useAuth()
+  const { login, isAuthenticated } = useAuth()
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,10 +40,24 @@ export default function LoginForm() {
       } else {
         // Handle login error
         console.error('Login failed:', data.message)
+        toast({
+          title: "Login failed",
+          description: "Could not login, please double check authentication or email aman@corafone.com",
+          variant: "destructive",
+        })
       }
     } catch (error) {
       console.error('Login error:', error)
+      toast({
+        title: "Login failed",
+        description: "Could not login, please double check authentication or email aman@corafone.com",
+        variant: "destructive",
+      })
     }
+  }
+
+  if (isAuthenticated) {
+    router.push(ROUTES.MANAGE_AGENTS)
   }
 
   return (
