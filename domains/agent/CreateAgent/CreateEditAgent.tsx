@@ -94,19 +94,28 @@ export default function CreateEditAgent() {
     setIsLoading(true)
     if (searchId && token) {
       try {
-        await updateAgent(searchId, { ...agentData }, token);
-        setIsLoading(false)
-        toast({
-          title: "Agent updated",
+        const result = await updateAgent(searchId, { ...agentData }, token);
+        if (result) {
+          setIsLoading(false)
+          toast({
+            title: "Agent updated",
           description: `Successfully updated ${agentData.title}`,
-          className: "text-gray-700 bg-white",
-        })
+            className: "text-gray-700 bg-white",
+          })
+        } else {
+          setIsLoading(false)
+          toast({
+            title: "Agent update failed",
+            description: `Failed to update ${agentData.title}`,
+            variant: "destructive"
+          })
+        }
       } catch (error) {
         setIsLoading(false)
         // console.error("Error updating agent", error)
         toast({
-          title: "Agent updated",
-          description: `Successfully updated ${agentData.title}`,
+          title: "Agent update failed",
+          description: `Failed to update ${agentData.title}`,
           variant: "destructive"
         })
       }

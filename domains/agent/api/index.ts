@@ -100,8 +100,10 @@ export const updateAgent = async (agentId: string, agentData: Partial<AgentData>
 
         const updatedAgent = await response.json();
         console.log('Agent updated successfully:', updatedAgent);
+        return true;
     } catch (error) {
         console.error('Error updating agent:', error);
+        return false;
     }
 };
 
