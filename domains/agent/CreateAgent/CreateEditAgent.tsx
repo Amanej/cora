@@ -178,7 +178,7 @@ export default function CreateEditAgent() {
               <TabsContent value="knowledgebase">
                 <Card>
                   <CardContent className="pt-6">
-                    <AgentKnowledgeBase agentData={agentData} token={token} agentId={searchId} />
+                    <AgentKnowledgeBase agentData={agentData} token={token} agentId={searchId} refresh={() => handleUpdate()} />
                   </CardContent>
                 </Card>
               </TabsContent>

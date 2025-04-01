@@ -13,9 +13,10 @@ type AgentKnowledgeBaseProps = {
     agentData: AgentData;
     agentId?: string | null;
     token?: string | null;
+    refresh: () => void;
 }
 
-const AgentKnowledgeBase = ({ agentData, token, agentId }: AgentKnowledgeBaseProps) => {
+const AgentKnowledgeBase = ({ agentData, token, agentId, refresh }: AgentKnowledgeBaseProps) => {
     const [isUploading, setIsUploading] = useState(false);
 
     const onDrop = async (acceptedFiles: File[]) => {
@@ -42,7 +43,7 @@ const AgentKnowledgeBase = ({ agentData, token, agentId }: AgentKnowledgeBasePro
                 title: 'File uploaded successfully',
                 description: 'File uploaded successfully',
             });
-            
+            refresh();
         } catch (error) {
             console.error('Error uploading file:', error);
             toast({
