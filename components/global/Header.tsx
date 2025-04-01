@@ -25,8 +25,6 @@ const Header = () => {
 		return token
 	}
 
-	// isLoggedIn()
-
 	return (
 		<header className="px-4 lg:px-6 h-14 flex items-center">
 			<Link className="flex items-center justify-center" href="https://corafone.com/">
