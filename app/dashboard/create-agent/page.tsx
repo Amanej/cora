@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import CreateEditAgent from "@/domains/agent/CreateAgent/CreateEditAgent";
+import CreateEditAgent, { SkeletonLoader } from "@/domains/agent/CreateAgent/CreateEditAgent";
 
 const CreateEditAgentPage = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<SkeletonLoader />}>
       <CreateEditAgent />
     </Suspense>
   )

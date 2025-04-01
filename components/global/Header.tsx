@@ -5,9 +5,12 @@ import { useAuth } from '@clerk/clerk-react'
 import Link from 'next/link'
 import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs'
 import { ROUTES } from '@/lib/routing'
+import { useRouter } from 'next/navigation'
 
 const Header = () => {
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+	const router = useRouter();	
 
 	const { getToken, isLoaded, userId } = useAuth()
 	// console.log(" userId ", userId, " isLoaded ", isLoaded, " token ", getToken())
@@ -26,7 +29,7 @@ const Header = () => {
 
 	return (
 		<header className="px-4 lg:px-6 h-14 flex items-center">
-			<Link className="flex items-center justify-center" href="/">
+			<Link className="flex items-center justify-center" href="https://corafone.com/">
 				<img src="/Logo.svg" alt="Logo" className="h-4 m:h-6 w-auto" />
 			</Link>
 			<nav className="ml-auto flex gap-4 sm:gap-6">

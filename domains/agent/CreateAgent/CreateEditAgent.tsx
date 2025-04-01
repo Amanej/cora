@@ -2,51 +2,25 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createAgent, fetchAgentById, testCallAgent, updateAgent } from '../api'
-import { AgentData, AgentType, AgentStatus, AgentRecordingSetting } from '../types'
+import { fetchUserPhoneNumbers } from '@/domains/phonenumber/api'
+import { AgentData, AgentType, AgentStatus, AgentRecordingSetting, IndustryStandard } from '../types'
 import { Button } from "@/components/ui/button"
+import { useToast } from '@/hooks/use-toast'
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
 import SideBar, { SidebarPage } from '@/components/global/Sidebar'
 import { ROUTES } from '@/lib/routing'
 import { defaultAgentData } from './constants'
 import TestAgent from './components/TestAgent'
-import AgentActions from './components/AgentActions'
 import AgentKnowledgeBase from './components/AgentKnowledgeBase'
-import AgentPersona from './components/AgentPersona'
 import AgentHeader from './components/AgentHeader'
 import { useAuth } from '@/domains/auth/state/AuthContext'
 import AgentAnalysis from './components/AgentAnalysis'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import AgentSettings from './components/AgentSettings'
-import { useToast } from '@/hooks/use-toast'
-
-type PhoneNumberOption = {
-  number: string;
-  externalId: string;
-  countryCode: string;
-}
-
-const PHONENUMBER_OPTIONS: PhoneNumberOption[] = [
-  {
-    number: "+12056971654",
-    externalId: "e354916c-659a-489e-b141-a1e0ddb13712",
-    countryCode: "US",
-  },
-  {
-    number: "+4732994591",
-    externalId: "c8471c8c-133f-4df2-abab-b1ad4d7cf59d",
-    countryCode: "NO",
-  },
-  {
-    number: "+4732994597",
-    externalId: "e31add50-a0c2-4c0f-bb10-5518b198ad2f",
-    countryCode: "NO",
-  }
-]
+import AgentConversation from './components/AgentConversation'
+import AgentSettingsTab from './tabs/AgentSettingsTab'
+import AgentPersonaTab from './tabs/AgentPersonaTab'
+import { extractVariables } from '../utils'
 
 export default function CreateEditAgent() {
   const { toast } = useToast()
@@ -54,7 +28,7 @@ export default function CreateEditAgent() {
   const [isEditing, setIsEditing] = useState(false) // Set to false for create mode
   const [isLoading, setIsLoading] = useState(false)
   const [_agentData, setAgentData] = useState(defaultAgentData);
-  const [testNumber, setTestNumber] = useState(defaultAgentData.phoneNumberId)
+  const [testNumber, setTestNumber] = useState('')
   const router = useRouter();
 
   const searchParams = useSearchParams();
@@ -71,9 +45,21 @@ export default function CreateEditAgent() {
     setIsLoading(false);
   };
 
+  const fetchNumbers = async (token: string) => {
+    const numbers = await fetchUserPhoneNumbers(token);
+    console.log('Fetched phone numbers:', numbers);
+    return numbers;
+  };
+
   useEffect(() => {
     if (searchId && token) {
       fetchAgent(searchId, token);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      fetchNumbers(token);
     }
   }, [token]);
 
@@ -91,7 +77,7 @@ export default function CreateEditAgent() {
     openingLine: _agentData.openingLine || '',
     endCallPhrases: _agentData.endCallPhrases || [],
     evaluation: _agentData.evaluation || {},
-    settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON },
+    settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON, industryStandard: IndustryStandard.None, timezone: 'America/New_York', currency: 'USD' },
   };
 
   const handleSave = async () => {
@@ -126,23 +112,25 @@ export default function CreateEditAgent() {
         })
       }
     }
-    // router.push(ROUTES.MANAGE_AGENTS);
 
   }
 
-  const handleTestAgent = async () => {
+  const handleTestAgent = async (testValues: Record<string, string>) => {
     if (searchId && token) {
       setIsLoading(true)
-      await testCallAgent(searchId, testNumber, token)
+      await testCallAgent(searchId, testNumber, token, testValues)
       setIsLoading(false)
     }
   }
 
   // console.log("agentData", agentData)
+  const isInbound = agentData.type === AgentType.Incoming;
+  const conversationVariables = extractVariables(agentData.instructions || "")
+  // console.log("conversationVariables", conversationVariables)
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
-      <SideBar currentPage={SidebarPage.Manage} />
+      <SideBar currentPage={SidebarPage.CreateAgent} />
 
       {/* Main content */}
       <main className="flex-1 p-8 overflow-auto">
@@ -167,52 +155,7 @@ export default function CreateEditAgent() {
                 <TabsTrigger value="settings">Actions & Settings</TabsTrigger>
               </TabsList>
               <TabsContent value="persona">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="space-y-6">
-                      <div className="grid grid-cols-2 gap-4">
-                        <AgentPersona agentData={_agentData} setAgentData={setAgentData} />
-                        <div className="space-y-2">
-                          <Label htmlFor="phone">Phone number</Label>
-                          <Select
-                            value={_agentData.phoneNumberId}
-                            onValueChange={(value) => {
-                              setAgentData({ ..._agentData, phoneNumberId: value })
-                            }}
-                          >
-                            <SelectTrigger id="phone">
-                              <SelectValue placeholder="Select a phone number" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {PHONENUMBER_OPTIONS.map((option) => (
-                                <SelectItem key={option.externalId} value={option.externalId}>
-                                  {option.number}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="type">Type</Label>
-                          <Select
-                            onValueChange={(value) => {
-                              setAgentData({ ..._agentData, type: value as AgentType })
-                            }}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder={AgentType.Incoming} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value={AgentType.Incoming}>Incoming</SelectItem>
-                              <SelectItem value={AgentType.Outgoing}>Outgoing</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                <AgentPersonaTab agentData={_agentData} setAgentData={setAgentData} />
               </TabsContent>
               <TabsContent value="analysis">
                 <Card>
@@ -222,49 +165,16 @@ export default function CreateEditAgent() {
                       successEvaluation={_agentData.evaluation?.successEvaluation || ''}
                       setSummary={(summary) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, summary } })}
                       setSuccessEvaluation={(successEvaluation) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, successEvaluation } })}
-                      structuredSummary={_agentData.evaluation?.structuredSummary}
+                      structuredSummary={_agentData.evaluation?.structuredSummary || []}
                       setStructuredSummary={(structuredSummary) => setAgentData({ ..._agentData, evaluation: { ..._agentData.evaluation, structuredSummary } })}
+                      industryStandard={_agentData.settings?.industryStandard || IndustryStandard.None}
+                      setIndustryStandard={(industryStandard) => setAgentData({ ..._agentData, settings: { ..._agentData.settings, industryStandard } })}
                     />
                   </CardContent>
                 </Card>
               </TabsContent>
               <TabsContent value="conversation">
-                <Card>
-                  <CardContent className="pt-6">
-
-                    <div className="space-y-2">
-                      <Label htmlFor="openingLine">First message</Label>
-                      <Input placeholder="Opening message" value={_agentData.openingLine}
-                        onChange={(e) => {
-                          setAgentData({ ..._agentData, openingLine: e.target.value })
-                        }}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="instructions">Instructions</Label>
-                      <Textarea
-                        id="instructions"
-                        placeholder="Describe how you want the agent to behave"
-                        className="min-h-[200px]"
-                        value={_agentData.instructions}
-                        onChange={(e) => {
-                          setAgentData({ ..._agentData, instructions: e.target.value })
-                        }}
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="endCallPhrases">End call phrases <span className="text-xs text-gray-500">(comma separated)</span></Label>
-                      <Input placeholder="End call phrases" value={_agentData.endCallPhrases?.toString() || ''}
-                        onChange={(e) => {
-                          const endphrases = e.target.value.split(',');
-                          setAgentData({ ..._agentData, endCallPhrases: endphrases })
-                        }}
-                      />
-                    </div>
-
-                  </CardContent>
-                </Card>
+                <AgentConversation agentData={_agentData} setAgentData={setAgentData} />
               </TabsContent>
               <TabsContent value="knowledgebase">
                 <Card>
@@ -274,51 +184,7 @@ export default function CreateEditAgent() {
                 </Card>
               </TabsContent>
               <TabsContent value="settings">
-                <Card>
-                  <CardContent className="pt-6">
-                    <AgentActions integrationIds={agentData.integrationIds} setIntegrationIds={(ids) => {
-                      setAgentData({ ...agentData, integrationIds: ids })
-                    }} />
-                    <Separator className="my-4" />
-                    <AgentSettings 
-                      recordingType={_agentData?.settings?.recordingType}
-                      setRecordingType={(recordingType) => {
-                        setAgentData({ 
-                          ..._agentData, 
-                          settings: { ..._agentData.settings, recordingType } 
-                        })
-                      }}
-                      voicemailBehaviour={_agentData?.settings?.voicemailBehaviour}
-                      setVoicemailBehaviour={(voicemailBehaviour) => {
-                        setAgentData({ 
-                          ..._agentData, 
-                          settings: { ..._agentData.settings, voicemailBehaviour } 
-                        })
-                      }}
-                      voicemailMessage={_agentData?.settings?.voicemailMessage}
-                      setVoicemailMessage={(voicemailMessage) => {
-                        setAgentData({ 
-                          ..._agentData, 
-                          settings: { ..._agentData.settings, voicemailMessage } 
-                        })
-                      }}
-                      transferCallTo={_agentData?.settings?.transferCallTo}
-                      setTransferCallTo={(transferCallTo) => {
-                        setAgentData({ 
-                          ..._agentData, 
-                          settings: { ..._agentData.settings, transferCallTo } 
-                        })
-                      }}
-                      repeatCalls={_agentData?.settings?.repeatCalls}
-                      setRepeatCalls={(repeatCalls) => {
-                        setAgentData({ 
-                          ..._agentData, 
-                          settings: { ..._agentData.settings, repeatCalls } 
-                        })
-                      }}
-                    />
-                  </CardContent>
-                </Card>
+                <AgentSettingsTab agentData={_agentData} setAgentData={setAgentData} />
               </TabsContent>
             </Tabs>
 
@@ -328,8 +194,7 @@ export default function CreateEditAgent() {
         <Card className="mt-4">
           <CardContent>
             <div className="space-y-6 mt-4">
-
-              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} />
+              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} variables={conversationVariables} />
 
               <div className="flex justify-end space-x-6">
                 <Button disabled={isLoading} onClick={() => {
@@ -343,4 +208,60 @@ export default function CreateEditAgent() {
       </main>
     </div >
   )
+}
+
+
+export const SkeletonLoader = () => {
+  return (
+    <div className="flex h-screen bg-gray-100 animate-pulse">
+      {/* Sidebar */}
+      <SideBar currentPage={SidebarPage.CreateAgent} />
+
+      {/* Main content */}
+      <main className="flex-1 p-8 overflow-auto">
+        <div className="h-8 bg-gray-300 rounded w-1/3 mb-6"></div>
+
+        <Card>
+          <CardHeader>
+            <div className="h-10 bg-gray-300 rounded w-full"></div>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="persona" className="mb-4">
+              <TabsList>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+                <div className="h-8 bg-gray-300 rounded w-24"></div>
+              </TabsList>
+              <TabsContent value="persona">
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="h-10 bg-gray-300 rounded w-full"></div>
+                        <div className="h-10 bg-gray-300 rounded w-full"></div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              {/* Repeat similar structure for other tabs */}
+            </Tabs>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-4">
+          <CardContent>
+            <div className="space-y-6 mt-4">
+              <div className="h-10 bg-gray-300 rounded w-full"></div>
+              <div className="flex justify-end space-x-6">
+                <div className="h-10 bg-gray-300 rounded w-32"></div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
+  );
 }

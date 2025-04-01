@@ -11,13 +11,21 @@ export enum PERSONAS {
     BRITISH = "british",
     BRITISH_FEMALE = "britishFemale",
     NORWEGIAN = "norwegian",
+    NORWEGIAN_FEMALE = "norwegianFemale",
+    NORWEGIAN_MALE = "norwegianMale",
     AMERICAN_FEMALE = "americanFemale",
     AMERICAN_MALE = "americanMale",
     SPANISH_ELDER_FEMALE = "spanishElderFemale",
     SPANISH_FEMALE = "spanishFemale",
     SPANISH_MALE = "spanishMale",
+    FRENCH_MALE = "frenchMale",
+    FRENCH_FEMALE = "frenchFemale",
     GERMAN_FEMALE = "germanFemale",
-    ITALIAN_MALE = "italianMale"
+    ITALIAN_MALE = "italianMale",
+    SWEDISH_FEMALE = "swedishFemale",
+    SWEDISH_MALE = "swedishMale",
+    DANISH_FEMALE = "danishFemale",
+    DANISH_MALE = "danishMale"
 }
 
 const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
@@ -35,6 +43,12 @@ const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value={PERSONAS.NORWEGIAN}>🇳🇴 Male - Norwegian</SelectItem>
+                    <SelectItem value={PERSONAS.NORWEGIAN_FEMALE}>🇳🇴 Female - Norwegian</SelectItem>
+                    <SelectItem value={PERSONAS.NORWEGIAN_MALE}>🇳🇴 Male - Norwegian v2</SelectItem>
+                    <SelectItem value={PERSONAS.SWEDISH_FEMALE}>🇸🇪 Female - Swedish</SelectItem>
+                    <SelectItem value={PERSONAS.SWEDISH_MALE}>🇸🇪 Male - Swedish</SelectItem>
+                    <SelectItem value={PERSONAS.DANISH_FEMALE}>🇩🇰 Female - Danish</SelectItem>
+                    <SelectItem value={PERSONAS.DANISH_MALE}>🇩🇰 Male - Danish</SelectItem>
                     <SelectItem value={PERSONAS.BRITISH}>🇬🇧 Male -  British</SelectItem>
                     <SelectItem value={PERSONAS.BRITISH_FEMALE}>🇬🇧 Female - British</SelectItem>
                     <SelectItem value={PERSONAS.AMERICAN_FEMALE}>🇺🇸 Female - American</SelectItem>
@@ -44,6 +58,8 @@ const AgentPersona = ({ agentData, setAgentData }: AgentPersonaProps) => {
                     <SelectItem value={PERSONAS.SPANISH_MALE}>🇪🇸 Male - Spanish</SelectItem>
                     <SelectItem value={PERSONAS.GERMAN_FEMALE}>🇩🇪 Female - German</SelectItem>
                     <SelectItem value={PERSONAS.ITALIAN_MALE}>🇮🇹 Male - Italian</SelectItem>
+                    <SelectItem value={PERSONAS.FRENCH_MALE}>🇫🇷 Male - French</SelectItem>
+                    <SelectItem value={PERSONAS.FRENCH_FEMALE}>🇫🇷 Female - French</SelectItem>
                 </SelectContent>
             </Select>
         </div>

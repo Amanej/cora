@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { AgentRecordingSetting, AgentRepeatCalls, AgentVoicemailBehaviour } from '../../types'
 import { Label } from "@/components/ui/label"
@@ -5,8 +6,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from '@/components/ui/separator';
 import { PhoneInput } from '@/components/ui/phone-input';
 import AgentRepeatCallsForm from './AgentRepeatCalls';
+import Localization from './Settings/Localization';
 
 interface AgentSettingsProps {
+  isInbound?: boolean;
   recordingType?: AgentRecordingSetting;
   setRecordingType: (type: AgentRecordingSetting) => void;
   voicemailBehaviour?: AgentVoicemailBehaviour;
@@ -17,10 +20,17 @@ interface AgentSettingsProps {
   setTransferCallTo: (number: string) => void;
   repeatCalls?: AgentRepeatCalls;
   setRepeatCalls: (repeatCalls: AgentRepeatCalls) => void;
+  localization?: {
+    timezone?: string;
+    currency?: string;
+  };
+  setLocalization: (localization: {
+    timezone?: string;
+    currency?: string;
+  }) => void;
 }
+export default function AgentSettings({ isInbound, recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo, repeatCalls, setRepeatCalls, localization, setLocalization }: AgentSettingsProps) {
 
-export default function AgentSettings({ recordingType, setRecordingType, voicemailBehaviour, setVoicemailBehaviour, voicemailMessage, setVoicemailMessage, transferCallTo, setTransferCallTo, repeatCalls, setRepeatCalls }: AgentSettingsProps) {
-  console.log("repeatCalls", repeatCalls)
   return (
     <>
       <div className="space-y-2">
@@ -77,22 +87,35 @@ export default function AgentSettings({ recordingType, setRecordingType, voicema
           />
         */}
       </div>
+      {false && (
+        <>
+          <Separator className="my-4" />
+          <div className="space-y-2">
+            <Label htmlFor="repeatCalls">Repeat calls</Label>
+            <AgentRepeatCallsForm
+              schedule={repeatCalls?.schedule}
+              setSchedule={(schedule) => setRepeatCalls({ ...repeatCalls, schedule: schedule })}
+              days={repeatCalls?.schedule?.days || { monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false }}
+              setDays={(days) => setRepeatCalls({ ...repeatCalls, schedule: { ...repeatCalls?.schedule, days, timezone: repeatCalls?.schedule?.timezone || null, hours: repeatCalls?.schedule?.hours || { from: null, to: null } } })}
+              hours={repeatCalls?.schedule?.hours || { from: null, to: null }}
+              setHours={(hours) => setRepeatCalls({ ...repeatCalls, schedule: { ...repeatCalls?.schedule, hours, timezone: repeatCalls?.schedule?.timezone || null, days: repeatCalls?.schedule?.days || { monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false } } })}
+              setMax={(max) => setRepeatCalls({ ...repeatCalls, max: max })}
+              max={repeatCalls?.max}
+              setRepeatCallDelay={(delay) => setRepeatCalls({ ...repeatCalls, delay: { hours: delay } })}
+              delay={repeatCalls?.delay?.hours}
+              enabled={repeatCalls?.enabled}
+              setEnabled={(enabled) => setRepeatCalls({ ...repeatCalls, enabled: enabled })}
+            />
+          </div>
+        </>
+      )}
       <Separator className="my-4" />
       <div className="space-y-2">
-        <Label htmlFor="repeatCalls">Repeat calls</Label>
-        <AgentRepeatCallsForm 
-          schedule={repeatCalls?.schedule} 
-          setSchedule={(schedule) => setRepeatCalls({ ...repeatCalls, schedule: schedule })} 
-          days={repeatCalls?.schedule?.days || { monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false }} 
-          setDays={(days) => setRepeatCalls({ ...repeatCalls, schedule: { ...repeatCalls?.schedule, days, timezone: repeatCalls?.schedule?.timezone || null, hours: repeatCalls?.schedule?.hours || { from: null, to: null } } })} 
-          hours={repeatCalls?.schedule?.hours || { from: null, to: null }} 
-          setHours={(hours) => setRepeatCalls({ ...repeatCalls, schedule: { ...repeatCalls?.schedule, hours, timezone: repeatCalls?.schedule?.timezone || null, days: repeatCalls?.schedule?.days || { monday: false, tuesday: false, wednesday: false, thursday: false, friday: false, saturday: false, sunday: false } } })} 
-          setMax={(max) => setRepeatCalls({ ...repeatCalls, max: max })} 
-          max={repeatCalls?.max} 
-          setRepeatCallDelay={(delay) => setRepeatCalls({ ...repeatCalls, delay: { hours: delay } })} 
-          delay={repeatCalls?.delay?.hours} 
-          enabled={repeatCalls?.enabled} 
-          setEnabled={(enabled) => setRepeatCalls({ ...repeatCalls, enabled: enabled })} 
+        <Localization
+          timezone={localization?.timezone || undefined}
+          setTimezone={(timezone) => setLocalization({ ...localization, timezone })}
+          currency={localization?.currency || undefined}
+          setCurrency={(currency) => setLocalization({ ...localization, currency })}
         />
       </div>
     </>

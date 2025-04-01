@@ -170,7 +170,10 @@ const CallSheet: React.FC<Props> = ({ agentId, sheetId }) => {
                 <div className="flex justify-between items-center mb-6">
                     {/* Fix agent name */}
                     <p className="text-sm font-light text-black">Call sheet &gt; <span className="font-bold">{sheet?.title}</span></p>
-                    <Button className="underline" onClick={() => router.push(ROUTES.CALL_SHEETS_BY_AGENT + "/" + currentAgentId)} variant="link" size="sm">Callsheets by agent</Button>
+                    <div className="flex items-center">
+                        <Button className="underline" onClick={() => router.push(ROUTES.CALL_SHEETS_BY_AGENT + "/" + currentAgentId)} variant="link" size="sm">Agent Callsheets</Button>
+                        <Button className="underline" onClick={() => router.push(ROUTES.LOGG + "?agentId=" + currentAgentId)} variant="link" size="sm">Agent Logs</Button>
+                    </div>
                 </div>
 
                 <div {...getRootProps()} className="border-2 border-dashed border-gray-400 p-4 mb-4 text-center cursor-pointer text-gray-800 bg-gray-200">
