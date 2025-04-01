@@ -5,9 +5,9 @@ import Link from "next/link"
 import { AgentData } from "../../types";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { toast } from "sonner";
 import APP_CONFIG from "@/lib/config";
 import { getLoggedInHeadersWithFile } from "@/domains/auth/utils";
+import { toast } from "@/hooks/use-toast";
 
 type AgentKnowledgeBaseProps = {
     agentData: AgentData;
@@ -38,11 +38,17 @@ const AgentKnowledgeBase = ({ agentData, token, agentId }: AgentKnowledgeBasePro
             }
 
             const result = await response.json();
-            toast.success('File uploaded successfully');
+            toast({
+                title: 'File uploaded successfully',
+                description: 'File uploaded successfully',
+            });
             
         } catch (error) {
             console.error('Error uploading file:', error);
-            toast.error('Failed to upload file');
+            toast({
+                title: 'Failed to upload file',
+                description: 'Failed to upload file',
+            });
         } finally {
             setIsUploading(false);
         }
