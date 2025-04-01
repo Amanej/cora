@@ -15,7 +15,6 @@ export const fetchUserPhoneNumbers = async (token: string): Promise<IPhoneNumber
         }
 
         const phoneNumbers = await response.json();
-        console.log('Fetched phone numbers:', phoneNumbers);
         return phoneNumbers;
     } catch (error) {
         console.error('Error fetching phone numbers:', error);
