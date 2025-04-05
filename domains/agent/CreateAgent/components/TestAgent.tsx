@@ -62,7 +62,7 @@ const TestAgentDialog = ({ variables, isLoading, handleTestAgent, isEditing }: T
                 <DialogHeader>
                     <DialogTitle>Test Agent with Variables</DialogTitle>
                 </DialogHeader>
-                <div className="grid gap-4 py-4">
+                <div className="grid gap-4 py-4 overflow-y-scroll max-h-[500px]">
                     {variables.map((variable) => (
                         <div key={variable.name} className="grid grid-cols-4 items-center gap-4">
                             <Label htmlFor={variable.name} className="text-right">
