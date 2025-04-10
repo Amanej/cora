@@ -20,7 +20,7 @@ export default function VerificationPage() {
 
   const handleVerification = async () => {
     try {
-      const response = await fetch(`${APP_CONFIG.backendUrl}/integrations/verify-call`, {
+      const response = await fetch(`${APP_CONFIG.backendUrl}/integrations/lea/verify-call`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ callId, phoneNumber }),
