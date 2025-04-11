@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/card"
 import APP_CONFIG from "@/lib/config";
 import { useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, Suspense } from "react"
 
-export default function VerificationPage() {
+function VerificationContent() {
   const searchParams = useSearchParams();
   const callId = searchParams.get('callId');
   const phoneNumber = searchParams.get('phonenumber');
@@ -38,7 +38,7 @@ export default function VerificationPage() {
   }
 
   return (
-    <div className="m-auto">
+    <div className="flex items-center justify-center min-h-screen p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <CardTitle className="text-2xl">Verify your call</CardTitle>
@@ -46,27 +46,44 @@ export default function VerificationPage() {
             Please confirm your phone number: {phoneNumber}
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           {status === 'pending' && (
             <Button 
               className="w-full" 
               onClick={handleVerification}
+              size="lg"
             >
               Confirm
             </Button>
           )}
           {status === 'confirmed' && (
-            <div className="text-center text-green-600 font-medium">
+            <div className="text-center text-green-600 font-medium py-4">
               Your call has been verified successfully!
             </div>
           )}
           {status === 'failed' && (
-            <div className="text-center text-red-600 font-medium">
+            <div className="text-center text-red-600 font-medium py-4">
               Failed to verify your call. Please try again.
             </div>
           )}
         </CardContent>
       </Card>
     </div>
+  )
+}
+
+export default function VerificationPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">Loading...</CardTitle>
+          </CardHeader>
+        </Card>
+      </div>
+    }>
+      <VerificationContent />
+    </Suspense>
   )
 }
