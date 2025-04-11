@@ -14,4 +14,6 @@ export const ROUTES = {
     CALL_SHEET: '/dashboard/call-sheet/', // callSheetId
     CALL_LOGS_BY_AGENT: '/dashboard/agent/calls/', // :agentId
     CREATE_CALL_SHEET: '/dashboard/agent/callsheet/new/', // :agentId
+    MANAGE_QUERIES: '/dashboard/queries',
+    CREATE_QUERY: '/dashboard/queries/create',
 }
