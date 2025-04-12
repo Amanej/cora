@@ -61,5 +61,6 @@ export const defaultAgentData: AgentData = {
     status: AgentStatus.Active,
     templateId: '',
     persona: '', // Add this line
+    externalId: '',
   }
   
