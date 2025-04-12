@@ -95,6 +95,7 @@ export type AgentData = {
   templateId: string,
   persona: string,
   endCallPhrases?: string[];
+  externalId?: string;
   evaluation: {
     summary?: string;
     successEvaluation?: string;

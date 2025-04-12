@@ -2,9 +2,10 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { Variable } from "@/domains/agent/utils";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { PlusCircle } from "lucide-react";
+import InBrowser from "./TestAgent/InBrowser";
 
 type TestAgentProps = {
     isEditing: boolean;
@@ -13,27 +14,22 @@ type TestAgentProps = {
     handleTestAgent: (testValues: Record<string, string>) => void;
     variables: Variable[];
     isLoading: boolean;
+    externalId?: string;
 }
 
 type TestAgentDialogProps = {
     variables: Variable[];
     isLoading: boolean;
+    testValues: Record<string, string>;
+    setTestValues: Dispatch<SetStateAction<Record<string, string>>>
     handleTestAgent: (testValues: Record<string, string>) => void;
     isEditing: boolean;
 }
-const TestAgentDialog = ({ variables, isLoading, handleTestAgent, isEditing }: TestAgentDialogProps) => {
+const TestAgentDialog = ({ variables, isLoading, handleTestAgent, testValues, setTestValues, isEditing }: TestAgentDialogProps) => {
     const [open, setOpen] = useState(false);
-    const [testValues, setTestValues] = useState<Record<string, string>>(() => {
-        // Initialize with default values for each variable
-        const initialValues: Record<string, string> = {};
-        variables.forEach(variable => {
-            initialValues[variable.name] = `Test value for ${variable.name}`;
-        });
-        return initialValues;
-    });
 
     const handleInputChange = (key: string, value: string) => {
-        setTestValues(prev => ({
+        setTestValues((prev: any) => ({
             ...prev,
             [key]: value
         }));
@@ -91,7 +87,15 @@ const TestAgentDialog = ({ variables, isLoading, handleTestAgent, isEditing }: T
     );
 };
 
-const TestAgent = ({ isEditing, testNumber, setTestNumber, handleTestAgent, isLoading, variables }: TestAgentProps) => {
+const TestAgent = ({ isEditing, testNumber, setTestNumber, handleTestAgent, isLoading, variables, externalId }: TestAgentProps) => {
+    const [testValues, setTestValues] = useState<Record<string, string>>(() => {
+        // Initialize with default values for each variable
+        const initialValues: Record<string, string> = {};
+        variables.forEach(variable => {
+            initialValues[variable.name] = `Test value for ${variable.name}`;
+        });
+        return initialValues;
+    });
     return (
         <div className="space-y-2">
             <Label>Test agent</Label>
@@ -109,7 +113,7 @@ const TestAgent = ({ isEditing, testNumber, setTestNumber, handleTestAgent, isLo
                 }
                 <Button variant="outline"
                     onClick={() => {
-                        handleTestAgent({})
+                        handleTestAgent(testValues)
                     }}
                     disabled={isLoading || !isEditing || !testNumber.length}
                 >Test agent</Button>
@@ -119,7 +123,11 @@ const TestAgent = ({ isEditing, testNumber, setTestNumber, handleTestAgent, isLo
                     isLoading={isLoading}
                     handleTestAgent={handleTestAgent}
                     isEditing={isEditing}
+                    testValues={testValues}
+                    setTestValues={setTestValues}
                 />
+
+                <InBrowser assistantId={externalId} variables={testValues} />
             </div>
         </div>
     )

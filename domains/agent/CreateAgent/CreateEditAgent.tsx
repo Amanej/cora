@@ -78,6 +78,7 @@ export default function CreateEditAgent() {
     endCallPhrases: _agentData.endCallPhrases || [],
     evaluation: _agentData.evaluation || {},
     settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON, industryStandard: IndustryStandard.None, timezone: 'America/New_York', currency: 'USD' },
+    externalId: _agentData.externalId || '',
   };
 
   const handleSave = async () => {
@@ -123,7 +124,7 @@ export default function CreateEditAgent() {
     }
   }
 
-  // console.log("agentData", agentData)
+  console.log("agentData", agentData)
   const isInbound = agentData.type === AgentType.Incoming;
   const conversationVariables = extractVariables(agentData.instructions || "")
   // console.log("conversationVariables", conversationVariables)
@@ -194,7 +195,7 @@ export default function CreateEditAgent() {
         <Card className="mt-4">
           <CardContent>
             <div className="space-y-6 mt-4">
-              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} variables={conversationVariables} />
+              <TestAgent isEditing={isEditing} testNumber={testNumber} setTestNumber={setTestNumber} handleTestAgent={handleTestAgent} isLoading={isLoading} variables={conversationVariables} externalId={agentData.externalId} />
 
               <div className="flex justify-end space-x-6">
                 <Button disabled={isLoading} onClick={() => {
