@@ -71,6 +71,8 @@ export default function Localization({ timezone, setTimezone, currency, setCurre
             <SelectItem value="NOK">Norwegian Kroner (NOK)</SelectItem>
             <SelectItem value="DKK">Danish Kroner (DKK)</SelectItem>
             <SelectItem value="SEK">Swedish Kronor (SEK)</SelectItem>
+            <SelectItem value="SAR">Saudi Riyal (SAR)</SelectItem>
+            <SelectItem value="AED">UAE Dirham (AED)</SelectItem>
           </SelectContent>
         </Select>
       </div>
