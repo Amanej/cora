@@ -19,6 +19,7 @@ export enum LANG {
     NO = "NORWEGIAN",
     SWE = "SWEDISH",
     ENG = "ENGLISH",
+    AR = "ARABIC",
     /*
     ES = "SPANISH",
     FR = "FRENCH",
@@ -79,6 +80,13 @@ const ENGLISH_ASSISTANTS = {
     */
 }
 
+const ARABIC_ASSISTANTS = {
+    [useCase.CUSTOMER_SURVEY]: "30af1aba-1da6-4c58-955a-dd77a8045490", // Not used
+    [useCase.DEBT_COLLECTION]: "95bb71f3-65fb-4380-a212-9434083cd16e",
+    [useCase.CUSTOMER_SERVICE]: "30187067-b023-4fb7-b7d4-f91d0089eeb5", // Not used
+    [useCase.LEAD_QUALIFICATION]: "2529deba-e5a8-4465-b057-ede6dfe661db", // Not used
+}
+
 
 
 const getAssistantId = (useCase: useCase, lang: LANG) => {
@@ -95,10 +103,14 @@ const getAssistantId = (useCase: useCase, lang: LANG) => {
             console.log("isSwedish")
             return SWEDISH_ASSISTANTS[useCase]
             break;
+        case LANG.AR:
+            console.log("isArabic")
+            return ARABIC_ASSISTANTS[useCase]
+            break;
     }
 };
 
-export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCase: useCase, lang: LANG) => {
+export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCase: useCase, lang: LANG, variables?: object) => {
     console.log("useCase, lang",useCase, lang);
     const assistantId = getAssistantId(useCase, lang);
     console.log("assistantId ",assistantId);
@@ -110,6 +122,9 @@ export const triggerCustomerSurveyCall = async (phoneNumberToCall: string, useCa
         customer: {
             numberE164CheckEnabled: true,
             number: phoneNumberToCall
+        },
+        assistantOverrides: {
+            variableValues: variables
         }
     };
     const options = {
