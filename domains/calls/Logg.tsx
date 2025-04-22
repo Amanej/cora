@@ -27,6 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { formatEndingReason } from './utils';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/base/DatePicker';
+import { Badge } from '@/components/ui/badge';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -214,6 +215,7 @@ export default function CallLogs() {
                     <TableHead>Successful</TableHead>
                     {isSelectedAgentOutbound && <TableHead>Reached</TableHead>}
                     <TableHead>Ending reason</TableHead>
+                    <TableHead>Outcomes</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -228,6 +230,9 @@ export default function CallLogs() {
                     const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
                     const reached = call.status === 'Completed' && duration > 0 && !endedBecauseOfVoicemail && !call.outcome.receivedVoicemail;
                     const isQueued = call.status === 'Queued';
+                    const isCeaseAndDesist = call.outcome.collectionAnalysis?.cease_and_desist;
+                    const isBankruptcy = call.outcome.collectionAnalysis?.bankruptcy;
+                    const isLegalAction = call.outcome.collectionAnalysis?.legal_action;
                     return (
                       <TableRow key={index}>
                         <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -239,6 +244,11 @@ export default function CallLogs() {
                         <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
 
                           {call.outcome.vulnerability && <span>⚠️</span>}
+                        </TableCell>
+                        <TableCell>
+                          {isCeaseAndDesist && <Badge variant="destructive">Cease and Desist</Badge>}
+                          {isBankruptcy && <Badge variant="destructive" className="ml-2">Bankruptcy</Badge>}
+                          {isLegalAction && <Badge variant="destructive" className="ml-2 bg-indigo-800">Legal Action</Badge>}
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">
