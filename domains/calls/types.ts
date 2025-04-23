@@ -18,6 +18,7 @@ export type Call = {
             paymentMade?: {
                 total_debt_owed: number,
                 payment_received: boolean,
+                payment_failed: boolean,
             },
             paymentPlan?: {
                 plan_accepted: boolean,
@@ -25,12 +26,16 @@ export type Call = {
                 pay_frequency: string,
                 amount_agreed: number,
             },
+            bankruptcy?: boolean,
+            cease_and_desist?: boolean,
+            legal_action?: boolean,
             typeOfHardship?: string,
             income_expenditure_analysis?: boolean,
         },
         contactAnalysis?: {
             was_the_right_number?: boolean,
             was_the_right_party?: boolean,
+            wanted_to_talk_human?: boolean,
         }
     }
     createdAt: Date;
