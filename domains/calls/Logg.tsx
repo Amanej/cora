@@ -28,6 +28,7 @@ import { formatEndingReason } from './utils';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/base/DatePicker';
 import { Badge } from '@/components/ui/badge';
+import { OutcomeCallCell } from './component/OutcomeCallCell';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -233,6 +234,9 @@ export default function CallLogs() {
                     const isCeaseAndDesist = call.outcome.collectionAnalysis?.cease_and_desist;
                     const isBankruptcy = call.outcome.collectionAnalysis?.bankruptcy;
                     const isLegalAction = call.outcome.collectionAnalysis?.legal_action;
+                    const paymentMade = call.outcome.collectionAnalysis?.paymentMade?.payment_received;
+                    const paymentFailed = call.outcome.collectionAnalysis?.paymentMade?.payment_failed;
+                    const humanWantedToTalk = call.outcome.contactAnalysis?.wanted_to_talk_human;
                     return (
                       <TableRow key={index}>
                         <TableCell>{format(new Date(call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -246,9 +250,14 @@ export default function CallLogs() {
                           {call.outcome.vulnerability && <span>⚠️</span>}
                         </TableCell>
                         <TableCell>
-                          {isCeaseAndDesist && <Badge variant="destructive">Cease and Desist</Badge>}
-                          {isBankruptcy && <Badge variant="destructive" className="ml-2">Bankruptcy</Badge>}
-                          {isLegalAction && <Badge variant="destructive" className="ml-2 bg-indigo-800">Legal Action</Badge>}
+                          {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
+                          {paymentMade && <Badge>Payment made</Badge>}
+                          {humanWantedToTalk && <Badge>Wants human</Badge>}
+                          <OutcomeCallCell
+                            isCeaseAndDesist={isCeaseAndDesist}
+                            isBankruptcy={isBankruptcy}
+                            isLegalAction={isLegalAction}
+                          />
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">

@@ -18,6 +18,7 @@ export type Call = {
             paymentMade?: {
                 total_debt_owed: number,
                 payment_received: boolean,
+                payment_failed: boolean,
             },
             paymentPlan?: {
                 plan_accepted: boolean,
@@ -34,6 +35,7 @@ export type Call = {
         contactAnalysis?: {
             was_the_right_number?: boolean,
             was_the_right_party?: boolean,
+            wanted_to_talk_human?: boolean,
         }
     }
     createdAt: Date;
