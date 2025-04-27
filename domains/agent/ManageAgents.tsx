@@ -10,6 +10,7 @@ import { fetchAgents } from "./api"
 import AgentCard from "./components/AgentCard"
 import { useAuth } from "@/domains/auth/state/AuthContext"
 import { useRouter } from "next/navigation"
+import { Button } from "@/components/ui/button"
 
 const Management = () => {
   const { token, isApproved, isAuthenticated } = useAuth();
@@ -53,6 +54,12 @@ const Management = () => {
           <div className="flex text-gray-800">
             <Loader className="animate-spin mr-2" /> Checking your account...
           </div>
+            <Button variant="secondary" className="ml-auto mt-2" onClick={() => {
+              // Clear local storage
+              localStorage.clear();
+              // Refresh the page
+              window.location.reload();
+            }}>Try to login</Button>
         </main>
     </div>
     )
