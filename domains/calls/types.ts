@@ -1,6 +1,7 @@
 import { AgentRecordingSetting } from "../agent/types";
 
 export type Call = {
+    _id: string;
     agentId: string;
     phoneNumber: string;
     recordingUrl?: string;
