@@ -29,6 +29,8 @@ import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/base/DatePicker';
 import { Badge } from '@/components/ui/badge';
 import { OutcomeCallCell } from './component/OutcomeCallCell';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -40,6 +42,9 @@ export default function CallLogs() {
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
   const [showRealtime, setShowRealtime] = useState(false);
   const [date, setDate] = useState<Date | undefined>(undefined);
+  const [durationFilter, setDurationFilter] = useState<string>('all');
+  const [minDuration, setMinDuration] = useState<string>('');
+  const [maxDuration, setMaxDuration] = useState<string>('');
 
   const searchParams = useSearchParams();
   const searchId = searchParams.get('agentId');
@@ -135,13 +140,40 @@ export default function CallLogs() {
       return true;
     });
 
-    if (!showPickUpsOnly) return sameDayCalls;
+    let filteredByPickUps = sameDayCalls;
+    if (showPickUpsOnly) {
+      filteredByPickUps = sameDayCalls.filter(call => {
+        return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
+      });
+    }
 
-    console.log("LOGG - date ",date);
-    return sameDayCalls.filter(call => {
-      return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
-    });
-  }, [calls, showPickUpsOnly, date]);
+    // Apply duration filter
+    if (durationFilter !== 'all') {
+      return filteredByPickUps.filter(call => {
+        if (!call.startedAt || !call.endedAt) return false;
+        
+        const duration = new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime();
+        const durationInSeconds = Math.floor(duration / 1000);
+        
+        switch (durationFilter) {
+          case 'short':
+            return durationInSeconds < 30;
+          case 'medium':
+            return durationInSeconds >= 30 && durationInSeconds < 120;
+          case 'long':
+            return durationInSeconds >= 120;
+          case 'custom':
+            const min = minDuration ? parseInt(minDuration) : 0;
+            const max = maxDuration ? parseInt(maxDuration) : Infinity;
+            return durationInSeconds >= min && durationInSeconds <= max;
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filteredByPickUps;
+  }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration]);
 
   const formattedEndingReason = (endingReason: ENDING_REASON) => {
     return formatEndingReason(endingReason)
@@ -199,6 +231,44 @@ export default function CallLogs() {
                 <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
 
                 <DatePicker date={date} onChange={setDate} />
+                
+                <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
+                
+                <div className="flex items-center space-x-2">
+                  <Label htmlFor="duration-filter" className="text-sm text-gray-800 font-light">Duration:</Label>
+                  <Select value={durationFilter} onValueChange={setDurationFilter}>
+                    <SelectTrigger className="w-[120px] bg-white text-gray-800">
+                      <SelectValue placeholder="Select duration" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All</SelectItem>
+                      <SelectItem value="short">Short (&lt; 30s)</SelectItem>
+                      <SelectItem value="medium">Medium (30s-2m)</SelectItem>
+                      <SelectItem value="long">Long (&gt; 2m)</SelectItem>
+                      <SelectItem value="custom">Custom</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {durationFilter === 'custom' && (
+                    <div className="flex items-center space-x-2">
+                      <Input 
+                        type="number" 
+                        placeholder="Min (s)" 
+                        className="w-20 bg-white text-gray-800" 
+                        value={minDuration}
+                        onChange={(e) => setMinDuration(e.target.value)}
+                      />
+                      <span className="text-sm text-gray-800">-</span>
+                      <Input 
+                        type="number" 
+                        placeholder="Max (s)" 
+                        className="w-20 bg-white text-gray-800" 
+                        value={maxDuration}
+                        onChange={(e) => setMaxDuration(e.target.value)}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="flex items-center space-x-2">
                 <p className="text-sm text-gray-800 font-light"><span className="font-bold">Total calls:</span> {filteredCalls.length}</p>
@@ -251,8 +321,8 @@ export default function CallLogs() {
                         </TableCell>
                         <TableCell>
                           {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
-                          {paymentMade && <Badge>Payment made</Badge>}
-                          {humanWantedToTalk && <Badge>Wants human</Badge>}
+                          {paymentMade && <Badge className="ml-1">Payment made</Badge>}
+                          {humanWantedToTalk && <Badge className="ml-1">Wants human</Badge>}
                           <OutcomeCallCell
                             isCeaseAndDesist={isCeaseAndDesist}
                             isBankruptcy={isBankruptcy}
