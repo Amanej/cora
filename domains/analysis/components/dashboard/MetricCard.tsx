@@ -25,6 +25,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
           <span className="text-sm font-medium text-muted-foreground">{label}</span>
           <div className="flex items-baseline justify-between">
             <span className="text-3xl font-bold tracking-tight">{formattedValue}</span>
+            {/*
             <div className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full
               ${trend === 'up' 
                 ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
@@ -38,6 +39,7 @@ export const MetricCard: React.FC<MetricCardProps> = ({ metric }) => {
               ) : null}
               {Math.abs(change).toFixed(1)}%
             </div>
+            */}
           </div>
         </div>
       </CardContent>
