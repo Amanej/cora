@@ -194,6 +194,21 @@ export default function CallLogs() {
     return filteredByPickUps;
   }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration, phoneFilter]);
 
+  const uniquePhoneNumbers = useMemo(() => {
+    const phoneNumbers = calls.reduce((acc: string[], call) => {
+      if (call.phoneNumber && !acc.includes(call.phoneNumber)) {
+        acc.push(call.phoneNumber);
+      }
+      return acc;
+    }, []);
+    
+    console.log('Unique phone numbers:', phoneNumbers);
+    console.log('Total unique numbers:', phoneNumbers.length);
+    
+    return phoneNumbers;
+  }, [calls]);
+
+
   const formattedEndingReason = (endingReason: ENDING_REASON) => {
     return formatEndingReason(endingReason)
   }
@@ -297,7 +312,7 @@ export default function CallLogs() {
                       <Button 
                         variant="ghost" 
                         size="sm" 
-                        className="h-6 px-2 text-xs"
+                        className="h-6 px-2 text-xs text-gray-800"
                         onClick={() => setPhoneFilter('')}
                       >
                         Clear
@@ -328,7 +343,7 @@ export default function CallLogs() {
                 </TableHeader>
                 <TableBody>
                   {filteredCalls.map((call, index) => {
-                    console.log("LOGG - call", call)
+                    // console.log("LOGG - call", call)
                     const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
                     const durationFormatted = duration > 0
                       ? format(new Date(0).setMilliseconds(duration), 'mm:ss')

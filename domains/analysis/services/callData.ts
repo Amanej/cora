@@ -65,7 +65,9 @@ export const formatMetricValue = (total: number, percentage: number): number => 
 
 const WHITELISTED_AGENTS = [
   '67e548d75e99abd5f8dd2a39',
-  '67e5977ed5b60a6320206aed'
+  '67e5977ed5b60a6320206aed',
+  '68095dd6f1642d3553c8f235',
+  '68095e27f1642d3553c8f23f'
 ]
 
 const getMetricCalculationConfig = (
@@ -81,11 +83,13 @@ const getMetricCalculationConfig = (
 }
 
 const calculateRPC = (totalCalls: number, calls?: Call[], agentId?: string) => {
+  console.log('calculateRPC', totalCalls, calls, agentId);
   const { usePlaceholderValues, placeholderValue } = getMetricCalculationConfig(agentId, calls, 0.2);
   if (usePlaceholderValues || !calls) {
     return placeholderValue(totalCalls);
   }
 
+  console.log('calculating RPC');
   return calls.reduce((count, call) => {
     const wasRightParty = call.outcome?.contactAnalysis?.was_the_right_party;
     return count + (wasRightParty ? 1 : 0);
@@ -156,6 +160,7 @@ const calculatePaymentsMade = (totalCalls: number, calls?: Call[], agentId?: str
 }
 
 const calculateHumanTransfer = (totalCalls: number, calls?: Call[], agentId?: string) => {
+  console.log('calculateHumanTransfer', totalCalls, calls, agentId);
   if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
     return formatMetricValue(totalCalls, 0.06);
   }
@@ -164,6 +169,7 @@ const calculateHumanTransfer = (totalCalls: number, calls?: Call[], agentId?: st
     return formatMetricValue(totalCalls, 0.06);
   }
 
+  console.log('calculating Human Transfer');
   return calls.reduce((count, call) => {
     const humanTransfer = call.outcome.endingReason === ENDING_REASON.ASSISTANT_FORWARDED_CALL;
     return count + (humanTransfer ? 1 : 0);
@@ -267,7 +273,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
   return [
     {
       id: 'total-calls',
-      label: 'Total Calls Made',
+      label: 'Total Calls',
       value: totalCalls,
       change: 12.5,
       trend: 'up',
@@ -297,6 +303,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       trend: 'down',
       category: 'contact'
     },
+    /*
     {
       id: 'vulnerable-customers',
       label: 'Vulnerable Customers',
@@ -304,7 +311,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       change: 2.4,
       trend: 'up',
       category: 'vulnerability'
-    },
+    },*/
     {
       id: 'payments-made',
       label: 'Payments Made',
@@ -313,6 +320,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       trend: 'up',
       category: 'outcome'
     },
+    /*
     {
       id: 'income-expenditure',
       label: 'Income & Expenditure Taken',
@@ -321,6 +329,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       trend: 'up',
       category: 'outcome'
     },
+    */
     {
       id: 'human-transfer',
       label: 'Transfers to Human Agent',
@@ -331,7 +340,7 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
     },
     {
       id: 'total-debt',
-      label: 'Total Debt Outstanding',
+      label: 'Total Debt Collected',
       value: totalDebt,
       change: 2.1,
       trend: 'up',

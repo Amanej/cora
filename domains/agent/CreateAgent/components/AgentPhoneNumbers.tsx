@@ -17,7 +17,7 @@ interface AgentPhoneNumbersProps {
 
 export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, setPhoneNumberId }: AgentPhoneNumbersProps) {
 
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const [numbers, setNumbers] = useState<IPhoneNumber[]>([]);
 
     const fetchNumbers = async (token: string) => {
@@ -38,7 +38,9 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
 
     const selectedNumberHasDifferentAgent = !isCurrentPhoneNumber && selectedNumberHasAgent && isIncoming;
 
-    // console.log("PhoneNumberId ", phoneNumberId, "numbers", numbers)
+    const filteredNumbers = numbers.filter(number => {
+        return user?.email === "admin@eliteportfoliomgmt.com" && !number.number.startsWith("+47");
+    });
     return (
         <div className="space-y-2">
             <Label htmlFor="phone">Phone number</Label>
@@ -50,7 +52,7 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
                     <SelectValue placeholder="Select a phone number" />
                 </SelectTrigger>
                 <SelectContent>
-                    {numbers.map((number: IPhoneNumber) => (
+                    {filteredNumbers.map((number: IPhoneNumber) => (
                         <SelectItem key={number.externalId} value={number.externalId}>
                             {number.number}
                         </SelectItem>

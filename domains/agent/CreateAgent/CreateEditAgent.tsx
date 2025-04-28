@@ -124,7 +124,7 @@ export default function CreateEditAgent() {
     }
   }
 
-  console.log("agentData", agentData)
+  // console.log("agentData", agentData)
   const isInbound = agentData.type === AgentType.Incoming;
   const conversationVariables = extractVariables(agentData.instructions || "")
   // console.log("conversationVariables", conversationVariables)

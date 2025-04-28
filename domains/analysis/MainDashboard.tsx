@@ -49,10 +49,12 @@ const TopBar = ({
         <div className="flex flex-col sm:flex-row justify-between mb-6">
             <TabsList className="bg-white">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
+                {/*
                 <TabsTrigger value="contact">Contact Success</TabsTrigger>
                 <TabsTrigger value="outcomes">Call Outcomes</TabsTrigger>
                 <TabsTrigger value="vulnerability">Vulnerability</TabsTrigger>
                 <TabsTrigger value="debt">Debt</TabsTrigger>
+                */}
             </TabsList>
 
             <div className="flex items-center gap-2 mt-4 sm:mt-0">
@@ -61,6 +63,7 @@ const TopBar = ({
                     selectedAgent={selectedAgent}
                     onAgentChange={onAgentChange}
                 />
+                {/*
                 <FilterPanel
                     selectedMetrics={dataState.selectedMetrics}
                     setSelectedMetrics={handleSetMetrics}
@@ -69,6 +72,7 @@ const TopBar = ({
                     selectedVulnerabilityType={dataState.selectedVulnerabilityType}
                     setSelectedVulnerabilityType={handleSetVulnerabilityType}
                 />
+                */}
                 {/*                   
                     <TeamFilter 
                         selectedTeam={selectedTeam} 
@@ -192,7 +196,7 @@ const MainAnalysisDashboard = () => {
             />
         */}
 
-            <div className="flex-1 p-6">
+            <div className="flex-1 p-6 min-h-[85vh]">
                 <div className="flex flex-col gap-6">
                     <div className="flex items-center justify-between">
                         <Tabs
@@ -212,11 +216,11 @@ const MainAnalysisDashboard = () => {
 
                             <TabsContent value="overview" className="m-0">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {filteredMetrics.slice(0, 8).map(metric => (
+                                    {filteredMetrics.slice(0, 6).map(metric => (
                                         <MetricCard key={metric.id} metric={metric} />
                                     ))}
                                 </div>
-
+                                {/*
                                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
                                     <CallTrendChart data={trendData} variables={dataState.selectedVariables} />
                                     <CallContactChart data={contactData} />
@@ -243,8 +247,9 @@ const MainAnalysisDashboard = () => {
                                         vulnerabilityType={dataState.selectedVulnerabilityType}
                                     />
                                 </div>
+                                */}
                             </TabsContent>
-
+                            {/*
                             <TabsContent value="contact" className="m-0">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {contactMetrics.filter(metric => {
@@ -271,6 +276,7 @@ const MainAnalysisDashboard = () => {
                                     />
                                 </div>
                             </TabsContent>
+                            
 
                             <TabsContent value="outcomes" className="m-0">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -347,6 +353,7 @@ const MainAnalysisDashboard = () => {
                                     />
                                 </div>
                             </TabsContent>
+                            */}
                         </Tabs>
                     </div>
                 </div>
