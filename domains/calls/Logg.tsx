@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlayCircle, FileText, Trash2, StickyNote, Phone, Copy } from "lucide-react"
+import { PlayCircle, FileText, Trash2, StickyNote, Phone, Copy, Filter, CreditCard } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
 import { AgentData, AgentRecordingSetting, AgentType } from "../agent/types"
@@ -32,6 +32,9 @@ import { OutcomeCallCell } from './component/OutcomeCallCell';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -47,6 +50,23 @@ export default function CallLogs() {
   const [minDuration, setMinDuration] = useState<string>('');
   const [maxDuration, setMaxDuration] = useState<string>('');
   const [phoneFilter, setPhoneFilter] = useState<string>('');
+  const [outcomeFilters, setOutcomeFilters] = useState<{
+    ceaseAndDesist: boolean;
+    bankruptcy: boolean;
+    legalAction: boolean;
+    paymentFailed: boolean;
+    paymentMade: boolean;
+    humanWantedToTalk: boolean;
+    planAccepted: boolean;
+  }>({
+    ceaseAndDesist: false,
+    bankruptcy: false,
+    legalAction: false,
+    paymentFailed: false,
+    paymentMade: false,
+    humanWantedToTalk: false,
+    planAccepted: false,
+  });
 
   const searchParams = useSearchParams();
   const searchId = searchParams.get('agentId');
@@ -134,6 +154,11 @@ export default function CallLogs() {
     document.getElementById('show-note-dialog')?.click();
   }
 
+  const handleShowPaymentPlan = (call: Call) => {
+    setSelectedCall(call);
+    document.getElementById('show-payment-plan-dialog')?.click();
+  };
+
   const handlePhoneClick = (phoneNumber: string) => {
     if (phoneFilter === phoneNumber) {
       // If already filtered by this number, clear the filter
@@ -142,6 +167,25 @@ export default function CallLogs() {
       // Otherwise, filter by this number
       setPhoneFilter(phoneNumber);
     }
+  };
+
+  const handleOutcomeFilterChange = (key: keyof typeof outcomeFilters) => {
+    setOutcomeFilters(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const clearOutcomeFilters = () => {
+    setOutcomeFilters({
+      ceaseAndDesist: false,
+      bankruptcy: false,
+      legalAction: false,
+      paymentFailed: false,
+      paymentMade: false,
+      humanWantedToTalk: false,
+      planAccepted: false,
+    });
   };
 
   const filteredCalls = useMemo(() => {
@@ -163,6 +207,31 @@ export default function CallLogs() {
     if (phoneFilter) {
       filteredByPickUps = filteredByPickUps.filter(call => {
         return call.phoneNumber === phoneFilter;
+      });
+    }
+
+    // Apply outcome filters
+    const hasActiveOutcomeFilters = Object.values(outcomeFilters).some(value => value);
+    if (hasActiveOutcomeFilters) {
+      filteredByPickUps = filteredByPickUps.filter(call => {
+        const isCeaseAndDesist = call.outcome.collectionAnalysis?.cease_and_desist;
+        const isBankruptcy = call.outcome.collectionAnalysis?.bankruptcy;
+        const isLegalAction = call.outcome.collectionAnalysis?.legal_action;
+        const paymentMade = call.outcome.collectionAnalysis?.paymentMade?.payment_received;
+        const paymentFailed = call.outcome.collectionAnalysis?.paymentMade?.payment_failed;
+        const humanWantedToTalk = call.outcome.contactAnalysis?.wanted_to_talk_human;
+        const planAccepted = call.outcome.collectionAnalysis?.paymentPlan?.plan_accepted;
+
+        // If any of the selected filters match, include the call
+        return (
+          (outcomeFilters.ceaseAndDesist && isCeaseAndDesist) ||
+          (outcomeFilters.bankruptcy && isBankruptcy) ||
+          (outcomeFilters.legalAction && isLegalAction) ||
+          (outcomeFilters.paymentMade && paymentMade) ||
+          (outcomeFilters.paymentFailed && paymentFailed) ||
+          (outcomeFilters.humanWantedToTalk && humanWantedToTalk) ||
+          (outcomeFilters.planAccepted && planAccepted)
+        );
       });
     }
 
@@ -192,21 +261,18 @@ export default function CallLogs() {
     }
 
     return filteredByPickUps;
-  }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration, phoneFilter]);
+  }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration, phoneFilter, outcomeFilters]);
 
-  const uniquePhoneNumbers = useMemo(() => {
-    const phoneNumbers = calls.reduce((acc: string[], call) => {
-      if (call.phoneNumber && !acc.includes(call.phoneNumber)) {
-        acc.push(call.phoneNumber);
-      }
-      return acc;
-    }, []);
-    
-    console.log('Unique phone numbers:', phoneNumbers);
-    console.log('Total unique numbers:', phoneNumbers.length);
-    
-    return phoneNumbers;
-  }, [calls]);
+  const totalMinutesCalled = useMemo(() => {
+    return filteredCalls.reduce((total, call) => {
+      if (!call.startedAt || !call.endedAt) return total;
+      
+      const duration = new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime();
+      const durationInMinutes = Math.floor(duration / (1000 * 60));
+      
+      return total + durationInMinutes;
+    }, 0);
+  }, [filteredCalls]);
 
 
   const formattedEndingReason = (endingReason: ENDING_REASON) => {
@@ -214,7 +280,6 @@ export default function CallLogs() {
   }
 
   const isSelectedAgentOutbound = selectedAgent?.type === AgentType.Outgoing;
-
   return (
     <div>
       {isLoading ? <SkeletonLoader /> : (
@@ -225,7 +290,7 @@ export default function CallLogs() {
           {/* Main content */}
           <main className="flex-1 p-8 overflow-auto">
             <div className="flex justify-between items-center mb-6">
-              <p className="text-sm font-light text-black">Logger</p>
+              <h2 className="text-2xl font-bold text-black">Logs</h2>
             </div>
 
             <div>
@@ -257,10 +322,14 @@ export default function CallLogs() {
                 }} />
                 <Label htmlFor="realtime" className="text-sm text-gray-800 font-light">Watch</Label>
 
-                <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
-                  setShowPickUpsOnly(checked as boolean);
-                }} />
-                <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only Reached</Label>
+                {isSelectedAgentOutbound && (
+                  <>
+                    <Checkbox id="reached-only" checked={showPickUpsOnly} onCheckedChange={(checked) => {
+                      setShowPickUpsOnly(checked as boolean);
+                    }} />
+                    <Label htmlFor="reached-only" className="text-sm text-gray-800 font-light">Only Reached</Label>
+                  </>
+                )}
 
                 <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
 
@@ -304,25 +373,123 @@ export default function CallLogs() {
                   )}
                 </div>
 
-                {phoneFilter && (
-                  <>
-                    <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
-                    <div className="flex items-center space-x-2">
-                      <Label className="text-sm text-gray-800 font-light">Filtered by: <span className="font-medium">{phoneFilter}</span></Label>
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-6 px-2 text-xs text-gray-800"
-                        onClick={() => setPhoneFilter('')}
-                      >
-                        Clear
-                      </Button>
+                <Separator orientation="vertical" className="h-4 bg-gray-600 mx-2" />
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="sm" className="h-8 px-2 text-xs bg-white text-gray-800">
+                      <Filter className="h-3 w-3 mr-1" />
+                      Outcomes
+                      {Object.values(outcomeFilters).some(value => value) && (
+                        <Badge variant="secondary" className="ml-1 h-4 w-4 p-0 flex items-center justify-center">
+                          {Object.values(outcomeFilters).filter(Boolean).length}
+                        </Badge>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-2 bg-white text-gray-800">
+                    <div className="flex justify-between items-center mb-2">
+                      <h4 className="text-sm font-medium">Filter by outcomes</h4>
+                      {Object.values(outcomeFilters).some(value => value) && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-6 px-2 text-xs"
+                          onClick={clearOutcomeFilters}
+                        >
+                          Clear
+                        </Button>
+                      )}
                     </div>
-                  </>
-                )}
+                    <Separator className="mb-2" />
+                    <ScrollArea className="h-[200px]">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="cease-and-desist" 
+                            checked={outcomeFilters.ceaseAndDesist} 
+                            onCheckedChange={() => handleOutcomeFilterChange('ceaseAndDesist')} 
+                          />
+                          <Label htmlFor="cease-and-desist" className="text-sm">Cease and Desist</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="bankruptcy" 
+                            checked={outcomeFilters.bankruptcy} 
+                            onCheckedChange={() => handleOutcomeFilterChange('bankruptcy')} 
+                          />
+                          <Label htmlFor="bankruptcy" className="text-sm">Bankruptcy</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="legal-action" 
+                            checked={outcomeFilters.legalAction} 
+                            onCheckedChange={() => handleOutcomeFilterChange('legalAction')} 
+                          />
+                          <Label htmlFor="legal-action" className="text-sm">Legal Action</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="payment-failed" 
+                            checked={outcomeFilters.paymentFailed} 
+                            onCheckedChange={() => handleOutcomeFilterChange('paymentFailed')} 
+                          />
+                          <Label htmlFor="payment-failed" className="text-sm">Payment Failed</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="payment-made" 
+                            checked={outcomeFilters.paymentMade} 
+                            onCheckedChange={() => handleOutcomeFilterChange('paymentMade')} 
+                          />
+                          <Label htmlFor="payment-made" className="text-sm">Payment Made</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="human-wanted" 
+                            checked={outcomeFilters.humanWantedToTalk} 
+                            onCheckedChange={() => handleOutcomeFilterChange('humanWantedToTalk')} 
+                          />
+                          <Label htmlFor="human-wanted" className="text-sm">Wants human</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox 
+                            id="plan-accepted" 
+                            checked={outcomeFilters.planAccepted} 
+                            onCheckedChange={() => handleOutcomeFilterChange('planAccepted')} 
+                          />
+                          <Label htmlFor="plan-accepted" className="text-sm">Plan Accepted</Label>
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </PopoverContent>
+                </Popover>
+
+
               </div>
               <div className="flex items-center space-x-2">
-                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Total calls:</span> {filteredCalls.length}</p>
+                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Minutes:</span> {totalMinutesCalled}</p>
+                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Calls:</span> {filteredCalls.length}</p>
+              </div>
+            </div>
+
+            <div className="flex mb-4 pl-4 justify-between items-center">
+              <div>
+                  {phoneFilter && (
+                        <>
+                          <div className="flex items-center space-x-2">
+                            <Label className="text-sm text-gray-800 font-light">Filtered by: <span className="font-medium">{phoneFilter}</span></Label>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-6 px-2 text-xs text-gray-800"
+                              onClick={() => setPhoneFilter('')}
+                            >
+                              Clear
+                            </Button>
+                          </div>
+                        </>
+                  )}
               </div>
             </div>
 
@@ -343,6 +510,7 @@ export default function CallLogs() {
                 </TableHeader>
                 <TableBody>
                   {filteredCalls.map((call, index) => {
+                    // console.log("id", call._id)
                     // console.log("LOGG - call", call)
                     const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
                     const durationFormatted = duration > 0
@@ -358,6 +526,7 @@ export default function CallLogs() {
                     const paymentMade = call.outcome.collectionAnalysis?.paymentMade?.payment_received;
                     const paymentFailed = call.outcome.collectionAnalysis?.paymentMade?.payment_failed;
                     const humanWantedToTalk = call.outcome.contactAnalysis?.wanted_to_talk_human;
+                    const planAccepted = call.outcome.collectionAnalysis?.paymentPlan?.plan_accepted;
                     return (
                       <TableRow key={index}>
                         <TableCell>{format(new Date(call.startedAt || call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
@@ -384,6 +553,23 @@ export default function CallLogs() {
                           {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
                           {paymentMade && <Badge className="ml-1">Payment made</Badge>}
                           {humanWantedToTalk && <Badge className="ml-1">Wants human</Badge>}
+                          {planAccepted && (
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <Badge 
+                                    className="ml-1 cursor-pointer" 
+                                    onClick={() => handleShowPaymentPlan(call)}
+                                  >
+                                    Plan accepted
+                                  </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Click to view payment plan details</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          )}
                           <OutcomeCallCell
                             isCeaseAndDesist={isCeaseAndDesist}
                             isBankruptcy={isBankruptcy}
@@ -521,6 +707,58 @@ export default function CallLogs() {
                   <Button variant="secondary" onClick={() => {
                     setSelectedCall(null)
                     document.getElementById('show-note-dialog')?.click();
+                  }}>
+                    Close
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <button className="hidden" id="show-payment-plan-dialog"></button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto bg-white text-gray-800">
+                <DialogHeader>
+                  <DialogTitle>Payment Plan Details</DialogTitle>
+                  <DialogDescription>
+                    Details of the payment plan discussed in the call
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="py-4">
+                  {selectedCall?.outcome.collectionAnalysis?.paymentPlan ? (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">Plan Accepted</h3>
+                          <p className="text-base">{selectedCall.outcome.collectionAnalysis.paymentPlan.plan_accepted ? "Yes" : "No"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">Pay Frequency</h3>
+                          <p className="text-base">{selectedCall.outcome.collectionAnalysis.paymentPlan.pay_frequency || "Not specified"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">Amount</h3>
+                          <p className="text-base">{selectedCall.outcome.collectionAnalysis.paymentPlan.amount_agreed ? `$${selectedCall.outcome.collectionAnalysis.paymentPlan.amount_agreed}` : "Not specified"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">Frequency</h3>
+                          <p className="text-base">{selectedCall.outcome.collectionAnalysis.paymentPlan.pay_frequency || "Not specified"}</p>
+                        </div>
+                        <div>
+                          <h3 className="text-sm font-medium text-gray-500">Total Debt Owed</h3>
+                          <p className="text-base">{selectedCall.outcome.collectionAnalysis.paymentPlan.total_debt_owed || "Not specified"}</p>
+                        </div>    
+                      </div>
+                    </div>
+                  ) : (
+                    <p>No payment plan details available</p>
+                  )}
+                </div>
+                <DialogFooter>
+                  <Button variant="secondary" onClick={() => {
+                    setSelectedCall(null)
+                    document.getElementById('show-payment-plan-dialog')?.click();
                   }}>
                     Close
                   </Button>
