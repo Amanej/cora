@@ -1,19 +1,75 @@
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
-import { FileText, Trash } from "lucide-react"
+import { FileText, Trash, Upload } from "lucide-react"
 import Link from "next/link"
 import { AgentData } from "../../types";
+import { useState } from "react";
+import { useDropzone } from "react-dropzone";
+import APP_CONFIG from "@/lib/config";
+import { getLoggedInHeadersWithFile } from "@/domains/auth/utils";
+import { toast } from "@/hooks/use-toast";
 
 type AgentKnowledgeBaseProps = {
-    agentData: AgentData
+    agentData: AgentData;
+    agentId?: string | null;
+    token?: string | null;
+    refresh: () => void;
 }
 
-const AgentKnowledgeBase = ({ agentData }: AgentKnowledgeBaseProps) => {
+const AgentKnowledgeBase = ({ agentData, token, agentId, refresh }: AgentKnowledgeBaseProps) => {
+    const [isUploading, setIsUploading] = useState(false);
+
+    const onDrop = async (acceptedFiles: File[]) => {
+        try {
+            setIsUploading(true);
+            const file = acceptedFiles[0];
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('agentId', agentId || '');
+
+            const response = await fetch(`${APP_CONFIG.backendUrl}/integrations/file`, {
+                method: 'POST',
+                body: formData,
+                headers: getLoggedInHeadersWithFile(token || '')
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload file');
+            }
+
+            const result = await response.json();
+            toast({
+                title: 'File uploaded successfully',
+                description: 'File uploaded successfully',
+            });
+            refresh();
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            toast({
+                title: 'Failed to upload file',
+                description: 'Failed to upload file',
+            });
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        accept: {
+            'application/pdf': ['.pdf'],
+            'text/plain': ['.txt'],
+            'application/msword': ['.doc'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': ['.docx']
+        },
+        maxFiles: 1
+    });
+
     return (
         <div className="space-y-2">
             <Label>Knowledge base</Label>
-            <div className="flex space-x-4">
-                {/* TODO: Add knowledgebase files */}
+            <div className="flex flex-wrap gap-4">
                 {agentData.knowledgebase.length > 0 &&
                     <>
                         {agentData.knowledgebase.map((file) =>
@@ -27,7 +83,24 @@ const AgentKnowledgeBase = ({ agentData }: AgentKnowledgeBaseProps) => {
                         )}
                     </>
                 }
-                <Button variant="outline">Upload</Button>
+                <div 
+                    {...getRootProps()} 
+                    className={`cursor-pointer transition-colors duration-200 ${
+                        isDragActive ? 'bg-accent' : ''
+                    }`}
+                >
+                    <input {...getInputProps()} />
+                    <Button 
+                        variant="outline" 
+                        className={`flex items-center min-w-[120px] ${
+                            isDragActive ? 'border-primary' : ''
+                        }`}
+                        disabled={isUploading}
+                    >
+                        <Upload className="mr-2 h-4 w-4" />
+                        {isUploading ? 'Uploading...' : isDragActive ? 'Drop here' : 'Upload'}
+                    </Button>
+                </div>
             </div>
         </div>
     )

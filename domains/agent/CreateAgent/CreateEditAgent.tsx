@@ -47,7 +47,6 @@ export default function CreateEditAgent() {
 
   const fetchNumbers = async (token: string) => {
     const numbers = await fetchUserPhoneNumbers(token);
-    console.log('Fetched phone numbers:', numbers);
     return numbers;
   };
 
@@ -96,19 +95,28 @@ export default function CreateEditAgent() {
     setIsLoading(true)
     if (searchId && token) {
       try {
-        await updateAgent(searchId, { ...agentData }, token);
-        setIsLoading(false)
-        toast({
-          title: "Agent updated",
+        const result = await updateAgent(searchId, { ...agentData }, token);
+        if (result) {
+          setIsLoading(false)
+          toast({
+            title: "Agent updated",
           description: `Successfully updated ${agentData.title}`,
-          className: "text-gray-700 bg-white",
-        })
+            className: "text-gray-700 bg-white",
+          })
+        } else {
+          setIsLoading(false)
+          toast({
+            title: "Agent update failed",
+            description: `Failed to update ${agentData.title}`,
+            variant: "destructive"
+          })
+        }
       } catch (error) {
         setIsLoading(false)
         // console.error("Error updating agent", error)
         toast({
-          title: "Agent updated",
-          description: `Successfully updated ${agentData.title}`,
+          title: "Agent update failed",
+          description: `Failed to update ${agentData.title}`,
           variant: "destructive"
         })
       }
@@ -180,7 +188,7 @@ export default function CreateEditAgent() {
               <TabsContent value="knowledgebase">
                 <Card>
                   <CardContent className="pt-6">
-                    <AgentKnowledgeBase agentData={agentData} />
+                    <AgentKnowledgeBase agentData={agentData} token={token} agentId={searchId} refresh={() => handleUpdate()} />
                   </CardContent>
                 </Card>
               </TabsContent>

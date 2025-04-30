@@ -22,7 +22,6 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
 
     const fetchNumbers = async (token: string) => {
         const numbers = await fetchUserPhoneNumbers(token);
-        console.log('Fetched phone numbers:', numbers);
         setNumbers(numbers);
     };
 
