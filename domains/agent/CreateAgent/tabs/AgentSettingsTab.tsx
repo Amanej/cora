@@ -31,6 +31,7 @@ export default function AgentSettingsTab({ agentData, setAgentData }: AgentSetti
               settings: { ...agentData.settings, recordingType }
             })
           }}
+          isInbound={isInbound}
           voicemailBehaviour={agentData?.settings?.voicemailBehaviour}
           setVoicemailBehaviour={(voicemailBehaviour) => {
             setAgentData({
