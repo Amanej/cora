@@ -47,7 +47,7 @@ export default function CreateEditAgent() {
 
   const fetchNumbers = async (token: string) => {
     const numbers = await fetchUserPhoneNumbers(token);
-    console.log('Fetched phone numbers:', numbers);
+    // console.log('Fetched phone numbers:', numbers);
     return numbers;
   };
 

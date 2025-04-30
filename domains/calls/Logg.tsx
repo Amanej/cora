@@ -35,6 +35,7 @@ import { toast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { OutcomesCell } from './component/Outcomes';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -550,9 +551,15 @@ export default function CallLogs() {
                           {call.outcome.vulnerability && <span>⚠️</span>}
                         </TableCell>
                         <TableCell>
-                          {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
-                          {paymentMade && <Badge className="ml-1">Payment made</Badge>}
-                          {humanWantedToTalk && <Badge className="ml-1">Wants human</Badge>}
+                          <OutcomesCell 
+                            paymentFailed={paymentFailed}
+                            paymentMade={paymentMade}
+                            humanWantedToTalk={humanWantedToTalk}
+                            isCeaseAndDesist={isCeaseAndDesist}
+                            isBankruptcy={isBankruptcy}
+                            isLegalAction={isLegalAction}
+                            callProgress={call.outcome.collectionAnalysis?.callProgress}
+                          />
                           {planAccepted && (
                             <TooltipProvider>
                               <Tooltip>
@@ -570,11 +577,6 @@ export default function CallLogs() {
                               </Tooltip>
                             </TooltipProvider>
                           )}
-                          <OutcomeCallCell
-                            isCeaseAndDesist={isCeaseAndDesist}
-                            isBankruptcy={isBankruptcy}
-                            isLegalAction={isLegalAction}
-                          />
                         </TableCell>
                         <TableCell>
                           <div className="flex space-x-2">

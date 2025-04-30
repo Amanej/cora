@@ -27,6 +27,11 @@ export type Call = {
                 pay_frequency: string,
                 amount_agreed: number,
             },
+            callProgress?: { // @TODO - This is custom to EPM
+                attemptedVerification?: boolean,
+                explainedDebt?: boolean,
+                offeredPaymentOptions?: boolean
+            },
             bankruptcy?: boolean,
             cease_and_desist?: boolean,
             legal_action?: boolean,
