@@ -53,7 +53,7 @@ export default function AgentConversation({ agentData, setAgentData }: AgentConv
       </div>
       <div className="space-y-2">
         <Label htmlFor="endCallPhrases">End call message</Label>
-        <p className="text-sm text-gray-500">Messages the agent will say when ending the call, default is "Goodbye" in the language of the caller</p>
+        <p className="text-sm text-gray-500">Messages the agent will say when ending the call, default is "Goodbye" in the language of the agent</p>
         <Input 
           id="endCallMessage"
           placeholder="End call message" 
