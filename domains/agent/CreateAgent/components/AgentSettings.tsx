@@ -49,7 +49,6 @@ export default function AgentSettings({ isInbound, recordingType, setRecordingTy
           </SelectContent>
         </Select>
       </div>
-      <Separator className="my-4" />
       {/*
       <div className="space-y-2">
         <Label htmlFor="recordingType">Voicemail behaviour</Label>
@@ -67,14 +66,19 @@ export default function AgentSettings({ isInbound, recordingType, setRecordingTy
         </Select>
       </div>
       */}
-      <div className="space-y-2 mt-4">
-        <Label htmlFor="voicemailMessage">Voicemail message</Label>
-        <Input placeholder="Leave blank to let the agent come up with something" value={voicemailMessage?.toString() || ''}
+      {!isInbound && (
+        <>
+              <Separator className="my-4" />
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="voicemailMessage">Voicemail message</Label>
+            <Input placeholder="Leave blank to let the agent come up with something" value={voicemailMessage?.toString() || ''}
           onChange={(e) => {
             setVoicemailMessage(e.target.value)
           }}
-        />
-      </div>
+            />
+          </div>
+        </>
+      )}
       <Separator className="my-4" />
       <div className="space-y-2">
         <Label htmlFor="transferCallTo">Transfer to</Label>

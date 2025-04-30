@@ -76,6 +76,7 @@ export default function CreateEditAgent() {
     persona: _agentData.persona || '', // Add this line
     openingLine: _agentData.openingLine || '',
     endCallPhrases: _agentData.endCallPhrases || [],
+    endCallMessage: _agentData.endCallMessage || '',
     evaluation: _agentData.evaluation || {},
     settings: _agentData.settings || { recordingType: AgentRecordingSetting.ON, industryStandard: IndustryStandard.None, timezone: 'America/New_York', currency: 'USD' },
     externalId: _agentData.externalId || '',

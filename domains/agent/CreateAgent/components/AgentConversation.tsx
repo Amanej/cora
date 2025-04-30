@@ -39,7 +39,8 @@ export default function AgentConversation({ agentData, setAgentData }: AgentConv
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="endCallPhrases">End call phrases <span className="text-xs text-gray-500">(comma separated)</span></Label>
+        <Label htmlFor="endCallPhrases">End call triggers<span className="text-xs text-gray-500">(comma separated)</span></Label>
+        <p className="text-sm text-gray-500">Phrases that trigger the agent to end the call</p>
         <Input 
           id="endCallPhrases"
           placeholder="End call phrases" 
@@ -50,6 +51,19 @@ export default function AgentConversation({ agentData, setAgentData }: AgentConv
           }}
         />
       </div>
+      <div className="space-y-2">
+        <Label htmlFor="endCallPhrases">End call message</Label>
+        <p className="text-sm text-gray-500">Messages the agent will say when ending the call, default is "Goodbye" in the language of the agent</p>
+        <Input 
+          id="endCallMessage"
+          placeholder="End call message" 
+          value={agentData.endCallMessage || ''}
+          onChange={(e) => {
+            setAgentData({ ...agentData, endCallMessage: e.target.value })
+          }}
+        />
+      </div>
+      
     </div>
   )
 }
