@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { AgentData } from "@/domains/agent/types"
+import FunctionBubbleEditor from "./Agent_TextArea_Function"
 
 interface AgentConversationProps {
   agentData: AgentData
@@ -36,6 +37,7 @@ export default function AgentConversation({ agentData, setAgentData }: AgentConv
             setAgentData({ ...agentData, instructions: e.target.value })
           }}
         />
+        <FunctionBubbleEditor agentData={agentData} setAgentData={setAgentData} />
       </div>
 
       <div className="space-y-2">

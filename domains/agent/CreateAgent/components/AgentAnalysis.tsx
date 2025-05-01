@@ -3,6 +3,7 @@ import { Label } from "@/components/ui/label";
 import BestPractices from "./Analysis/BestPractices";
 import { IndustryStandard, AgentStructuredSummaryFields } from "@/domains/agent/types";
 import AgentStructuredSummary from "./AgentStructuredSummary";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
     summary: string;
@@ -28,10 +29,10 @@ const AgentAnalysis = ({
     return (
 
         <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                     <Label>Summarize call</Label>
-                    <Input placeholder="Summary" value={summary}
+                    <Textarea placeholder="Summary" value={summary}
                         onChange={(e) => {
                             setSummary(e.target.value)
                         }}
