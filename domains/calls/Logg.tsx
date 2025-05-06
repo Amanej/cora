@@ -1,8 +1,7 @@
 'use client'
 
-import { format, isSameDay } from 'date-fns';
+import {  isSameDay } from 'date-fns';
 import { useSearchParams } from 'next/navigation';
-import { nb } from 'date-fns/locale';
 import SideBar, { SidebarPage } from "@/components/global/Sidebar"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,14 +12,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { PlayCircle, FileText, Trash2, StickyNote, Phone, Copy, Filter, CreditCard } from "lucide-react"
+import { Filter, ArrowUpDown, RefreshCw } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
-import { AgentData, AgentRecordingSetting, AgentType } from "../agent/types"
+import { AgentData, AgentType } from "../agent/types"
 import { fetchCallsByAgentId, triggerCall } from "./api"
 import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
-import clsx from 'clsx';
 import { Dialog, DialogFooter, DialogDescription, DialogTitle, DialogContent, DialogHeader, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -28,14 +26,11 @@ import { formatEndingReason } from './utils';
 import { Separator } from '@/components/ui/separator';
 import { DatePicker } from '@/components/base/DatePicker';
 import { Badge } from '@/components/ui/badge';
-import { OutcomeCallCell } from './component/OutcomeCallCell';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { toast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { OutcomesCell } from './component/Outcomes';
+import { CallLogRow } from './components/CallLogRow';
 
 export default function CallLogs() {
   const { token } = useAuth();
@@ -68,6 +63,9 @@ export default function CallLogs() {
     humanWantedToTalk: false,
     planAccepted: false,
   });
+  const [phoneSearch, setPhoneSearch] = useState<string>('');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const searchParams = useSearchParams();
   const searchId = searchParams.get('agentId');
@@ -161,13 +159,7 @@ export default function CallLogs() {
   };
 
   const handlePhoneClick = (phoneNumber: string) => {
-    if (phoneFilter === phoneNumber) {
-      // If already filtered by this number, clear the filter
-      setPhoneFilter('');
-    } else {
-      // Otherwise, filter by this number
-      setPhoneFilter(phoneNumber);
-    }
+    setPhoneSearch(phoneNumber);
   };
 
   const handleOutcomeFilterChange = (key: keyof typeof outcomeFilters) => {
@@ -201,6 +193,13 @@ export default function CallLogs() {
     if (showPickUpsOnly) {
       filteredByPickUps = sameDayCalls.filter(call => {
         return !!(call.startedAt && call.endedAt) === true && call.status !== 'Processing';
+      });
+    }
+
+    // Apply phone number search filter
+    if (phoneSearch) {
+      filteredByPickUps = filteredByPickUps.filter(call => {
+        return call.phoneNumber.includes(phoneSearch);
       });
     }
 
@@ -262,7 +261,7 @@ export default function CallLogs() {
     }
 
     return filteredByPickUps;
-  }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration, phoneFilter, outcomeFilters]);
+  }, [calls, showPickUpsOnly, date, durationFilter, minDuration, maxDuration, phoneSearch, phoneFilter, outcomeFilters]);
 
   const totalMinutesCalled = useMemo(() => {
     return filteredCalls.reduce((total, call) => {
@@ -281,6 +280,29 @@ export default function CallLogs() {
   }
 
   const isSelectedAgentOutbound = selectedAgent?.type === AgentType.Outgoing;
+
+  const sortedAndFilteredCalls = useMemo(() => {
+    const filtered = filteredCalls;
+    
+    return [...filtered].sort((a, b) => {
+      const dateA = new Date(a.startedAt || a.createdAt).getTime();
+      const dateB = new Date(b.startedAt || b.createdAt).getTime();
+      return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
+    });
+  }, [filteredCalls, sortDirection]);
+
+  const handleRefresh = async () => {
+    if (!token || !selectedAgent?._id) return;
+    
+    setIsRefreshing(true);
+    try {
+      const agentCalls = await fetchCallsByAgentId(selectedAgent._id, token);
+      setCalls(agentCalls);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div>
       {isLoading ? <SkeletonLoader /> : (
@@ -313,6 +335,15 @@ export default function CallLogs() {
                     </option>
                   ))}
                 </select>
+              </div>
+              <div className="mb-4">
+                <Input
+                  type="text"
+                  placeholder="Search by phone number..."
+                  value={phoneSearch}
+                  onChange={(e) => setPhoneSearch(e.target.value)}
+                  className="w-full bg-white text-gray-800"
+                />
               </div>
             </div>
 
@@ -468,161 +499,68 @@ export default function CallLogs() {
 
 
               </div>
-              <div className="flex items-center space-x-2">
-                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Minutes:</span> {totalMinutesCalled}</p>
-                <p className="text-sm text-gray-800 font-light"><span className="font-bold">Calls:</span> {filteredCalls.length}</p>
+
+            </div>
+
+            <div>
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <p className="text-sm text-gray-800 font-light"><span className="font-bold">Minutes:</span> {totalMinutesCalled}</p>
+                  <p className="text-sm text-gray-800 font-light"><span className="font-bold">Calls:</span> {filteredCalls.length}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleRefresh}
+                  className="h-6 w-6 text-gray-800"
+                  disabled={isRefreshing}
+                >
+                  <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+                </Button>
               </div>
             </div>
 
-            <div className="flex mb-4 pl-4 justify-between items-center">
-              <div>
-                  {phoneFilter && (
-                        <>
-                          <div className="flex items-center space-x-2">
-                            <Label className="text-sm text-gray-800 font-light">Filtered by: <span className="font-medium">{phoneFilter}</span></Label>
-                            <Button 
-                              variant="ghost" 
-                              size="sm" 
-                              className="h-6 px-2 text-xs text-gray-800"
-                              onClick={() => setPhoneFilter('')}
-                            >
-                              Clear
-                            </Button>
-                          </div>
-                        </>
-                  )}
-              </div>
-            </div>
-
-            <div className="bg-white text-gray-900 shadow-md rounded-lg overflow-hidden">
+            <div className="bg-white text-gray-900 shadow-md rounded-lg mt-2 overflow-hidden relative">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Date</TableHead>
+                    <TableHead>
+                      <Button
+                        variant="ghost"
+                        onClick={() => setSortDirection(prev => prev === 'desc' ? 'asc' : 'desc')}
+                        className="flex items-center gap-1"
+                      >
+                        Date
+                        <ArrowUpDown className="h-4 w-4" />
+                      </Button>
+                    </TableHead>
                     <TableHead>Number</TableHead>
-                    <TableHead>Status</TableHead>
+                    {isSelectedAgentOutbound && <TableHead>Status</TableHead>}
                     <TableHead>Duration</TableHead>
-                    <TableHead>Successful</TableHead>
+                    <TableHead>Success</TableHead>
                     {isSelectedAgentOutbound && <TableHead>Reached</TableHead>}
-                    <TableHead>Ending reason</TableHead>
+                    <TableHead>Ending</TableHead>
                     <TableHead>Outcomes</TableHead>
                     <TableHead>Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredCalls.map((call, index) => {
-                    // console.log("id", call._id)
-                    // console.log("LOGG - call", call)
-                    const duration = call.startedAt && call.endedAt ? new Date(call.endedAt).getTime() - new Date(call.startedAt).getTime() : 0;
-                    const durationFormatted = duration > 0
-                      ? format(new Date(0).setMilliseconds(duration), 'mm:ss')
-                      : '00:00';
-                    const hideSound = call.settings?.recordingType === AgentRecordingSetting.CONDITIONAL && !call.settings?.acceptedRecording;
-                    const endedBecauseOfVoicemail = call.outcome.endingReason === ENDING_REASON.VOICEMAIL;
-                    const reached = call.status === 'Completed' && duration > 0 && !endedBecauseOfVoicemail && !call.outcome.receivedVoicemail;
-                    const isQueued = call.status === 'Queued';
-                    const isCeaseAndDesist = call.outcome.collectionAnalysis?.cease_and_desist;
-                    const isBankruptcy = call.outcome.collectionAnalysis?.bankruptcy;
-                    const isLegalAction = call.outcome.collectionAnalysis?.legal_action;
-                    const paymentMade = call.outcome.collectionAnalysis?.paymentMade?.payment_received;
-                    const paymentFailed = call.outcome.collectionAnalysis?.paymentMade?.payment_failed;
-                    const humanWantedToTalk = call.outcome.contactAnalysis?.wanted_to_talk_human;
-                    const planAccepted = call.outcome.collectionAnalysis?.paymentPlan?.plan_accepted;
-                    return (
-                      <TableRow key={index}>
-                        <TableCell>{format(new Date(call.startedAt || call.createdAt), "d. MMM yy 'kl' HH:mm", { locale: nb })}</TableCell>
-                        <TableCell>
-                          <button 
-                            className={clsx(
-                              "text-left hover:underline focus:outline-none", 
-                              phoneFilter === call.phoneNumber ? "font-bold text-blue-600" : ""
-                            )}
-                            onClick={() => handlePhoneClick(call.phoneNumber)}
-                          >
-                            {call.phoneNumber}
-                          </button>
-                        </TableCell>
-                        <TableCell>{call.status}</TableCell>
-                        <TableCell>{durationFormatted}</TableCell>
-                        <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
-                        {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
-                        <TableCell>{call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} {call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
-
-                          {call.outcome.vulnerability && <span>⚠️</span>}
-                        </TableCell>
-                        <TableCell>
-                          <OutcomesCell 
-                            paymentFailed={paymentFailed}
-                            paymentMade={paymentMade}
-                            humanWantedToTalk={humanWantedToTalk}
-                            isCeaseAndDesist={isCeaseAndDesist}
-                            isBankruptcy={isBankruptcy}
-                            isLegalAction={isLegalAction}
-                            callProgress={call.outcome.collectionAnalysis?.callProgress}
-                          />
-                          {planAccepted && (
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Badge 
-                                    className="ml-1 cursor-pointer" 
-                                    onClick={() => handleShowPaymentPlan(call)}
-                                  >
-                                    Plan accepted
-                                  </Badge>
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  <p>Click to view payment plan details</p>
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex space-x-2">
-                            {!hideSound &&
-                              <Button variant="ghost" size="icon" title="Play" onClick={() => handlePlayAudio(call)}>
-                                <PlayCircle className={clsx("h-4 w-4", call.recordingUrl ? "" : "opacity-50")} />
-                              </Button>
-                            }
-                            <Button variant="ghost" size="icon" title="Read transcript" onClick={() => handleShowTranscript(call)}>
-                              <FileText className={clsx("h-4 w-4", call.transcript?.length > 0 ? "" : "opacity-50")} />
-                            </Button>
-                            {call.note && (
-                              <Button variant="ghost" size="icon" title="Read note" onClick={() => handleShowNote(call)}>
-                                <StickyNote className="h-4 w-4" />
-                              </Button>)}
-                            {isQueued && (
-                              <Button variant="ghost" size="icon" title="Trigger call" onClick={() => handleTriggerCall(call)}>
-                                <Phone className="h-4 w-4" />
-                              </Button>
-                            )}
-                            <Button
-                              variant="ghost" 
-                              size="icon"
-                              title="Copy ID"
-                              onClick={async () => {
-                                await navigator.clipboard.writeText(call._id);
-                                toast({
-                                  className: "bg-white text-gray-800",
-                                  description: "ID copied to clipboard",
-                                  duration: 2000,
-                                });
-                              }}
-                            >
-                              <Copy className="h-4 w-4" />
-                            </Button>
-                            {/*                             
-                              <Button variant="ghost" size="icon" title="Delete">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            */}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  }
-                  )}
+                  {sortedAndFilteredCalls.map((call, index) => (
+                    <CallLogRow
+                      key={index}
+                      call={call}
+                      index={index}
+                      phoneFilter={phoneFilter}
+                      isSelectedAgentOutbound={isSelectedAgentOutbound}
+                      onPhoneClick={handlePhoneClick}
+                      onPlayAudio={handlePlayAudio}
+                      onShowTranscript={handleShowTranscript}
+                      onShowNote={handleShowNote}
+                      onTriggerCall={handleTriggerCall}
+                      onShowPaymentPlan={handleShowPaymentPlan}
+                      formattedEndingReason={formattedEndingReason}
+                    />
+                  ))}
                 </TableBody>
               </Table>
             </div>

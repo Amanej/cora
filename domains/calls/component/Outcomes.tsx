@@ -38,7 +38,7 @@ export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
             {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
             {paymentMade && <Badge className="ml-1 bg-green-500">Payment made</Badge>}
             {humanWantedToTalk && <Badge className="ml-1 bg-blue-500">Wants human</Badge>}
-            {lastStep && <Badge className="ml-1 bg-purple-500">Reached: {lastStep}</Badge>}
+            {lastStep && false && <Badge className="ml-1 bg-purple-500">Reached: {lastStep}</Badge>}
             <OutcomeCallCell
                 isCeaseAndDesist={isCeaseAndDesist}
                 isBankruptcy={isBankruptcy}

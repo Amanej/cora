@@ -1,6 +1,6 @@
 import { ROUTES } from "@/lib/routing";
 import Link from "next/link"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, Users, Plus, FileText, Settings, BarChart } from "lucide-react";
 
 export enum SidebarPage {
@@ -17,6 +17,13 @@ interface SideBarProps {
 
 const SideBar: React.FC<SideBarProps> = ({ currentPage }) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    useEffect(() => {
+        // Only run on client-side
+        if (typeof window !== 'undefined' && window.innerWidth < 1200) {
+            setIsCollapsed(true);
+        }
+    }, []); // Empty dependency array - only run once on mount
 
     return (
         <aside className={`${isCollapsed ? 'w-16' : 'w-64'} bg-white ${isCollapsed ? 'p-4' : 'p-6'} shadow-md transition-all duration-300 relative`}>
