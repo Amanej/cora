@@ -76,6 +76,10 @@ export enum IndustryStandard {
   FDCPAUS = "fdcpa-us"
 }
 
+export enum IntegrationType {
+  SCollect = "scollect",
+}
+
 
 
 export type AgentData = {
@@ -90,6 +94,7 @@ export type AgentData = {
     name: string
   }[],
   integrationIds: string[],
+  integrations: IntegrationType[],
   createdAt: Date,
   status: AgentStatus,
   templateId: string,
