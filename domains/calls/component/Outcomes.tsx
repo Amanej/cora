@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { OutcomeCallCell } from "./OutcomeCallCell";
 import { User, Phone } from "lucide-react";
 import { CallProgress } from "./CallProgress";
+import { isContactWrongPerson, isContactWrongNumber, isContactWrong } from "../utils/validation";
 
 interface OutcomeCallCellProps {
     paymentFailed?: boolean;
@@ -24,8 +25,8 @@ export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
     isBankruptcy,
     isLegalAction,  
 }) => {
-    const isWrongPerson = typeof wasRightPerson === "boolean" && !wasRightPerson;
-    const isWrongNumber = typeof wasRightNumber === "boolean" && !wasRightNumber;
+    const isWrongPerson = isContactWrongPerson(wasRightPerson);
+    const isWrongNumber = isContactWrongNumber(wasRightNumber);
     return (
             <div className="flex flex-wrap gap-1">
                 {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
