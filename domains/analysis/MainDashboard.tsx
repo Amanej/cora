@@ -216,7 +216,7 @@ const MainAnalysisDashboard = () => {
 
                             <TabsContent value="overview" className="m-0">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                                    {filteredMetrics.slice(0, 6).map(metric => (
+                                    {filteredMetrics.slice(0, 8).map(metric => (
                                         <MetricCard key={metric.id} metric={metric} />
                                     ))}
                                 </div>

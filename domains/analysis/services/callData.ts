@@ -2,7 +2,7 @@ import { Call, ENDING_REASON } from "@/domains/calls/types";
 export interface CallMetric {
   id: string;
   label: string;
-  value: number;
+  value: number | string;
   change: number;
   trend: 'up' | 'down' | 'stable';
   category: string;
@@ -144,6 +144,25 @@ const calculateVulnerableCustomers = (totalCalls: number, calls?: Call[], agentI
 }
 
 
+const calculateCollectedPayments = (totalCalls: number, calls?: Call[], agentId?: string) => {
+  if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  if (!calls) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  return calls.reduce((count, call) => {
+    const paymentMade = call.outcome?.collectionAnalysis?.paymentMade?.payment_amount;
+    return count + (paymentMade ? paymentMade : 0);
+  }, 0);
+}
+
+const formatCurrency = (amount: number): string => {
+  return `$${Math.floor(amount).toLocaleString('en-US')}`;
+}
+
 const calculatePaymentsMade = (totalCalls: number, calls?: Call[], agentId?: string) => {
   if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
     return formatMetricValue(totalCalls, 0.1);
@@ -159,8 +178,25 @@ const calculatePaymentsMade = (totalCalls: number, calls?: Call[], agentId?: str
   }, 0);
 }
 
+
+const calculatePaymentPlans = (totalCalls: number, calls?: Call[], agentId?: string) => {
+  if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  if (!calls) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  return calls.reduce((count, call) => {
+    const paymentPlan = call.outcome?.collectionAnalysis?.paymentPlan?.plan_accepted;
+    return count + (paymentPlan ? 1 : 0);
+  }, 0);
+}
+
+
 const calculateHumanTransfer = (totalCalls: number, calls?: Call[], agentId?: string) => {
-  console.log('calculateHumanTransfer', totalCalls, calls, agentId);
+  // console.log('calculateHumanTransfer', totalCalls, calls, agentId);
   if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
     return formatMetricValue(totalCalls, 0.06);
   }
@@ -259,6 +295,10 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
 
   const paymentsMade = calculatePaymentsMade(totalCalls, calls, agentId);
 
+  const paymentPlans = calculatePaymentPlans(totalCalls, calls, agentId);
+
+  const collectedPayments = calculateCollectedPayments(totalCalls, calls, agentId);
+
   const humanTransfer = calculateHumanTransfer(totalCalls, calls, agentId);
 
   const incomeExpenditure = calculateIncomeExpenditure(totalCalls, calls, agentId);
@@ -317,6 +357,22 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       label: 'Payments Made',
       value: paymentsMade,
       change: 15.7,
+      trend: 'up',
+      category: 'outcome'
+    },
+    {
+      id: 'collected-payments',
+      label: 'Collected Payments',
+      value: formatCurrency(collectedPayments),
+      change: 15.7,
+      trend: 'up',
+      category: 'outcome'
+    },
+    {
+      id: 'payment-plans',
+      label: 'Payment Plans Made',
+      value: paymentPlans,
+      change: 15.7, 
       trend: 'up',
       category: 'outcome'
     },
