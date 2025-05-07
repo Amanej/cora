@@ -20,6 +20,9 @@ export type Call = {
                 total_debt_owed: number,
                 payment_received: boolean,
                 payment_failed: boolean,
+                payment_amount?: number,
+                remainder_amount?: number,
+                settled_percentage?: number
             },
             paymentPlan?: {
                 plan_accepted: boolean,
