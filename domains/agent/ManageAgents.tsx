@@ -58,7 +58,7 @@ const Management = () => {
               // Clear local storage
               localStorage.clear();
               // Refresh the page
-              if (typeof window !== 'undefined') {
+              if (typeof window !== 'undefined' && window.location) {
                 window.location.reload();
               }
             }}>Try to login</Button>
