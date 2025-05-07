@@ -14,7 +14,7 @@ export const CallProgress: React.FC<CallProgressProps> = ({
     const getLastReachedStep = () => {
         if (offeredPaymentOptions) return "Offered Payment";
         if (explainedDebt) return "Explained Debt";
-        if (attemptedVerification) return "Verified";
+        if (attemptedVerification) return "Attempted Verification";
         return null;
     };
 
