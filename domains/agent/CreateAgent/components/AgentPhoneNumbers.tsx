@@ -32,8 +32,6 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
         }
     }, [token]);
 
-    console.log('numbers', numbers);
-
     const selectedNumber = numbers.find(number => number.externalId === phoneNumberId);
     const isCurrentPhoneNumber = selectedNumber?.agentId === agentId;
     const selectedNumberHasAgent = selectedNumber?.agentId !== null;
