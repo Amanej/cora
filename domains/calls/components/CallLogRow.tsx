@@ -57,6 +57,8 @@ export const CallLogRow = ({
   const humanWantedToTalk = call.outcome.contactAnalysis?.wanted_to_talk_human;
   const planAccepted = call.outcome.collectionAnalysis?.paymentPlan?.plan_accepted;
 
+  const contactAnalysis = call.outcome.contactAnalysis;
+
   return (
     <TableRow key={index}>
       <TableCell>{format(new Date(call.startedAt || call.createdAt), "d. MMM yy 'kl' HH:mm")}</TableCell>
@@ -87,11 +89,13 @@ export const CallLogRow = ({
         {isSelectedAgentOutbound && call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
         {call.outcome.vulnerability && <span>⚠️</span>}
       </TableCell>
-      <TableCell>
+      <TableCell className="flex">
         <OutcomesCell 
           paymentFailed={paymentFailed}
           paymentMade={paymentMade}
           humanWantedToTalk={humanWantedToTalk}
+          wasRightPerson={contactAnalysis?.was_the_right_party}
+          wasRightNumber={contactAnalysis?.was_the_right_number}
           isCeaseAndDesist={isCeaseAndDesist}
           isBankruptcy={isBankruptcy}
           isLegalAction={isLegalAction}
