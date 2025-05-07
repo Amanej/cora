@@ -27,10 +27,9 @@ export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
     const isWrongPerson = typeof wasRightPerson === "boolean" && !wasRightPerson;
     const isWrongNumber = typeof wasRightNumber === "boolean" && !wasRightNumber;
     return (
-        <div className="space-y-2">
             <div className="flex flex-wrap gap-1">
                 {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
-                {paymentMade && <Badge className="bg-green-500">Payment made</Badge>}
+                {paymentMade && <Badge className="bg-green-800">Payment made</Badge>}
                 {humanWantedToTalk && <Badge className="bg-blue-500">Wants human</Badge>}
                 {wasRightPerson && <Badge className="bg-purple-500" title="Right person"><User className="w-4 h-4" /></Badge>}
                 {isWrongPerson && <Badge variant="destructive" title="Wrong person"><User className="w-4 h-4" /></Badge>}
@@ -42,7 +41,6 @@ export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
                     isLegalAction={isLegalAction}
                 />
             </div>
-        </div>
     );
 };
 

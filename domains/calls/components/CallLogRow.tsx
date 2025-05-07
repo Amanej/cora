@@ -89,7 +89,7 @@ export const CallLogRow = ({
         {isSelectedAgentOutbound && call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
         {call.outcome.vulnerability && <span>⚠️</span>}
       </TableCell>
-      <TableCell className="flex">
+      <TableCell className="flex py-4 px-0">
         <OutcomesCell 
           paymentFailed={paymentFailed}
           paymentMade={paymentMade}
@@ -105,7 +105,7 @@ export const CallLogRow = ({
             <Tooltip>
               <TooltipTrigger asChild>
                 <Badge 
-                  className="ml-1 cursor-pointer" 
+                  className="ml-1 cursor-pointer bg-blue-800" 
                   onClick={() => onShowPaymentPlan(call)}
                 >
                   Plan accepted
