@@ -32,6 +32,8 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
         }
     }, [token]);
 
+    console.log('numbers', numbers);
+
     const selectedNumber = numbers.find(number => number.externalId === phoneNumberId);
     const isCurrentPhoneNumber = selectedNumber?.agentId === agentId;
     const selectedNumberHasAgent = selectedNumber?.agentId !== null;
@@ -39,7 +41,9 @@ export default function AgentPhoneNumbers({ agentId, isIncoming, phoneNumberId, 
     const selectedNumberHasDifferentAgent = !isCurrentPhoneNumber && selectedNumberHasAgent && isIncoming;
 
     const filteredNumbers = numbers.filter(number => {
-        return user?.email === "admin@eliteportfoliomgmt.com" && !number.number.startsWith("+47");
+        const EPM = user?.email === "admin@eliteportfoliomgmt.com" && !number.number.startsWith("+47");
+        const isUser = user?.email !== "admin@eliteportfoliomgmt.com" && number.number.startsWith("+47");
+        return EPM || isUser;
     });
     return (
         <div className="space-y-2">
