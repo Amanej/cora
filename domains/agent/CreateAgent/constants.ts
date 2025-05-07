@@ -24,6 +24,7 @@ export const defaultAgentData: AgentData = {
         successEvaluation: '',
         structuredSummary: [],
     },
+    integrations: [],
     settings: {
         recordingType: AgentRecordingSetting.ON,
         voicemailBehaviour: AgentVoicemailBehaviour.LEAVE_VOICEMAIL,

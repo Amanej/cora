@@ -70,6 +70,7 @@ export default function CreateEditAgent() {
     instructions: _agentData.instructions || 'Handle customer inquiries',
     knowledgebase: _agentData.knowledgebase,
     integrationIds: _agentData.integrationIds || [],
+    integrations: _agentData.integrations || [],
     createdAt: _agentData.createdAt || new Date(),
     status: _agentData.status || AgentStatus.Active,
     templateId: _agentData.templateId || 'template-123',

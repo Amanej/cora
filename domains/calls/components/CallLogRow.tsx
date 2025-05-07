@@ -10,12 +10,14 @@ import { OutcomesCell } from "../component/Outcomes";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { toast } from '@/hooks/use-toast';
+import { CallProgress } from '../component/CallProgress';
 
 interface CallLogRowProps {
   call: Call;
   index: number;
   phoneFilter: string;
   isSelectedAgentOutbound: boolean;
+  agentIsScollect: boolean;
   onPhoneClick: (phoneNumber: string) => void;
   onPlayAudio: (call: Call) => void;
   onShowTranscript: (call: Call) => void;
@@ -30,6 +32,7 @@ export const CallLogRow = ({
   index,
   phoneFilter,
   isSelectedAgentOutbound,
+  agentIsScollect,
   onPhoneClick,
   onPlayAudio,
   onShowTranscript,
@@ -72,6 +75,13 @@ export const CallLogRow = ({
       <TableCell>{durationFormatted}</TableCell>
       <TableCell>{call.outcome.booleanValue ? "✅" : "❌"}</TableCell>
       {isSelectedAgentOutbound && <TableCell>{reached ? "✅" : "❌"}</TableCell>}
+      {agentIsScollect && <TableCell>
+        <CallProgress
+          attemptedVerification={call.outcome.collectionAnalysis?.callProgress?.attemptedVerification}
+          explainedDebt={call.outcome.collectionAnalysis?.callProgress?.explainedDebt}
+          offeredPaymentOptions={call.outcome.collectionAnalysis?.callProgress?.offeredPaymentOptions}
+        />
+      </TableCell>}
       <TableCell>
         {call.outcome.endingReason ? formattedEndingReason(call.outcome.endingReason) : "Unknown"} 
         {isSelectedAgentOutbound && call.outcome.receivedVoicemail && !endedBecauseOfVoicemail ? "- Voicemail" : ""}
@@ -85,7 +95,6 @@ export const CallLogRow = ({
           isCeaseAndDesist={isCeaseAndDesist}
           isBankruptcy={isBankruptcy}
           isLegalAction={isLegalAction}
-          callProgress={call.outcome.collectionAnalysis?.callProgress}
         />
         {planAccepted && (
           <TooltipProvider>

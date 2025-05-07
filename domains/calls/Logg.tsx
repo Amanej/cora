@@ -15,7 +15,7 @@ import {
 import { Filter, ArrowUpDown, RefreshCw } from "lucide-react"
 import { useEffect, useMemo, useState } from "react"
 import { fetchAgents } from "../agent/api"
-import { AgentData, AgentType } from "../agent/types"
+import { AgentData, AgentType, IntegrationType } from "../agent/types"
 import { fetchCallsByAgentId, triggerCall } from "./api"
 import { Call, ENDING_REASON } from "./types"
 import { useAuth } from '../auth/state/AuthContext';
@@ -303,6 +303,8 @@ export default function CallLogs() {
     }
   };
 
+  const agentIsScollect = selectedAgent?.integrations.includes(IntegrationType.SCollect);
+
   return (
     <div>
       {isLoading ? <SkeletonLoader /> : (
@@ -539,6 +541,7 @@ export default function CallLogs() {
                     <TableHead>Duration</TableHead>
                     <TableHead>Success</TableHead>
                     {isSelectedAgentOutbound && <TableHead>Reached</TableHead>}
+                    {agentIsScollect && <TableHead>Reached</TableHead>}
                     <TableHead>Ending</TableHead>
                     <TableHead>Outcomes</TableHead>
                     <TableHead>Actions</TableHead>
@@ -551,6 +554,7 @@ export default function CallLogs() {
                       call={call}
                       index={index}
                       phoneFilter={phoneFilter}
+                      agentIsScollect={agentIsScollect || false}
                       isSelectedAgentOutbound={isSelectedAgentOutbound}
                       onPhoneClick={handlePhoneClick}
                       onPlayAudio={handlePlayAudio}

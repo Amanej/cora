@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { OutcomeCallCell } from "./OutcomeCallCell";
+import { CallProgress } from "./CallProgress";
 
 interface OutcomeCallCellProps {
     paymentFailed?: boolean;
@@ -8,11 +9,6 @@ interface OutcomeCallCellProps {
     isCeaseAndDesist?: boolean;
     isBankruptcy?: boolean;
     isLegalAction?: boolean;
-    callProgress?: {
-        attemptedVerification?: boolean;
-        explainedDebt?: boolean;
-        offeredPaymentOptions?: boolean;
-    }
 }
 
 export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
@@ -22,28 +18,20 @@ export const OutcomesCell: React.FC<OutcomeCallCellProps> = ({
     isCeaseAndDesist,
     isBankruptcy,
     isLegalAction,  
-    callProgress
 }) => {
-    const getLastReachedStep = () => {
-        if (callProgress?.offeredPaymentOptions) return "Offered Payment";
-        if (callProgress?.explainedDebt) return "Explained Debt";
-        if (callProgress?.attemptedVerification) return "Verified";
-        return null;
-    };
-
-    const lastStep = getLastReachedStep();
-
     return (
-        <>
-            {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
-            {paymentMade && <Badge className="ml-1 bg-green-500">Payment made</Badge>}
-            {humanWantedToTalk && <Badge className="ml-1 bg-blue-500">Wants human</Badge>}
-            {lastStep && false && <Badge className="ml-1 bg-purple-500">Reached: {lastStep}</Badge>}
-            <OutcomeCallCell
-                isCeaseAndDesist={isCeaseAndDesist}
-                isBankruptcy={isBankruptcy}
-                isLegalAction={isLegalAction}
-            />
-        </>
+        <div className="space-y-2">
+            <div className="flex flex-wrap gap-1">
+                {paymentFailed && <Badge variant="destructive">Payment failed</Badge>}
+                {paymentMade && <Badge className="bg-green-500">Payment made</Badge>}
+                {humanWantedToTalk && <Badge className="bg-blue-500">Wants human</Badge>}
+                <OutcomeCallCell
+                    isCeaseAndDesist={isCeaseAndDesist}
+                    isBankruptcy={isBankruptcy}
+                    isLegalAction={isLegalAction}
+                />
+            </div>
+        </div>
     );
 };
+
