@@ -194,6 +194,22 @@ const calculatePaymentPlans = (totalCalls: number, calls?: Call[], agentId?: str
   }, 0);
 }
 
+const calculatePaymentPlanAmount = (totalCalls: number, calls?: Call[], agentId?: string) => {
+  if (!agentId || !WHITELISTED_AGENTS.includes(agentId)) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  if (!calls) {
+    return formatMetricValue(totalCalls, 0.1);
+  }
+
+  return calls.reduce((count, call) => {
+    const paymentPlan = call.outcome?.collectionAnalysis?.paymentPlan?.amount_agreed;
+    return count + (paymentPlan ? paymentPlan : 0);
+  }, 0);
+}
+
+
 
 const calculateHumanTransfer = (totalCalls: number, calls?: Call[], agentId?: string) => {
   // console.log('calculateHumanTransfer', totalCalls, calls, agentId);
@@ -297,6 +313,8 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
 
   const paymentPlans = calculatePaymentPlans(totalCalls, calls, agentId);
 
+  const paymentPlanAmount = calculatePaymentPlanAmount(totalCalls, calls, agentId);
+
   const collectedPayments = calculateCollectedPayments(totalCalls, calls, agentId);
 
   const humanTransfer = calculateHumanTransfer(totalCalls, calls, agentId);
@@ -373,6 +391,14 @@ export const getCallMetrics = (calls?: Call[]): CallMetric[] => {
       label: 'Payment Plans Made',
       value: paymentPlans,
       change: 15.7, 
+      trend: 'up',
+      category: 'outcome'
+    },
+    {
+      id: 'payment-plan-amount',
+      label: 'Payment Plan Amount',
+      value: formatCurrency(paymentPlanAmount),
+      change: 15.7,
       trend: 'up',
       category: 'outcome'
     },
