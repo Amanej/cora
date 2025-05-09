@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { AgentData } from "@/domains/agent/types"
+// import FunctionCallerAdvanced from "../../components/Conversation/FunctionCalling"
 
 interface AgentConversationProps {
   agentData: AgentData
@@ -37,6 +38,8 @@ export default function AgentConversation({ agentData, setAgentData }: AgentConv
           }}
         />
       </div>
+
+      {/*<FunctionCallerAdvanced />*/}
 
       <div className="space-y-2">
         <Label htmlFor="endCallPhrases">End call triggers<span className="text-xs text-gray-500">(comma separated)</span></Label>
