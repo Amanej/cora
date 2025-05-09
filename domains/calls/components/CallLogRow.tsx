@@ -61,7 +61,7 @@ export const CallLogRow = ({
 
   return (
     <TableRow key={index}>
-      <TableCell>{format(new Date(call.startedAt || call.createdAt), "d. MMM yy 'kl' HH:mm")}</TableCell>
+      <TableCell>{format(new Date(call.startedAt || call.createdAt), "PPp")}</TableCell>
       <TableCell>
         <button 
           className={clsx(
